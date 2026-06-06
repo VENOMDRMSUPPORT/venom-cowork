@@ -102,7 +102,9 @@ export interface Capabilities {
     skills: {
       read: boolean;
       install: boolean;
-      repo: { owner: string; name: string; ref: string };
+      // null when no default skill hub is configured
+      // (VENOMCOWORK_HUB_OWNER + VENOMCOWORK_HUB_REPO env vars unset).
+      repo: { owner: string; name: string; ref: string } | null;
     };
   };
   plugins: { read: boolean; write: boolean };

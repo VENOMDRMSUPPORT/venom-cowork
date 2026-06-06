@@ -33,8 +33,10 @@ Use `--sidecar-source` to control where `venomcowork-server` and `opencode-route
 `opencode` resolution. Set `VENOMCOWORK_SIDECAR_SOURCE` / `VENOMCOWORK_OPENCODE_SOURCE` to
 apply the same policies via env vars.
 
-By default the manifest is fetched from
-`https://github.com/venom-cowork/workspace/releases/download/venomcowork-orchestrator-v<version>/venomcowork-orchestrator-sidecars.json`.
+By default the manifest is fetched from the release host that published this
+build. Set `VENOMCOWORK_SIDECAR_BASE_URL` to point at a host you control when
+publishing your own orchestrator builds; the orchestrator will append
+`/venomcowork-orchestrator-sidecars.json` automatically.
 
 OpenCode Router is optional. If it exits, `venomcowork` continues running unless you pass
 `--opencode-router-required` or set `VENOMCOWORK_OPENCODE_ROUTER_REQUIRED=1`.

@@ -2,7 +2,7 @@
   "name": "venomcowork-ui-mcp",
   "version": "0.1.0",
   "description": "MCP server for VenomCowork UI control â€” exposes snapshot, actions, and execute as MCP tools",
-  "author": "VenomCowork <support@venomcowork.local>",
+  "author": "VenomCowork",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -14,11 +14,6 @@
   "scripts": {
     "check": "node --check index.mjs",
     "test": "node --check index.mjs"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/venom-cowork/workspace.git",
-    "directory": "packages/venomcowork-ui-mcp"
   },
   "publishConfig": {
     "access": "public"

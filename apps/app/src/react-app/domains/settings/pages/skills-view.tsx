@@ -503,7 +503,19 @@ export function SkillsView(props: SkillsViewProps) {
   );
 
   const hasDefaultHubRepo = useMemo(
-    () => hubRepos.some((repo) => `${repo.owner}/${repo.repo}@${repo.ref}` === "venom-cowork/workspace-hub@main"),
+    () => {
+      const def = (typeof import.meta !== "undefined" &&
+        typeof import.meta.env?.VITE_VENOMCOWORK_HUB_OWNER === "string" &&
+        typeof import.meta.env?.VITE_VENOMCOWORK_HUB_REPO === "string"
+          ? {
+              owner: import.meta.env.VITE_VENOMCOWORK_HUB_OWNER.trim(),
+              repo: import.meta.env.VITE_VENOMCOWORK_HUB_REPO.trim(),
+              ref: (import.meta.env.VITE_VENOMCOWORK_HUB_REF?.trim?.() || "main"),
+            }
+          : null);
+      if (!def || !def.owner || !def.repo) return false;
+      return hubRepos.some((repo) => `${repo.owner}/${repo.repo}@${repo.ref}` === `${def.owner}/${def.repo}@${def.ref}`);
+    },
     [hubRepos],
   );
 
@@ -1065,7 +1077,11 @@ export function SkillsView(props: SkillsViewProps) {
               <button
                 type="button"
                 onClick={() => {
-                  void Promise.resolve(extensions.addHubRepo({ owner: "venom-cowork", repo: "venomcowork-hub", ref: "main" })).then(() => {
+                  const owner = import.meta.env?.VITE_VENOMCOWORK_HUB_OWNER?.trim?.();
+                  const repo = import.meta.env?.VITE_VENOMCOWORK_HUB_REPO?.trim?.();
+                  const ref = import.meta.env?.VITE_VENOMCOWORK_HUB_REF?.trim?.() || "main";
+                  if (!owner || !repo) return;
+                  void Promise.resolve(extensions.addHubRepo({ owner, repo, ref })).then(() => {
                     void extensions.refreshHubSkills({ force: true });
                   });
                 }}
@@ -1364,7 +1380,7 @@ export function SkillsView(props: SkillsViewProps) {
                     type="text"
                     value={customRepoName}
                     onChange={(event) => setCustomRepoName(event.currentTarget.value)}
-                    placeholder="venomcowork-hub"
+                    placeholder={import.meta.env?.VITE_VENOMCOWORK_HUB_REPO?.trim?.() || "hub-repo"}
                     className="w-full rounded-lg border border-dls-border bg-dls-hover px-3 py-2 text-xs font-mono text-dls-text focus:outline-none"
                     spellCheck={false}
                   />

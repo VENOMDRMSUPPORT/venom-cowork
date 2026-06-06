@@ -39,9 +39,12 @@ export type EmbeddedServerHandle = {
 export async function startEmbeddedServer(options: EmbeddedServerOptions): Promise<EmbeddedServerHandle> {
   const config = await resolveServerConfig(options);
   const serverUrl = `http://${config.host === "0.0.0.0" ? "127.0.0.1" : config.host}:${config.port}`;
+  // No hosted model catalog is wired in this vanilla build. Operators can
+  // set VENOMCOWORK_MODELS_URL to point at their own catalog, or leave it
+  // unset and the app will fall back to whatever OpenCode provides locally.
   const opencodeModelsUrl = process.env.VENOMCOWORK_DEV_MODE === "1"
     ? "http://localhost:8791/models"
-    : "https://models.venomcowork.local/";
+    : process.env.VENOMCOWORK_MODELS_URL || "";
 
   // Spawn managed OpenCode if requested and no explicit base URL was provided.
   let managedOpencode: ManagedOpencodeServer | null = null;

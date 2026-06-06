@@ -44,10 +44,13 @@ const ORG_PROXY_HEADER = "x-venomcowork-legacy-org-id";
 const DEFAULT_DEN_TIMEOUT_MS = 12_000;
 
 export const DEFAULT_DEN_AUTH_NAME = "VenomCowork User";
+// No Den (cloud) control plane is wired in this vanilla build. Operators can
+// set VITE_DEN_BASE_URL at build time to point at their own Den deployment.
+// When unset, the app treats Den features as unconfigured.
 const BUILD_DEN_BASE_URL =
   (typeof import.meta !== "undefined" && typeof import.meta.env?.VITE_DEN_BASE_URL === "string"
     ? import.meta.env.VITE_DEN_BASE_URL
-    : "").trim() || "https://app.venomcowork.local";
+    : "").trim();
 const BUILD_DEN_API_BASE_URL =
   (typeof import.meta !== "undefined" && typeof import.meta.env?.VITE_DEN_API_BASE_URL === "string"
     ? import.meta.env.VITE_DEN_API_BASE_URL
@@ -476,7 +479,7 @@ function isWebAppHost(hostname: string): boolean {
     }
   }
 
-  return normalized === "app.venomcowork.local" || normalized === "app.venomcowork.software" || normalized.startsWith("app.");
+  return normalized.startsWith("app.");
 }
 
 function stripDenApiBasePath(input: string | null | undefined): string | null {

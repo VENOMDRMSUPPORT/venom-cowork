@@ -2068,7 +2068,10 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
             developerMode={developerMode}
             onSendFeedback={() => platform.openLink(buildFeedbackUrl({ entrypoint: "settings" }))}
             onJoinDiscord={() => platform.openLink("https://discord.gg/VEhNQXxYMB")}
-            onReportIssue={() => platform.openLink("https://github.com/venom-cowork/workspace/issues/new?template=bug.yml")}
+            onReportIssue={() => {
+              const url = process.env.VENOMCOWORK_REPORT_ISSUE_URL;
+              if (url) platform.openLink(url);
+            }}
           />
         );
       case "permissions":

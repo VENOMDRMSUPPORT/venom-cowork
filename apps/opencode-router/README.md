@@ -6,11 +6,14 @@ Runtime requirement: Bun 1.3+ (`bun --version`).
 
 ## Install + Run
 
-One-command install (recommended):
+One-command install (recommended for end users):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/venom-cowork/workspace/dev/apps/opencode-router/install.sh | bash
+npm install -g opencode-router
 ```
+
+For development from this repo, run `pnpm -C apps/opencode-router setup`
+instead of pulling a remote install script.
 
 Install from npm:
 

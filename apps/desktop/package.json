@@ -4,8 +4,7 @@
   "version": "0.15.2",
   "description": "VenomCowork desktop shell",
   "author": {
-    "name": "VenomCowork",
-    "email": "support@venomcowork.local"
+    "name": "VenomCowork"
   },
   "main": "electron/main.mjs",
   "type": "module",

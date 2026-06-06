@@ -64,3 +64,8 @@ transcript-analysis
 # Old broken git from rename recovery
 .git-broken/
 
+# Local agent scratch (knowledge graph, runtime config, etc.)
+config.json
+graphify-out/
+
+

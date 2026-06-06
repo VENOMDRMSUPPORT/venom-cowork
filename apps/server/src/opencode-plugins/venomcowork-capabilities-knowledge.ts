@@ -56,7 +56,7 @@ Here is what you can help users with:
 - Go to Settings > Extensions to add MCP servers.
 - Popular integrations: Google Workspace, GitHub, Slack, databases, file systems.
 - Users can browse the marketplace for pre-built extensions, or add custom MCPs by providing a command (e.g. \`npx -y @some/mcp-server\`) or URL.
-- VenomCowork Cloud exposes a hosted remote MCP server at \`https://api.venomcowork.local/mcp\`. It uses OAuth, lets users choose an VenomCowork Cloud organization, and exposes Cloud resources such as config objects, connectors, plugins, marketplaces, skill hubs, skills, workers, members, roles, teams, and LLM providers. For setup details, read packages/docs/cloud/run-in-the-cloud/cloud-mcp.mdx.
+- VenomCowork Cloud is an optional hosted control plane for teams. This build does not bundle a Cloud MCP server; the in-app cloud features activate only when \`VITE_DEN_BASE_URL\` is set at build time. Operators can host their own Den API + web stack under their own domain if they need the same workflow.
 
 ## Voice Mode
 - Available as a side panel in sessions when the VenomCowork Voice extension is enabled.

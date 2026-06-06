@@ -153,7 +153,10 @@ export const MCP_QUICK_CONNECT: McpDirectoryInfo[] = [
       try {
         return `${readDenBootstrapConfig().baseUrl.replace(/\/+$/, "")}/mcp`;
       } catch {
-        return "https://app.venomcowork.local/mcp";
+        // No Den (cloud) control plane is configured in this vanilla build.
+        // The MCP quick-connect entry will only resolve when VITE_DEN_BASE_URL
+        // is set at build time.
+        return "";
       }
     },
     type: "remote",

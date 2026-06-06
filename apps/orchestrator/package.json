@@ -23,15 +23,6 @@
     "scripts",
     "README.md"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/venom-cowork/workspace.git",
-    "directory": "apps/orchestrator"
-  },
-  "homepage": "https://github.com/venom-cowork/workspace/tree/dev/apps/orchestrator",
-  "bugs": {
-    "url": "https://github.com/venom-cowork/workspace/issues"
-  },
   "keywords": [
     "venomcowork",
     "opencode",

@@ -5,5 +5,5 @@ export default function PasswordResetPreview(props: PasswordResetEmailProps) {
 }
 
 PasswordResetPreview.PreviewProps = {
-  resetLink: "https://app.venomcowork.local/api/auth/reset-password/example-token?callbackURL=https%3A%2F%2Fapp.venomcowork.local%2Freset-password",
+  resetLink: "",
 } satisfies PasswordResetEmailProps

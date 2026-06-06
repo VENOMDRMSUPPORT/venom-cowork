@@ -3,30 +3,25 @@
  *
  * There are two channels users can opt into:
  *
- * - "stable": the default. The desktop app auto-updates from the rolling
- *   "latest" GitHub release attached to whichever semver tag most recently
- *   finished the Release App workflow. macOS, Linux, Windows.
+ * - "stable": the default. The desktop app auto-updates from a user-supplied
+ *   feed URL. Set VENOMCOWORK_UPDATER_STABLE_URL to point at a generic
+ *   electron-updater host (S3, generic HTTP, local file server, etc.).
  *
- * - "alpha": a macOS-only rolling channel that auto-updates on every merge
- *   to `dev`. Alpha builds are published to a fixed GitHub release tag
- *   (`alpha-macos-latest`) so the updater endpoint stays stable while the
- *   underlying artifact is replaced on every dev push.
+ * - "alpha": a rolling channel. Set VENOMCOWORK_UPDATER_ALPHA_URL similarly.
  *
- * Only the macOS (arm64) build is published to the alpha channel today.
- * Linux and Windows always resolve to the stable channel.
+ * In this vanilla build the URLs are empty by default, so the in-app updater
+ * is effectively a no-op until the operator wires a feed.
  */
 
 import type { ReleaseChannel } from "../types";
 
-/** Stable channel's Tauri updater manifest URL. */
-export const STABLE_UPDATER_ENDPOINT =
-  "https://github.com/venom-cowork/workspace/releases/latest/download/latest.json";
+/** Stable channel electron-updater manifest URL (empty until configured). */
+export const STABLE_UPDATER_ENDPOINT = process.env.VENOMCOWORK_UPDATER_STABLE_URL || "";
 
-/** Alpha channel's Tauri updater manifest URL (macOS-only, rolling). */
-export const ALPHA_UPDATER_ENDPOINT =
-  "https://github.com/venom-cowork/workspace/releases/download/alpha-macos-latest/latest.json";
+/** Alpha channel electron-updater manifest URL (empty until configured). */
+export const ALPHA_UPDATER_ENDPOINT = process.env.VENOMCOWORK_UPDATER_ALPHA_URL || "";
 
-/** Rolling GitHub release tag that alpha macOS artifacts are published to. */
+/** Rolling release tag identifier (label only — no remote fetch in this build). */
 export const ALPHA_MACOS_RELEASE_TAG = "alpha-macos-latest";
 
 export type PlatformKind = "darwin" | "linux" | "windows" | "web" | "unknown";

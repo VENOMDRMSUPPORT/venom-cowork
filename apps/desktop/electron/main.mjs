@@ -42,9 +42,13 @@ const DESKTOP_PROTOCOL_SCHEME = "venomcowork";
 const isDevMode = process.env.VENOMCOWORK_DEV_MODE === "1";
 const APP_NAME = isDevMode ? "VenomCowork - Dev" : "VenomCowork";
 const APP_IDENTIFIER = isDevMode ? DEV_APP_IDENTIFIER : TAURI_APP_IDENTIFIER;
-const RELEASE_DOWNLOAD_BASE_URL = "https://github.com/venom-cowork/workspace/releases/latest/download";
-const RELEASE_PAGE_URL = "https://github.com/venom-cowork/workspace/releases/latest";
-const DOCS_PAGE_URL = "https://venomcowork.local/docs";
+// No external release feed is configured in this vanilla build. Set
+// VENOMCOWORK_RELEASE_DOWNLOAD_BASE_URL / VENOMCOWORK_RELEASE_PAGE_URL /
+// VENOMCOWORK_DOCS_PAGE_URL in your environment (or wrap this file) if you
+// want auto-update and external docs links to point at a server you control.
+const RELEASE_DOWNLOAD_BASE_URL = process.env.VENOMCOWORK_RELEASE_DOWNLOAD_BASE_URL || "";
+const RELEASE_PAGE_URL = process.env.VENOMCOWORK_RELEASE_PAGE_URL || "";
+const DOCS_PAGE_URL = process.env.VENOMCOWORK_DOCS_PAGE_URL || "";
 const COMPUTER_USE_HELPER_APP_NAME = "VenomCowork Computer Use.app";
 const COMPUTER_USE_HELPER_EXECUTABLE = "ComputerUse";
 const terminalProcesses = new Map();
@@ -434,7 +438,10 @@ if (extraLaunchArgs) {
   }
 }
 configureFakeMediaForTests(app, envFlagEnabled("VENOMCOWORK_ELECTRON_FAKE_MEDIA"));
-const DEFAULT_DEN_BASE_URL = "https://app.venomcowork.local";
+// No Den (cloud) control plane is wired in this vanilla build. Set
+// VENOMCOWORK_DEN_BASE_URL to point at your own Den deployment, or leave it
+// unset to keep Den features unconfigured.
+const DEFAULT_DEN_BASE_URL = process.env.VENOMCOWORK_DEN_BASE_URL || "";
 const DEFAULT_LOCAL_BASE_URL = "http://127.0.0.1:4096";
 const FORCE_DESKTOP_REQUIRE_SIGNIN = envFlagEnabled("VENOMCOWORK_FORCE_SIGNIN");
 const DEFAULT_DESKTOP_REQUIRE_SIGNIN = FORCE_DESKTOP_REQUIRE_SIGNIN;

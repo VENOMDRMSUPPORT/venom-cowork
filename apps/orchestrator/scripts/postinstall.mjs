@@ -59,7 +59,17 @@ function resolveFallbackBaseUrl(version) {
   if (override) {
     return override.replace(/\/$/, "")
   }
-  return `https://github.com/venom-cowork/workspace/releases/download/venomcowork-orchestrator-v${version}`
+  // No remote fallback host is wired in this vanilla build. The orchestrator's
+  // npm install is expected to provide a local platform binary package
+  // (see `optionalDependencies`). Set VENOMCOWORK_ORCHESTRATOR_DOWNLOAD_BASE_URL
+  // if you publish sidecars to a host you control.
+  throw new Error(
+    `venomcowork-orchestrator: no fallback download base URL configured. ` +
+      `Install the platform-specific optional dependency ` +
+      `(venomcowork-orchestrator-${process.platform}-${process.arch}) ` +
+      `or set VENOMCOWORK_ORCHESTRATOR_DOWNLOAD_BASE_URL. ` +
+      `(requested version: ${version})`,
+  )
 }
 
 async function downloadFallbackBinary() {

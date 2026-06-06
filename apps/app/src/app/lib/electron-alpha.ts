@@ -10,11 +10,13 @@ export type ElectronAlphaArtifact = {
   sha512: string;
 };
 
+// No remote release host is wired in this vanilla build. Override via
+// VENOMCOWORK_ELECTRON_ALPHA_BASE_URL if you publish alpha builds somewhere.
 const ELECTRON_ALPHA_RELEASE_BASE_URL =
-  "https://github.com/venom-cowork/workspace/releases/download/alpha-macos-latest";
+  process.env.VENOMCOWORK_ELECTRON_ALPHA_BASE_URL || "";
 
 export const ELECTRON_ALPHA_RELEASE_PAGE_URL =
-  "https://github.com/venom-cowork/workspace/releases/tag/alpha-macos-latest";
+  process.env.VENOMCOWORK_ELECTRON_ALPHA_RELEASE_PAGE_URL || "";
 
 export const ELECTRON_ALPHA_LATEST_MAC_YML_URL = `${ELECTRON_ALPHA_RELEASE_BASE_URL}/latest-mac.yml`;
 

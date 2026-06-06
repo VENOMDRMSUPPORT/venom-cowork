@@ -2,7 +2,10 @@
 import { useBootState, useBootOverlayVisible } from "./boot-state";
 import { OwDotTicker } from "./dot-ticker";
 
-const RELEASES_URL = "https://github.com/venom-cowork/workspace/releases";
+// No remote release page is configured in this vanilla build. Set
+// VENOMCOWORK_RELEASES_URL if you want the boot overlay to deep-link to a
+// release page you control.
+const RELEASES_URL = process.env.VENOMCOWORK_RELEASES_URL || "";
 
 /**
  * Quiet, opaque boot overlay. Solid surface fill so nothing bleeds through.

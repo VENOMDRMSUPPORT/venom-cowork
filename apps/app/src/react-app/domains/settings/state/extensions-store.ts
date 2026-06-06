@@ -68,11 +68,24 @@ import type { VenomcoworkServerStore } from "../../connections/venomcowork-serve
 const OPENCODE_SKILL_NAME_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const OPENCODE_MCP_NAME_RE = /^[A-Za-z0-9_][A-Za-z0-9_-]*$/;
 const OPENCODE_MCP_IMPORT_PATH_PREFIX = "opencode.jsonc#mcp.";
-const DEFAULT_HUB_REPO: HubSkillRepo = {
-  owner: "venom-cowork",
-  repo: "venomcowork-hub",
-  ref: "main",
-};
+// No default skill hub is wired in this vanilla build. Operators can set
+// VITE_VENOMCOWORK_HUB_OWNER / VITE_VENOMCOWORK_HUB_REPO at build time to
+// point the in-app Skills tab at a hub repository they control.
+const DEFAULT_HUB_REPO: HubSkillRepo | null =
+  typeof import.meta !== "undefined" &&
+  typeof import.meta.env?.VITE_VENOMCOWORK_HUB_OWNER === "string" &&
+  typeof import.meta.env?.VITE_VENOMCOWORK_HUB_REPO === "string" &&
+  import.meta.env.VITE_VENOMCOWORK_HUB_OWNER.trim() &&
+  import.meta.env.VITE_VENOMCOWORK_HUB_REPO.trim()
+    ? {
+        owner: import.meta.env.VITE_VENOMCOWORK_HUB_OWNER.trim(),
+        repo: import.meta.env.VITE_VENOMCOWORK_HUB_REPO.trim(),
+        ref:
+          (typeof import.meta.env.VITE_VENOMCOWORK_HUB_REF === "string" &&
+            import.meta.env.VITE_VENOMCOWORK_HUB_REF.trim()) ||
+          "main",
+      }
+    : null;
 const HUB_REPOS_STORAGE_KEY = "venomcowork.skills.hubRepos.v1";
 
 type SetStateAction<T> = T | ((current: T) => T);

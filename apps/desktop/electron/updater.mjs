@@ -29,9 +29,11 @@ function resolveAppVersion(app) {
   }
   return _cachedAppVersion;
 }
+// No external feed is wired in this vanilla build. Pass
+// VENOMCOWORK_UPDATER_STABLE_URL / VENOMCOWORK_UPDATER_ALPHA_URL to override.
 const ELECTRON_UPDATER_FEEDS = Object.freeze({
-  stable: "https://github.com/venom-cowork/workspace/releases/latest/download",
-  alpha: "https://github.com/venom-cowork/workspace/releases/download/alpha-macos-latest",
+  stable: process.env.VENOMCOWORK_UPDATER_STABLE_URL || "",
+  alpha: process.env.VENOMCOWORK_UPDATER_ALPHA_URL || "",
 });
 
 function normalizeElectronUpdaterChannel(value) {

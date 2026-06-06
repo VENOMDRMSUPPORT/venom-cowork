@@ -10,11 +10,18 @@ import { projectSkillsDir } from "./workspace-files.js";
 
 type HubRepo = { owner: string; repo: string; ref: string };
 
-const DEFAULT_HUB_REPO: HubRepo = {
-  owner: "venom-cowork",
-  repo: "venomcowork-hub",
-  ref: "main",
-};
+// No default skill hub is wired in this vanilla build. Set
+// VENOMCOWORK_HUB_OWNER / VENOMCOWORK_HUB_REPO / VENOMCOWORK_HUB_REF to point
+// the in-app Skills tab at a hub repository you control.
+function readEnvHubRepo(): HubRepo | null {
+  const owner = process.env.VENOMCOWORK_HUB_OWNER?.trim();
+  const repo = process.env.VENOMCOWORK_HUB_REPO?.trim();
+  const ref = process.env.VENOMCOWORK_HUB_REF?.trim() || "main";
+  if (owner && repo) return { owner, repo, ref };
+  return null;
+}
+
+const DEFAULT_HUB_REPO: HubRepo | null = readEnvHubRepo();
 
 const CATALOG_TTL_MS = 5 * 60 * 1000;
 const cachedCatalogByRepo = new Map<string, { at: number; items: HubSkillItem[] }>();
@@ -100,7 +107,11 @@ async function mapWithConcurrency<T, R>(
   return results;
 }
 
-export async function listHubSkills(repo: HubRepo = DEFAULT_HUB_REPO): Promise<HubSkillItem[]> {
+export async function listHubSkills(repo?: HubRepo | null): Promise<HubSkillItem[]> {
+  if (!repo) {
+    if (!DEFAULT_HUB_REPO) return [];
+    repo = DEFAULT_HUB_REPO;
+  }
   const now = Date.now();
   const repoKey = hubRepoKey(repo);
   const cachedCatalog = cachedCatalogByRepo.get(repoKey);
@@ -187,11 +198,17 @@ export async function installHubSkill(
   validateSkillName(name);
   const overwrite = Boolean(input.overwrite);
 
-  const repo: HubRepo = {
-    owner: input.repo?.owner?.trim() || DEFAULT_HUB_REPO.owner,
-    repo: input.repo?.repo?.trim() || DEFAULT_HUB_REPO.repo,
-    ref: input.repo?.ref?.trim() || DEFAULT_HUB_REPO.ref,
-  };
+  const owner = input.repo?.owner?.trim() || DEFAULT_HUB_REPO?.owner;
+  const repoName = input.repo?.repo?.trim() || DEFAULT_HUB_REPO?.repo;
+  const ref = input.repo?.ref?.trim() || DEFAULT_HUB_REPO?.ref || "main";
+  if (!owner || !repoName) {
+    throw new ApiError(
+      503,
+      "hub_unconfigured",
+      "Skill hub is not configured. Set VENOMCOWORK_HUB_OWNER and VENOMCOWORK_HUB_REPO, or pass owner/repo in the request.",
+    );
+  }
+  const repo: HubRepo = { owner, repo: repoName, ref };
 
   const prefix = `skills/${name}/`;
   const baseDir = join(projectSkillsDir(workspaceRoot), name);

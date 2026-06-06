@@ -104,7 +104,14 @@ function rejectedTokenMessage(target: RemoteWorkspaceConnectionTarget) {
 }
 
 function remoteSupportMessage(message: string) {
-  return `${message} Upgrade the VenomCowork host and try again. If this continues, contact team@venomcowork.local.`;
+  // VENOMCOWORK_SUPPORT_CONTACT lets the operator point users at their own
+  // support channel (email, Slack, issue tracker, etc.). When unset, the
+  // diagnostic tells the user to escalate through their own admin.
+  const contact = process.env.VENOMCOWORK_SUPPORT_CONTACT?.trim();
+  const suffix = contact
+    ? ` If this continues, contact ${contact}.`
+    : " If this continues, contact your VenomCowork administrator.";
+  return `${message} Upgrade the VenomCowork host and try again.${suffix}`;
 }
 
 export function redactRemoteDiagnosticText(value: string): string {

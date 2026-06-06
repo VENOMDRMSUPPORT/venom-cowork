@@ -1911,7 +1911,16 @@ function resolveSidecarBaseUrl(
     readFlag(flags, "sidecar-base-url") ??
     process.env.VENOMCOWORK_SIDECAR_BASE_URL;
   if (override && override.trim()) return override.trim();
-  return `https://github.com/venom-cowork/workspace/releases/download/venomcowork-orchestrator-v${cliVersion}`;
+  // No remote sidecar host is configured in this vanilla build. The
+  // orchestrator's npm install is expected to provide a local binary
+  // package (see `optionalDependencies`); only fall back to a remote URL
+  // when VENOMCOWORK_SIDECAR_BASE_URL is set explicitly.
+  throw new Error(
+    `venomcowork-orchestrator: no sidecar base URL configured. ` +
+      `Install the platform-specific optional dependency (venomcowork-orchestrator-${process.platform}-${process.arch}) ` +
+      `or set VENOMCOWORK_SIDECAR_BASE_URL / --sidecar-base-url to a host you control. ` +
+      `(requested version: ${cliVersion})`,
+  );
 }
 
 function resolveSidecarManifestUrl(

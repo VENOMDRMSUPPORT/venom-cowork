@@ -25,7 +25,9 @@ import {
   shouldShowVenomCoworkModelsPromo,
 } from "../../cloud/venomcowork-models-promo";
 
-const DOCS_URL = "https://venomcowork.local/docs";
+// No hosted docs in this vanilla build. Set VENOMCOWORK_DOCS_URL if you
+// maintain a documentation site.
+const DOCS_URL = process.env.VENOMCOWORK_DOCS_URL || "";
 const STATUS_BAR_BOOT_STARTED_AT = Date.now();
 const STATUS_BAR_INITIALIZING_MS = 15_000;
 

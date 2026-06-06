@@ -1,8 +1,11 @@
 ﻿const ENV_FEEDBACK_URL = String(import.meta.env.VITE_VENOMCOWORK_FEEDBACK_URL ?? "").trim();
 const ENV_APP_VERSION = String(import.meta.env.VITE_VENOMCOWORK_APP_VERSION ?? "").trim();
 
-export const DEFAULT_FEEDBACK_URL =
-  ENV_FEEDBACK_URL || "https://venomcowork.local/feedback";
+// No feedback endpoint is wired in this vanilla build. Operators can set
+// VITE_VENOMCOWORK_FEEDBACK_URL at build time to point users at their own
+// feedback intake (form, mailto, etc.). When unset, buildFeedbackUrl() throws
+// so callers can decide whether to hide the UI or fail loudly.
+export const DEFAULT_FEEDBACK_URL = ENV_FEEDBACK_URL;
 
 type FeedbackUrlOptions = {
   entrypoint: string;
@@ -82,6 +85,12 @@ function parseClientOsContext(): ClientOsContext {
 }
 
 export function buildFeedbackUrl(options: FeedbackUrlOptions): string {
+  if (!DEFAULT_FEEDBACK_URL) {
+    throw new Error(
+      "VenomCowork feedback URL is not configured. " +
+        "Set VITE_VENOMCOWORK_FEEDBACK_URL at build time to enable the feedback button.",
+    );
+  }
   const url = new URL(DEFAULT_FEEDBACK_URL);
   const osContext = parseClientOsContext();
 

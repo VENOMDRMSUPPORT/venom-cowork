@@ -12,8 +12,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const SUPPORT_EMAIL = "team@venomcowork.local";
-const SUPPORT_MAILTO = `mailto:${SUPPORT_EMAIL}?subject=VenomCowork%20Den%20remote%20worker%20upgrade`;
+// No operator support contact is wired in this vanilla build. Set
+// VENOMCOWORK_SUPPORT_CONTACT (or VITE_VENOMCOWORK_SUPPORT_CONTACT at build
+// time) to enable the help dialog. The string is used as a plain mailto
+// address when it contains '@', or as a full URL otherwise.
+const SUPPORT_CONTACT =
+  (typeof import.meta !== "undefined" &&
+    typeof import.meta.env?.VITE_VENOMCOWORK_SUPPORT_CONTACT === "string"
+    ? import.meta.env.VITE_VENOMCOWORK_SUPPORT_CONTACT.trim()
+    : "") ||
+  (typeof process !== "undefined" && typeof process.env?.VENOMCOWORK_SUPPORT_CONTACT === "string"
+    ? process.env.VENOMCOWORK_SUPPORT_CONTACT.trim()
+    : "");
+const SUPPORT_MAILTO = SUPPORT_CONTACT.includes("@")
+  ? `mailto:${SUPPORT_CONTACT}?subject=VenomCowork%20Den%20remote%20worker%20upgrade`
+  : SUPPORT_CONTACT;
 
 /**
  * Small inline link rendered inside the remote-worker error card. When clicked,
@@ -36,48 +49,53 @@ export function VenomCoworkDenHelpLink() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>VenomCowork Den remote workers</DialogTitle>
-            <DialogDescription>
-              We recently upgraded our servers. If your remote worker was
-              provisioned before that upgrade, it may no longer be compatible
-              with the current VenomCowork app.
-            </DialogDescription>
-          </DialogHeader>
+          <DialogTitle>VenomCowork Den remote workers</DialogTitle>
+          <DialogDescription>
+            If your remote worker is no longer compatible with the current
+            VenomCowork app, ask your administrator to upgrade it.
+          </DialogDescription>
+        </DialogHeader>
 
-          <div className="space-y-3 text-[13px] leading-5 text-gray-11">
-            <p>To get back online, you have two options:</p>
-            <ul className="ml-4 list-disc space-y-2">
+        <div className="space-y-3 text-[13px] leading-5 text-gray-11">
+          <p>To get back online:</p>
+          <ul className="ml-4 list-disc space-y-2">
+            {SUPPORT_CONTACT ? (
               <li>
-                Email{" "}
+                Contact{" "}
                 <a
                   href={SUPPORT_MAILTO}
                   className="font-medium text-blue-11 hover:underline"
                 >
-                  {SUPPORT_EMAIL}
+                  {SUPPORT_CONTACT}
                 </a>{" "}
-                and ask us to upgrade your worker.
+                and ask them to upgrade your worker.
               </li>
-              <li>
-                Use the in-app{" "}
-                <span className="font-medium text-dls-text">Feedback</span>{" "}
-                button to send us a note, and we&apos;ll pick it up from there.
-              </li>
-            </ul>
-          </div>
+            ) : (
+              <li>Ask your VenomCowork administrator to upgrade the worker.</li>
+            )}
+            <li>
+              Use the in-app{" "}
+              <span className="font-medium text-dls-text">Feedback</span>{" "}
+              button to file a note for your admin.
+            </li>
+          </ul>
+        </div>
 
-          <DialogFooter>
-            <DialogClose render={<Button type="button" variant="outline" />}>
-              Close
-            </DialogClose>
+        <DialogFooter>
+          <DialogClose render={<Button type="button" variant="outline" />}>
+            Close
+          </DialogClose>
+          {SUPPORT_CONTACT ? (
             <Button
               type="button"
               onClick={() => {
                 window.location.href = SUPPORT_MAILTO;
               }}
             >
-              Email support
+              Contact support
             </Button>
-          </DialogFooter>
+          ) : null}
+        </DialogFooter>
         </DialogContent>
       </Dialog>
     </>

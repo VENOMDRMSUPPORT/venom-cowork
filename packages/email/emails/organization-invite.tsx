@@ -8,7 +8,7 @@ export default function OrganizationInvitePreview(props: OrganizationInviteEmail
 }
 
 OrganizationInvitePreview.PreviewProps = {
-  inviteLink: "https://app.venomcowork.local/join-org?invite=invitation_preview",
+  inviteLink: "",
   invitedByName: "Ada Lovelace",
   invitedByEmail: "ada@example.com",
   organizationName: "VenomCowork Preview",

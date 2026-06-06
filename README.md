@@ -1,103 +1,65 @@
-﻿> VenomCowork is the open source alternative to Claude Cowork/Codex (desktop app).
+﻿# VenomCowork
 
+**VenomCowork** is the open-source alternative to Claude Cowork / Codex as a
+desktop app. Run local and remote agentic workflows from one place, powered by
+[OpenCode](https://github.com/sst/opencode).
+
+This repository is a vanilla rebrand of [OpenWork v0.15.2](https://github.com/different-ai/openwork).
+All upstream external endpoints (release feeds, doc sites, support emails,
+GitHub orgs) have been removed. Operators are expected to bring their own
+update feed, support contact, documentation site, and skill hub before
+shipping this build to end users.
+
+> **Not a hosted service.** This fork does not auto-publish anywhere. You build
+> the binaries, you sign them, you host them. The in-app updater is a no-op
+> until you point it at a feed URL you control.
+
+---
 
 ## Core Philosophy
 
-- Local-first, cloud-ready: VenomCowork runs on your machine in one click. Send a message instantly.
-- Composable: desktop app, Slack/Telegram connector, or server. Use what fits, no lock-in.
-- Ejectable: VenomCowork is powered by OpenCode, so everything OpenCode can do works in VenomCowork, even without a UI yet.
-- Sharing is caring: start solo on localhost, then explicitly opt into remote sharing when you need it.
+- **Local-first, cloud-ready.** VenomCowork runs on your machine in one click
+  and can connect to remote workers when you need them.
+- **Server-consumption first.** The desktop app is a client of the local
+  VenomCowork server surface; it does not invent a parallel control plane.
+- **Composable.** Use the desktop app, the orchestrator CLI, or the opencode
+  router — whatever fits the task.
+- **Ejectable.** Anything OpenCode can do is available from VenomCowork, even
+  before a dedicated UI surface exists.
+- **Sharing is caring.** Start solo on `localhost`, then opt into a remote
+  worker when your team is ready.
 
-<p align="center">
-  <img src="./app-demo.gif" alt="VenomCowork demo" width="800" />
-</p>
+## What is in the box
 
-VenomCowork is designed around the idea that you can easily ship your agentic workflows for your team as a repeatable, productized process.
+| App / Package | Path | Purpose |
+|---|---|---|
+| Desktop shell | `apps/desktop` | Electron shell that wraps the renderer, server, and sidecars into a Windows / macOS / Linux app |
+| Renderer UI | `apps/app` | React + Vite + shadcn/ui (Base UI) — the user-facing surface |
+| Local server | `apps/server` | Filesystem-backed API for the renderer; hosts skills, plugins, MCP, and the skill hub |
+| Orchestrator CLI | `apps/orchestrator` | `venomcowork` binary — orchestrates opencode + venomcowork-server + opencode-router |
+| OpenCode router | `apps/opencode-router` | Slack + Telegram bridge that routes messages to a running `opencode` server |
+| UI demo | `apps/ui-demo` | Standalone UI playground (no server) |
+| `@venom-cowork/venomcowork-ui-mcp` | `packages/venomcowork-ui-mcp` | MCP server exposing UI snapshot / actions / execute as tools |
+| `@venom-cowork/email` | `packages/email` | React Email templates (password reset, org invite) |
+| `@venom-cowork/types` | `packages/types` | Shared TypeScript types |
+| `@venom-cowork/ui` | `packages/ui` | Shared UI primitives |
+| `@venom-cowork/handsfree` | `packages/handsfree` | Voice / hands-free control glue |
 
-> [!TIP]
-> **Looking for an [Enterprise Plan](https://venomcowork.local/enterprise)?** [Speak with our Sales Team today](https://calendar.app.google/86QpCENvhfEzDFLu5)
->
-> Get enhanced capabilities including feature prioritization, SSO, SLA support, LTS versions, and more.
+The `ee/` tree contains the optional VenomCowork Cloud control plane (Den
+API, Den Web, landing site, inference, etc.). It is shipped untouched in this
+fork — the rebrand only updates the `productName` strings there so the
+brand is consistent. To remove the `ee/` apps from your workspace, delete
+the directory and any `ee` references in `pnpm-workspace.yaml`.
 
-## Alternate UIs
-- **VenomCowork Orchestrator (CLI host)**: run OpenCode + VenomCowork server without the desktop UI.
-  - install: `npm install -g venomcowork-orchestrator`
-  - run: `venomcowork start --workspace /path/to/workspace --approval auto`
-  - docs: [apps/orchestrator/README.md](./apps/orchestrator/README.md)
+---
 
 ## Quick start
 
-Download the desktop app from [venomcowork.local/download](https://venomcowork.local/download), grab the latest [GitHub release](https://github.com/venom-cowork/workspace/releases), or install from source below.
-
-- macOS and Linux downloads are available directly.
-- Windows access is currently handled through the paid support plan on [venomcowork.local/pricing#windows-support](https://venomcowork.local/pricing#windows-support).
-- Hosted VenomCowork Cloud workers are launched from the web app after checkout, then connected from the desktop app via `Add a worker` -> `Connect remote`.
-
-## Why
-
-Current CLI and GUIs for opencode are anchored around developers. That means a focus on file diffs, tool names, and hard to extend capabilities without relying on exposing some form of cli.
-
-VenomCowork is designed to be:
-
-- **Extensible**: skill and opencode plugins are installable modules.
-- **Auditable**: show what happened, when, and why.
-- **Permissioned**: access to privileged flows.
-- **Local/Remote**: VenomCowork works locally as well as can connect to remote servers.
-
-## Whatâ€™s Included
-
-- **Host mode**: runs opencode locally on your computer
-- **Client mode**: connect to an existing OpenCode server by URL.
-- **Sessions**: create/select sessions and send prompts.
-- **Live streaming**: SSE `/event` subscription for realtime updates.
-- **Execution plan**: render OpenCode todos as a timeline.
-- **Permissions**: surface permission requests and reply (allow once / always / deny).
-- **Templates**: save and re-run common workflows (stored locally).
-- **Debug exports**: copy or export the runtime debug report and developer log stream from Settings -> Debug when you need to file a bug.
-- **Skills manager**:
-  - list installed `.opencode/skills` folders
-  - import a local skill folder into `.opencode/skills/<skill-name>`
-
-## Skill Manager
-
-<img width="1292" height="932" alt="image" src="https://github.com/user-attachments/assets/b500c1c6-a218-42ce-8a11-52787f5642b6" />
-
-## Works on local computer or servers
-
-<img width="1292" height="932" alt="Screenshot 2026-01-13 at 7 05 16â€¯PM" src="https://github.com/user-attachments/assets/9c864390-de69-48f2-82c1-93b328dd60c3" />
-
-## Quick Start
-
 ### Requirements
 
-- Node.js + `pnpm`
-- Rust toolchain (for Tauri): install via `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-- Tauri CLI: `cargo install tauri-cli`
-- OpenCode CLI installed and available on PATH: `opencode`
-
-### Local Dev Prerequisites (Desktop)
-
-Before running `pnpm dev`, ensure these are installed and active in your shell:
-
-- Node + pnpm (repo uses `pnpm@10.27.0`)
-- **Bun 1.3.9+** (`bun --version`)
-- Rust toolchain (for Tauri), with Cargo from current `rustup` stable (supports `Cargo.lock` v4)
-- Xcode Command Line Tools (macOS)
-- On Linux, WebKitGTK 4.1 development packages so `pkg-config` can resolve `webkit2gtk-4.1` and `javascriptcoregtk-4.1`
-
-### One-minute sanity check
-
-Run from repo root:
-
-```bash
-git checkout dev
-git pull --ff-only origin dev
-pnpm install --frozen-lockfile
-
-which bun
-bun --version
-pnpm --filter @venom-cowork/desktop exec tauri --version
-```
+- Node.js 20+ and `pnpm` 10+ (`corepack enable` if you do not have pnpm)
+- Bun 1.3+ for building the opencode-plugins and the orchestrator binaries
+  (`bun --version`)
 
 ### Install
 
@@ -105,147 +67,162 @@ pnpm --filter @venom-cowork/desktop exec tauri --version
 pnpm install
 ```
 
-VenomCowork now lives in `apps/app` (UI) and `apps/desktop` (desktop shell).
+The install may take a few minutes — pnpm fetches Windows, macOS, and Linux
+native binaries for `node-pty`, `better-sqlite3`, and a few other packages.
+The install only needs to succeed once per checkout.
 
-### Run (Desktop)
+### Run the desktop app in dev mode
 
 ```bash
 pnpm dev
 ```
 
-`pnpm dev` now enables `VENOMCOWORK_DEV_MODE=1` automatically, so desktop dev uses an isolated OpenCode state instead of your personal global config/auth/data.
+`pnpm dev` automatically sets `VENOMCOWORK_DEV_MODE=1` and a dedicated
+`VENOMCOWORK_ELECTRON_REMOTE_DEBUG_PORT` so desktop development uses an
+isolated OpenCode state instead of your personal global config.
 
-### Run (Web UI only)
+### Run the renderer only (no Electron shell)
 
 ```bash
 pnpm dev:ui
 ```
 
-All repo `dev` entrypoints now opt into the same dev-mode isolation so local testing uses the VenomCowork-managed OpenCode state consistently.
-
-### Arch Users:
+### Build a Windows / macOS / Linux desktop installer
 
 ```bash
-sudo pacman -S --needed webkit2gtk-4.1
-curl -fsSL https://opencode.ai/install | bash -s -- --version "$(node -e "const fs=require('fs'); const parsed=JSON.parse(fs.readFileSync('constants.json','utf8')); process.stdout.write(String(parsed.opencodeVersion||'').trim().replace(/^v/,''));")" --no-modify-path
+node apps/desktop/scripts/electron-build.mjs
+cd apps/desktop && pnpm exec electron-builder --config electron-builder.yml
 ```
 
-## Architecture (high-level)
+The unpacked output lives at:
 
-- In **Host mode**, VenomCowork runs a local host stack and connects the UI to it.
-  - Default runtime: `venomcowork` (installed from `venomcowork-orchestrator`), which orchestrates `opencode`, `venomcowork-server`, and optionally `opencode-router`.
-  - Fallback runtime: `direct`, where the desktop app spawns `opencode serve --hostname 127.0.0.1 --port <free-port>` directly.
+- Windows: `apps/desktop/dist-electron/win-unpacked/VenomCowork.exe`
+- macOS:   `apps/desktop/dist-electron/mac-arm64/VenomCowork.app` (or `mac/`)
+- Linux:   `apps/desktop/dist-electron/linux-unpacked/venomcowork`
 
-When you select a project folder, VenomCowork runs the host stack locally using that folder and connects the desktop UI.
-This lets you run agentic workflows, send prompts, and see progress entirely on your machine without a remote server.
-
-- The UI uses `@opencode-ai/sdk/v2/client` to:
-  - connect to the server
-  - list/create sessions
-  - send prompts
-  - subscribe to SSE events(Server-Sent Events are used to stream real-time updates from the server to the UI.)
-  - read todos and permission requests
-
-## Folder Picker
-
-The folder picker uses the Tauri dialog plugin.
-Capability permissions are defined in:
-
-- `apps/desktop/src-tauri/capabilities/default.json`
-
-## OpenCode Plugins
-
-Plugins are the **native** way to extend OpenCode. VenomCowork now manages them from the Skills tab by
-reading and writing `opencode.json`.
-
-- **Project scope**: `<workspace>/opencode.json`
-- **Global scope**: `~/.config/opencode/opencode.json` (or `$XDG_CONFIG_HOME/opencode/opencode.json`)
-
-You can still edit `opencode.json` manually; VenomCowork uses the same format as the OpenCode CLI:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-wakatime"]
-}
-```
-
-## Useful Commands
+To produce a real installer (NSIS / dmg / AppImage), drop `--dir`:
 
 ```bash
-pnpm dev
-pnpm dev:ui
+cd apps/desktop && pnpm exec electron-builder --config electron-builder.yml
+```
+
+The installer is `apps/desktop/dist-electron/venomcowork-windows-x64-0.15.2.exe`
+(or the matching platform/arch name).
+
+To sign the build, set `CSC_LINK` and `CSC_KEY_PASSWORD` environment variables
+before running electron-builder. Without them, the build is unsigned and
+Windows will show a SmartScreen prompt on first launch.
+
+### Run the orchestrator CLI from source
+
+```bash
+pnpm --filter venomcowork-orchestrator dev -- \
+  start --workspace /path/to/workspace --approval auto --allow-external
+```
+
+### Verify the install
+
+```bash
+# Typecheck the renderer
 pnpm typecheck
-pnpm build
-pnpm build:ui
-pnpm test:e2e
+
+# Sanity-check the sidecar resolution
+pnpm --filter @venom-cowork/desktop exec node -e "console.log(require('./package.json').opencodeRouterVersion)"
 ```
 
-## Troubleshooting
+---
 
-If you need to report a desktop or session bug, open Settings -> Debug and export both the runtime debug report and developer logs before filing an issue.
+## Architecture (high level)
 
-### Linux / Wayland (Hyprland)
+When you open VenomCowork, the desktop shell does the following:
 
-If VenomCowork crashes on launch with WebKitGTK errors like `Failed to create GBM buffer`, disable dmabuf or compositing before launch. Try one of the following environment flags.
+1. Spawns the **VenomCowork server** (`apps/server`) on a free local port.
+2. Spawns **OpenCode** via the orchestrator (or, in fallback, `opencode serve`
+   directly).
+3. Loads the **renderer UI** (`apps/app/dist`) inside an Electron window.
+4. Wires the renderer to the server's REST + SSE endpoints.
 
-```bash
-WEBKIT_DISABLE_DMABUF_RENDERER=1 venomcowork
+The renderer uses `@opencode-ai/sdk` to talk to the server, which in turn
+talks to OpenCode. The whole thing runs on `127.0.0.1` by default — no
+remote calls are made unless you opt in.
+
+### Folder layout
+
+```
+apps/
+  app/                React renderer (Vite)
+  desktop/            Electron shell + electron-builder config
+    electron/         main.mjs, preload.mjs, updater.mjs
+    resources/        icons, sidecars, computer-use helper
+    server/           snapshot of apps/server/dist copied at build time
+  server/             Filesystem-backed API (Bun + TypeScript)
+  orchestrator/       CLI that orchestrates opencode + server + router
+  opencode-router/    Slack + Telegram bridge
+  ui-demo/            Standalone UI playground
+packages/
+  venomcowork-ui-mcp/ MCP server exposing UI as tools
+  email/              React Email templates
+  types/              Shared TypeScript types
+  ui/                 Shared UI primitives
+  handsfree/          Voice / hands-free control
+ee/                   Optional cloud control plane (untouched)
+brand/                Logo SVGs (master + variants)
 ```
 
-```bash
-WEBKIT_DISABLE_COMPOSITING_MODE=1 venomcowork
-```
+---
 
-## Security Notes
+## Operator configuration
 
-- VenomCowork hides model reasoning and sensitive tool metadata by default.
-- Host mode binds to `127.0.0.1` by default.
+This fork ships with **no external endpoints wired in**. Every default that
+used to point at the upstream operator's hosted services now resolves to an
+empty string and is only activated when you set the matching env var.
 
-## Contributing
+| Feature | Env var | Effect when set |
+|---|---|---|
+| In-app auto-updates (stable) | `VENOMCOWORK_UPDATER_STABLE_URL` | electron-updater `generic` feed URL for the stable channel |
+| In-app auto-updates (alpha) | `VENOMCOWORK_UPDATER_ALPHA_URL` | electron-updater `generic` feed URL for the alpha channel |
+| External release download page | `VENOMCOWORK_RELEASE_PAGE_URL` | Where the `Open external releases page` button points |
+| External docs page | `VENOMCOWORK_DOCS_URL` (desktop) or `VITE_VENOMCOWORK_DOCS_URL` (renderer) | Where the in-app docs link opens |
+| In-app feedback button | `VITE_VENOMCOWORK_FEEDBACK_URL` (build time) | Where the feedback form POSTs |
+| Web download page (renderer) | `VITE_VENOMCOWORK_DOWNLOAD_URL` (build time) | Where the "Download VenomCowork Desktop" banner links |
+| Support contact (diagnostics) | `VENOMCOWORK_SUPPORT_CONTACT` (runtime) or `VITE_VENOMCOWORK_SUPPORT_CONTACT` (build) | Email or URL shown in remote-workspace error messages |
+| Den (cloud) control plane | `VITE_DEN_BASE_URL` (build time) or `VENOMCOWORK_DEN_BASE_URL` (Electron) | Enables Cloud features; leave unset to keep the app fully local |
+| VenomCowork Cloud MCP quick-connect | `VITE_DEN_BASE_URL` (build time) | The MCP entry in Settings appears only when this is set |
+| Hosted model catalog | `VENOMCOWORK_MODELS_URL` | Where the embedded server looks for managed model data |
+| Default skill hub | `VENOMCOWORK_HUB_OWNER` + `VENOMCOWORK_HUB_REPO` (+ `VENOMCOWORK_HUB_REF`) on the server, or `VITE_VENOMCOWORK_HUB_OWNER` + `VITE_VENOMCOWORK_HUB_REPO` (+ `VITE_VENOMCOWORK_HUB_REF`) in the renderer | Default GitHub repo the in-app Skills tab lists; per-request `?owner=...&repo=...` overrides work without these |
+| Sidecar fallback base | `VENOMCOWORK_SIDECAR_BASE_URL` (CLI) or `VENOMCOWORK_ORCHESTRATOR_DOWNLOAD_BASE_URL` (postinstall) | Where the orchestrator fetches its `venomcowork-orchestrator` sidecars from when npm's optional platform package is missing |
+| "Report an issue" button | `VENOMCOWORK_REPORT_ISSUE_URL` (renderer build env) | URL opened from Settings -> General -> Report issue |
 
-- Review `AGENTS.md` plus `VISION.md`, `PRINCIPLES.md`, `PRODUCT.md`, and `ARCHITECTURE.md` to understand the product goals before making changes.
-- Ensure Node.js, `pnpm`, the Rust toolchain, and `opencode` are installed before working inside the repo.
-- Run `pnpm install` once per checkout, then verify your change with `pnpm typecheck` plus `pnpm test:e2e` (or the targeted subset of scripts) before opening a PR.
-- Use `.github/pull_request_template.md` when opening PRs and include exact commands, outcomes, manual verification steps, and evidence.
-- If CI fails, classify failures in the PR body as either code-related regressions or external/environment/auth blockers.
-- Add new PRDs to `apps/app/pr/<name>.md` following the `.opencode/skills/prd-conventions/SKILL.md` conventions described in `AGENTS.md`.
+If you fork this further, prefer **env vars over hard-coded URLs**. Hard
+coding a release feed, docs link, or support contact into a fresh fork
+re-creates the same lock-in this rebrand was designed to remove.
 
-Community docs:
+---
 
-- `CODE_OF_CONDUCT.md`
-- `SECURITY.md`
-- `SUPPORT.md`
-- `TRIAGE.md`
+## Tech stack
 
-First contribution checklist:
+- **Electron 35** desktop shell (no Tauri)
+- **React 19 + Vite 6 + shadcn/ui (Base UI)** for the renderer
+- **TypeScript** end-to-end (strict)
+- **Bun 1.3+** for the opencode-plugins and the orchestrator binaries
+- **pnpm 10+** workspaces
+- **electron-updater** with the `generic` provider (no GitHub release feed
+  hard-coded; set `VENOMCOWORK_UPDATER_STABLE_URL` to point it at a host you
+  control)
+- **better-sqlite3** + Drizzle for server-side state
+- **node-pty** for the in-app terminal
 
-- [ ] Run `pnpm install` and baseline verification commands.
-- [ ] Confirm your change has a clear issue link and scope.
-- [ ] Add/update tests for behavioral changes.
-- [ ] Include commands run and outcomes in your PR.
-- [ ] Add screenshots/video for user-facing flow changes.
+## Coding guidelines
 
-## Supported Languages
-
-Translated READMEs: [`translated_readmes/`](./translated_readmes/README.md), available in English, ç®€ä½“ä¸­æ–‡, ç¹é«”ä¸­æ–‡, æ—¥æœ¬èªž.
-
-The App is available in the following languages:
-- English (`en`)
-- French (`fr`)
-- Spanish (`es`)
-- Catalan (`ca`)
-- Brazilian Portuguese (`pt-BR`)
-- Japanese (`ja`)
-- Simplified Chinese (`zh`)
-- Thai (`th`)
-- Vietnamese (`vi`)
-- Russian (`ru`)
-
-## For Teams & Businesses
-
-Interested in using VenomCowork in your organization? We'd love to hear from you â€” reach out at [ben@venomcowork.local](mailto:ben@venomcowork.local) to chat about your use case.
+- TypeScript everywhere. No `any`, no `as`, no type casts unless the
+  surrounding type genuinely demands it.
+- Use `pnpm`. No `npm` or `yarn`.
+- Use the components under `apps/app/src/components` (shadcn/ui on Base UI)
+  before inventing new primitives.
+- Tailwind + tokens for styling. Match the dark-mode-first aesthetic.
+- Keep diffs small. If a problem can be solved in a simpler way, propose
+  the simpler way.
 
 ## License
 
-MIT â€” see `LICENSE`.
+MIT — see `LICENSE`.

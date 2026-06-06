@@ -8,11 +8,6 @@
     "opencode-router": "bin/opencode-router.mjs"
   },
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/venom-cowork/workspace.git",
-    "directory": "apps/opencode-router"
-  },
   "keywords": [
     "opencode",
     "router",

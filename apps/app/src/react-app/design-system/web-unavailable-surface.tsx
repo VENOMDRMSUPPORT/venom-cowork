@@ -36,15 +36,25 @@ export function WebUnavailableSurface(props: WebUnavailableSurfaceProps) {
         >
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <span>{MESSAGE}</span>
-            <a
-              href="https://venomcowork.local"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 underline underline-offset-2 hover:no-underline"
-            >
-              <span>Download VenomCowork Desktop</span>
-              <ArrowUpRight size={props.compact ? 12 : 14} />
-            </a>
+            {(() => {
+              const url =
+                (typeof import.meta !== "undefined" &&
+                  typeof import.meta.env?.VITE_VENOMCOWORK_DOWNLOAD_URL === "string"
+                  ? import.meta.env.VITE_VENOMCOWORK_DOWNLOAD_URL.trim()
+                  : "") || "";
+              if (!url) return null;
+              return (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 underline underline-offset-2 hover:no-underline"
+                >
+                  <span>Download VenomCowork Desktop</span>
+                  <ArrowUpRight size={props.compact ? 12 : 14} />
+                </a>
+              );
+            })()}
           </div>
         </div>
       ) : null}

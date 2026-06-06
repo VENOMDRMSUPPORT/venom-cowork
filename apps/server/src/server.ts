@@ -1118,7 +1118,16 @@ function buildCapabilities(config: ServerConfig): Capabilities {
       skills: {
         read: true,
         install: writeEnabled,
-        repo: { owner: "venom-cowork", name: "venomcowork-hub", ref: "main" },
+        // Default hub repo is operator-controlled via VENOMCOWORK_HUB_OWNER
+        // and VENOMCOWORK_HUB_REPO. When unset, the hub is reported as
+        // unconfigured and the in-app Skills tab will be empty.
+        repo: process.env.VENOMCOWORK_HUB_OWNER && process.env.VENOMCOWORK_HUB_REPO
+          ? {
+              owner: process.env.VENOMCOWORK_HUB_OWNER,
+              name: process.env.VENOMCOWORK_HUB_REPO,
+              ref: process.env.VENOMCOWORK_HUB_REF?.trim() || "main",
+            }
+          : null,
       },
     },
     plugins: { read: true, write: writeEnabled },
@@ -3833,10 +3842,21 @@ function createRoutes(
     const owner = ctx.url.searchParams.get("owner")?.trim();
     const repo = ctx.url.searchParams.get("repo")?.trim();
     const ref = ctx.url.searchParams.get("ref")?.trim();
+    if (!owner || !repo) {
+      return jsonResponse(
+        {
+          error: "hub_unconfigured",
+          message:
+            "Skill hub is not configured. Set VENOMCOWORK_HUB_OWNER and VENOMCOWORK_HUB_REPO, or pass ?owner=...&repo=... on the request.",
+          items: [],
+        },
+        503,
+      );
+    }
     const items = await listHubSkills({
-      owner: owner || "venom-cowork",
-      repo: repo || "venomcowork-hub",
-      ref: ref || "main",
+      owner,
+      repo,
+      ref: ref || process.env.VENOMCOWORK_HUB_REF?.trim() || "main",
     });
     return jsonResponse({ items });
   });

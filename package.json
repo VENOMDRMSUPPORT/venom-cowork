@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "VENOMCOWORK_DEV_MODE=1 VENOMCOWORK_ELECTRON_REMOTE_DEBUG_PORT=${VENOMCOWORK_ELECTRON_REMOTE_DEBUG_PORT:-9823} pnpm --filter @venom-cowork/desktop dev",
     "dev:electron": "VENOMCOWORK_DEV_MODE=1 pnpm --filter @venom-cowork/desktop dev:electron",
-    "dev:sandbox": "bash .devcontainer/dev-sandbox.sh",
     "dev:windows": ".\\scripts\\dev-windows.cmd",
     "dev:windows:x64": ".\\scripts\\dev-windows.cmd x64",
     "dev:ui": "VENOMCOWORK_DEV_MODE=1 pnpm --filter @venom-cowork/app dev",
@@ -21,7 +20,6 @@
     "dev:den:inference": "sh -lc 'DEN_WEB_PORT=${DEN_WEB_PORT:-3005}; VENOMCOWORK_APP_PORT=${VENOMCOWORK_APP_PORT:-5173}; INFERENCE_PORT=${INFERENCE_PORT:-8791}; DEN_LOCAL_ORIGINS=http://localhost:$DEN_WEB_PORT,http://127.0.0.1:$DEN_WEB_PORT,http://localhost:$VENOMCOWORK_APP_PORT,http://127.0.0.1:$VENOMCOWORK_APP_PORT; VENOMCOWORK_DEV_MODE=1 PORT=$INFERENCE_PORT DATABASE_URL=${DATABASE_URL:-mysql://root:password@127.0.0.1:3306/venomcowork_den} DEN_DB_ENCRYPTION_KEY=${DEN_DB_ENCRYPTION_KEY:-local-dev-db-encryption-key-please-change-1234567890} CORS_ORIGINS=${CORS_ORIGINS:-$DEN_LOCAL_ORIGINS} INFERENCE_PROXY_BASE_URL=${INFERENCE_PROXY_BASE_URL:-http://localhost:$INFERENCE_PORT} INFERENCE_ADMIN_TOKEN=${INFERENCE_ADMIN_TOKEN:-local-dev-admin-token} INFERENCE_WEBHOOK_SECRET=${INFERENCE_WEBHOOK_SECRET:-local-dev-webhook-secret} pnpm --filter @venom-cowork-ee/inference dev:local'",
     "dev:den:web": "sh -lc 'DEN_API_PORT=${DEN_API_PORT:-8790}; DEN_WEB_PORT=${DEN_WEB_PORT:-3005}; VENOMCOWORK_DEV_MODE=1 NEXT_PUBLIC_POSTHOG_KEY= NEXT_PUBLIC_POSTHOG_API_KEY= DEN_API_BASE=${DEN_API_BASE:-http://localhost:$DEN_API_PORT} DEN_AUTH_ORIGIN=${DEN_AUTH_ORIGIN:-http://localhost:$DEN_WEB_PORT} DEN_AUTH_FALLBACK_BASE=${DEN_AUTH_FALLBACK_BASE:-http://localhost:$DEN_API_PORT} pnpm --filter @venom-cowork-ee/den-web dev:local'",
     "email:dev": "pnpm --filter @venom-cowork/email dev",
-    "dev:den-docker": "bash packaging/docker/den-dev-up.sh",
     "dev:den:seed-demo": "pnpm --filter @venom-cowork-ee/den-api seed:demo-org",
     "dev:headless-web": "VENOMCOWORK_DEV_MODE=1 bun scripts/dev-headless-web.ts",
     "build": "node scripts/build.mjs",
@@ -44,12 +42,7 @@
     "bump:patch": "pnpm --filter @venom-cowork/app bump:patch",
     "bump:minor": "pnpm --filter @venom-cowork/app bump:minor",
     "bump:major": "pnpm --filter @venom-cowork/app bump:major",
-    "bump:set": "pnpm --filter @venom-cowork/app bump:set",
-    "release:review": "node scripts/release/review.mjs",
-    "release:prepare": "node scripts/release/prepare.mjs",
-    "release:prepare:dry": "node scripts/release/prepare.mjs --dry-run",
-    "release:ship": "node scripts/release/ship.mjs",
-    "release:ship:watch": "node scripts/release/ship.mjs --watch"
+    "bump:set": "pnpm --filter @venom-cowork/app bump:set"
   },
   "devDependencies": {
     "ico-endec": "^0.1.6",
