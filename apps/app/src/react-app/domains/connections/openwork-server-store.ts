@@ -1,4 +1,4 @@
-﻿import { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 import { t } from "../../../i18n";
 import type { StartupPreference, WorkspaceDisplay } from "../../../app/types";
@@ -6,22 +6,22 @@ import { isDesktopRuntime } from "../../../app/utils";
 import {
   venomcoworkServerInfo,
   venomcoworkServerRestart,
-  type OpenworkServerInfo,
+  type VenomcoworkServerInfo,
 } from "../../../app/lib/desktop";
 import {
-  clearOpenworkServerSettings,
-  createOpenworkServerClient,
-  isLoopbackOpenworkServerUrl,
-  normalizeOpenworkServerUrl,
-  readOpenworkServerSettings,
-  writeOpenworkServerSettings,
-  type OpenworkAuditEntry,
-  type OpenworkServerCapabilities,
-  type OpenworkServerClient,
-  type OpenworkServerDiagnostics,
-  type OpenworkServerError,
-  type OpenworkServerSettings,
-  type OpenworkServerStatus,
+  clearVenomcoworkServerSettings,
+  createVenomcoworkServerClient,
+  isLoopbackVenomcoworkServerUrl,
+  normalizeVenomcoworkServerUrl,
+  readVenomcoworkServerSettings,
+  writeVenomcoworkServerSettings,
+  type VenomcoworkAuditEntry,
+  type VenomcoworkServerCapabilities,
+  type VenomcoworkServerClient,
+  type VenomcoworkServerDiagnostics,
+  type VenomcoworkServerError,
+  type VenomcoworkServerSettings,
+  type VenomcoworkServerStatus,
 } from "../../../app/lib/venomcowork-server";
 
 type SetStateAction<T> = T | ((current: T) => T);
@@ -33,33 +33,33 @@ type RemoteWorkspaceInput = {
   displayName?: string | null;
 };
 
-export type OpenworkServerStoreSnapshot = {
-  venomcoworkServerSettings: OpenworkServerSettings;
+export type VenomcoworkServerStoreSnapshot = {
+  venomcoworkServerSettings: VenomcoworkServerSettings;
   shareRemoteAccessBusy: boolean;
   shareRemoteAccessError: string | null;
   venomcoworkServerUrl: string;
   venomcoworkServerBaseUrl: string;
   venomcoworkServerAuth: { token?: string; hostToken?: string };
-  venomcoworkServerClient: OpenworkServerClient | null;
-  venomcoworkServerStatus: OpenworkServerStatus;
-  venomcoworkServerCapabilities: OpenworkServerCapabilities | null;
+  venomcoworkServerClient: VenomcoworkServerClient | null;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
+  venomcoworkServerCapabilities: VenomcoworkServerCapabilities | null;
   venomcoworkServerReady: boolean;
   venomcoworkServerWorkspaceReady: boolean;
-  resolvedOpenworkCapabilities: OpenworkServerCapabilities | null;
+  resolvedVenomcoworkCapabilities: VenomcoworkServerCapabilities | null;
   venomcoworkServerCanWriteSkills: boolean;
   venomcoworkServerCanWritePlugins: boolean;
-  venomcoworkServerHostInfo: OpenworkServerInfo | null;
-  venomcoworkServerDiagnostics: OpenworkServerDiagnostics | null;
+  venomcoworkServerHostInfo: VenomcoworkServerInfo | null;
+  venomcoworkServerDiagnostics: VenomcoworkServerDiagnostics | null;
   venomcoworkReconnectBusy: boolean;
-  venomcoworkAuditEntries: OpenworkAuditEntry[];
+  venomcoworkAuditEntries: VenomcoworkAuditEntry[];
   venomcoworkAuditStatus: "idle" | "loading" | "error";
   venomcoworkAuditError: string | null;
   devtoolsWorkspaceId: string | null;
 };
 
-export type OpenworkServerStore = ReturnType<typeof createOpenworkServerStore>;
+export type VenomcoworkServerStore = ReturnType<typeof createVenomcoworkServerStore>;
 
-type CreateOpenworkServerStoreOptions = {
+type CreateVenomcoworkServerStoreOptions = {
   startupPreference: () => StartupPreference | null;
   documentVisible: () => boolean;
   developerMode: () => boolean;
@@ -71,18 +71,18 @@ type CreateOpenworkServerStoreOptions = {
 };
 
 type MutableState = {
-  venomcoworkServerSettings: OpenworkServerSettings;
+  venomcoworkServerSettings: VenomcoworkServerSettings;
   shareRemoteAccessBusy: boolean;
   shareRemoteAccessError: string | null;
   venomcoworkServerUrl: string;
-  venomcoworkServerStatus: OpenworkServerStatus;
-  venomcoworkServerCapabilities: OpenworkServerCapabilities | null;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
+  venomcoworkServerCapabilities: VenomcoworkServerCapabilities | null;
   venomcoworkServerCheckedAt: number | null;
-  venomcoworkServerHostInfo: OpenworkServerInfo | null;
+  venomcoworkServerHostInfo: VenomcoworkServerInfo | null;
   venomcoworkServerHostInfoReady: boolean;
-  venomcoworkServerDiagnostics: OpenworkServerDiagnostics | null;
+  venomcoworkServerDiagnostics: VenomcoworkServerDiagnostics | null;
   venomcoworkReconnectBusy: boolean;
-  venomcoworkAuditEntries: OpenworkAuditEntry[];
+  venomcoworkAuditEntries: VenomcoworkAuditEntry[];
   venomcoworkAuditStatus: "idle" | "loading" | "error";
   venomcoworkAuditError: string | null;
   devtoolsWorkspaceId: string | null;
@@ -91,13 +91,13 @@ type MutableState = {
 const applyStateAction = <T,>(current: T, next: SetStateAction<T>) =>
   typeof next === "function" ? (next as (value: T) => T)(current) : next;
 
-export function createOpenworkServerStore(options: CreateOpenworkServerStoreOptions) {
+export function createVenomcoworkServerStore(options: CreateVenomcoworkServerStoreOptions) {
   const bootStartedAt = Date.now();
   const listeners = new Set<() => void>();
   const intervals = new Map<string, number>();
 
   let clientCacheKey = "";
-  let clientCacheValue: OpenworkServerClient | null = null;
+  let clientCacheValue: VenomcoworkServerClient | null = null;
   let started = false;
   let disposed = false;
   let healthTimeoutId: number | null = null;
@@ -105,10 +105,10 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
   let healthDelayMs = 10_000;
   let consecutiveHealthFailures = 0;
   let visibilityChangeHandler: (() => void) | null = null;
-  let snapshot: OpenworkServerStoreSnapshot;
+  let snapshot: VenomcoworkServerStoreSnapshot;
 
   let state: MutableState = {
-    venomcoworkServerSettings: readOpenworkServerSettings(),
+    venomcoworkServerSettings: readVenomcoworkServerSettings(),
     shareRemoteAccessBusy: false,
     shareRemoteAccessError: null,
     venomcoworkServerUrl: "",
@@ -132,10 +132,10 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
   const getBaseUrl = () => {
     const pref = options.startupPreference();
     const hostInfo = state.venomcoworkServerHostInfo;
-    const settingsUrl = normalizeOpenworkServerUrl(state.venomcoworkServerSettings.urlOverride ?? "") ?? "";
+    const settingsUrl = normalizeVenomcoworkServerUrl(state.venomcoworkServerSettings.urlOverride ?? "") ?? "";
 
     if (pref === "local") return hostInfo?.baseUrl ?? "";
-    if (pref === "server" && settingsUrl && isLoopbackOpenworkServerUrl(settingsUrl) && hostInfo?.baseUrl) {
+    if (pref === "server" && settingsUrl && isLoopbackVenomcoworkServerUrl(settingsUrl) && hostInfo?.baseUrl) {
       return hostInfo.baseUrl;
     }
     if (pref === "server") return settingsUrl;
@@ -145,7 +145,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
   const getAuth = () => {
     const pref = options.startupPreference();
     const hostInfo = state.venomcoworkServerHostInfo;
-    const settingsUrl = normalizeOpenworkServerUrl(state.venomcoworkServerSettings.urlOverride ?? "") ?? "";
+    const settingsUrl = normalizeVenomcoworkServerUrl(state.venomcoworkServerSettings.urlOverride ?? "") ?? "";
     const settingsToken = state.venomcoworkServerSettings.token?.trim() ?? "";
     const settingsHostToken = state.venomcoworkServerSettings.hostToken?.trim() ?? "";
     const clientToken = hostInfo?.clientToken?.trim() ?? "";
@@ -154,7 +154,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     if (pref === "local") {
       return { token: clientToken || undefined, hostToken: hostToken || undefined };
     }
-    if (pref === "server" && settingsUrl && isLoopbackOpenworkServerUrl(settingsUrl) && hostInfo?.baseUrl) {
+    if (pref === "server" && settingsUrl && isLoopbackVenomcoworkServerUrl(settingsUrl) && hostInfo?.baseUrl) {
       return {
         token: clientToken || settingsToken || undefined,
         hostToken: hostToken || settingsHostToken || undefined,
@@ -163,7 +163,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     if (pref === "server") {
       return {
         token: settingsToken || undefined,
-        hostToken: settingsUrl && isLoopbackOpenworkServerUrl(settingsUrl) ? settingsHostToken || undefined : undefined,
+        hostToken: settingsUrl && isLoopbackVenomcoworkServerUrl(settingsUrl) ? settingsHostToken || undefined : undefined,
       };
     }
     if (hostInfo?.baseUrl) {
@@ -171,7 +171,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     }
     return {
       token: settingsToken || undefined,
-      hostToken: settingsUrl && isLoopbackOpenworkServerUrl(settingsUrl) ? settingsHostToken || undefined : undefined,
+      hostToken: settingsUrl && isLoopbackVenomcoworkServerUrl(settingsUrl) ? settingsHostToken || undefined : undefined,
     };
   };
 
@@ -187,7 +187,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     const key = `${baseUrl}::${auth.token ?? ""}::${auth.hostToken ?? ""}`;
     if (key !== clientCacheKey) {
       clientCacheKey = key;
-      clientCacheValue = createOpenworkServerClient({
+      clientCacheValue = createVenomcoworkServerClient({
         baseUrl,
         token: auth.token,
         hostToken: auth.hostToken,
@@ -202,12 +202,12 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     const venomcoworkServerClient = getClient();
     const venomcoworkServerReady = state.venomcoworkServerStatus === "connected";
     const venomcoworkServerWorkspaceReady = Boolean(options.runtimeWorkspaceId());
-    const resolvedOpenworkCapabilities = state.venomcoworkServerCapabilities;
+    const resolvedVenomcoworkCapabilities = state.venomcoworkServerCapabilities;
 
     const pref = options.startupPreference();
     const info = state.venomcoworkServerHostInfo;
     const hostUrl = info?.connectUrl ?? info?.lanUrl ?? info?.mdnsUrl ?? info?.baseUrl ?? "";
-    const settingsUrl = normalizeOpenworkServerUrl(state.venomcoworkServerSettings.urlOverride ?? "") ?? "";
+    const settingsUrl = normalizeVenomcoworkServerUrl(state.venomcoworkServerSettings.urlOverride ?? "") ?? "";
 
     let venomcoworkServerUrl = hostUrl || settingsUrl;
     if (pref === "local") venomcoworkServerUrl = hostUrl;
@@ -226,13 +226,13 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
       venomcoworkServerCapabilities: state.venomcoworkServerCapabilities,
       venomcoworkServerReady,
       venomcoworkServerWorkspaceReady,
-      resolvedOpenworkCapabilities,
+      resolvedVenomcoworkCapabilities,
       venomcoworkServerCanWriteSkills:
         venomcoworkServerReady &&
-        (resolvedOpenworkCapabilities?.skills?.write ?? false),
+        (resolvedVenomcoworkCapabilities?.skills?.write ?? false),
       venomcoworkServerCanWritePlugins:
         venomcoworkServerReady &&
-        (resolvedOpenworkCapabilities?.plugins?.write ?? false),
+        (resolvedVenomcoworkCapabilities?.plugins?.write ?? false),
       venomcoworkServerHostInfo: state.venomcoworkServerHostInfo,
       venomcoworkServerDiagnostics: state.venomcoworkServerDiagnostics,
       venomcoworkReconnectBusy: state.venomcoworkReconnectBusy,
@@ -254,20 +254,20 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     mutateState((current) => ({ ...current, [key]: value }));
   };
 
-  const setOpenworkServerSettings = (next: SetStateAction<OpenworkServerSettings>) => {
+  const setVenomcoworkServerSettings = (next: SetStateAction<VenomcoworkServerSettings>) => {
     const resolved = applyStateAction(state.venomcoworkServerSettings, next);
     mutateState((current) => ({ ...current, venomcoworkServerSettings: resolved }));
     queueHealthCheck(0);
   };
 
-  const updateOpenworkServerSettings = (next: OpenworkServerSettings) => {
-    const stored = writeOpenworkServerSettings(next);
+  const updateVenomcoworkServerSettings = (next: VenomcoworkServerSettings) => {
+    const stored = writeVenomcoworkServerSettings(next);
     mutateState((current) => ({ ...current, venomcoworkServerSettings: stored }));
     queueHealthCheck(0);
   };
 
-  const resetOpenworkServerSettings = () => {
-    clearOpenworkServerSettings();
+  const resetVenomcoworkServerSettings = () => {
+    clearVenomcoworkServerSettings();
     mutateState((current) => ({ ...current, venomcoworkServerSettings: {} }));
     queueHealthCheck(0);
   };
@@ -277,37 +277,37 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     options.startupPreference() !== "server" &&
     !state.venomcoworkServerHostInfoReady;
 
-  const shouldRetryStartupCheck = (status: OpenworkServerStatus) =>
+  const shouldRetryStartupCheck = (status: VenomcoworkServerStatus) =>
     status !== "connected" &&
     isDesktopRuntime() &&
     options.startupPreference() !== "server" &&
     Date.now() - bootStartedAt < 5_000;
 
-  const checkOpenworkServer = async (url: string, token?: string, hostToken?: string) => {
-    const client = createOpenworkServerClient({ baseUrl: url, token, hostToken });
+  const checkVenomcoworkServer = async (url: string, token?: string, hostToken?: string) => {
+    const client = createVenomcoworkServerClient({ baseUrl: url, token, hostToken });
     try {
       await client.health();
     } catch (error) {
-      const resolved = error as OpenworkServerError | Error;
+      const resolved = error as VenomcoworkServerError | Error;
       if ("status" in resolved && (resolved.status === 401 || resolved.status === 403)) {
-        return { status: "limited" as OpenworkServerStatus, capabilities: null };
+        return { status: "limited" as VenomcoworkServerStatus, capabilities: null };
       }
-      return { status: "disconnected" as OpenworkServerStatus, capabilities: null };
+      return { status: "disconnected" as VenomcoworkServerStatus, capabilities: null };
     }
 
     if (!token) {
-      return { status: "limited" as OpenworkServerStatus, capabilities: null };
+      return { status: "limited" as VenomcoworkServerStatus, capabilities: null };
     }
 
     try {
       const capabilities = await client.capabilities();
-      return { status: "connected" as OpenworkServerStatus, capabilities };
+      return { status: "connected" as VenomcoworkServerStatus, capabilities };
     } catch (error) {
-      const resolved = error as OpenworkServerError | Error;
+      const resolved = error as VenomcoworkServerError | Error;
       if ("status" in resolved && (resolved.status === 401 || resolved.status === 403)) {
-        return { status: "limited" as OpenworkServerStatus, capabilities: null };
+        return { status: "limited" as VenomcoworkServerStatus, capabilities: null };
       }
-      return { status: "disconnected" as OpenworkServerStatus, capabilities: null };
+      return { status: "disconnected" as VenomcoworkServerStatus, capabilities: null };
     }
   };
 
@@ -354,14 +354,14 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
 
     healthBusy = true;
     try {
-      let result = await checkOpenworkServer(url, auth.token, auth.hostToken);
+      let result = await checkVenomcoworkServer(url, auth.token, auth.hostToken);
 
       if (shouldRetryStartupCheck(result.status)) {
         await new Promise<void>((resolve) => window.setTimeout(resolve, 250));
         if (disposed) return;
 
         try {
-          const info = await venomcoworkServerInfo() as OpenworkServerInfo;
+          const info = await venomcoworkServerInfo() as VenomcoworkServerInfo;
           if (disposed) return;
 
           mutateState((current) => ({
@@ -374,7 +374,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
           const retryToken = info.clientToken?.trim() || undefined;
           const retryHostToken = info.hostToken?.trim() || undefined;
           if (retryUrl) {
-            result = await checkOpenworkServer(retryUrl, retryToken, retryHostToken);
+            result = await checkVenomcoworkServer(retryUrl, retryToken, retryHostToken);
           }
         } catch {
           // Preserve the original check result when the retry probe fails.
@@ -425,7 +425,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     if (!port) return;
     if (state.venomcoworkServerSettings.portOverride === port) return;
 
-    updateOpenworkServerSettings({
+    updateVenomcoworkServerSettings({
       ...state.venomcoworkServerSettings,
       portOverride: port,
     });
@@ -468,7 +468,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
       if (!options.documentVisible()) return;
       void (async () => {
         try {
-          const info = await venomcoworkServerInfo() as OpenworkServerInfo;
+          const info = await venomcoworkServerInfo() as VenomcoworkServerInfo;
           if (disposed) return;
           mutateState((current) => ({
             ...current,
@@ -611,8 +611,8 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     for (const key of [...intervals.keys()]) stopInterval(key);
   };
 
-  const testOpenworkServerConnection = async (next: OpenworkServerSettings) => {
-    const derived = normalizeOpenworkServerUrl(next.urlOverride ?? "");
+  const testVenomcoworkServerConnection = async (next: VenomcoworkServerSettings) => {
+    const derived = normalizeVenomcoworkServerUrl(next.urlOverride ?? "");
     if (!derived) {
       mutateState((current) => ({
         ...current,
@@ -623,7 +623,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
       return false;
     }
 
-    const result = await checkOpenworkServer(derived, next.token);
+    const result = await checkVenomcoworkServer(derived, next.token);
     consecutiveHealthFailures = result.status === "disconnected" ? consecutiveHealthFailures + 1 : 0;
     mutateState((current) => ({
       ...current,
@@ -651,7 +651,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     return ok;
   };
 
-  const reconnectOpenworkServer = async () => {
+  const reconnectVenomcoworkServer = async () => {
     if (state.venomcoworkReconnectBusy) return false;
     setStateField("venomcoworkReconnectBusy", true);
 
@@ -659,7 +659,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
       let hostInfo = state.venomcoworkServerHostInfo;
       if (isDesktopRuntime()) {
         try {
-          hostInfo = await venomcoworkServerInfo() as OpenworkServerInfo;
+          hostInfo = await venomcoworkServerInfo() as VenomcoworkServerInfo;
           mutateState((current) => ({ ...current, venomcoworkServerHostInfo: hostInfo }));
         } catch {
           hostInfo = null;
@@ -671,7 +671,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
         const liveToken = hostInfo.clientToken.trim();
         const settings = state.venomcoworkServerSettings;
         if ((settings.token?.trim() ?? "") !== liveToken) {
-          updateOpenworkServerSettings({ ...settings, token: liveToken });
+          updateVenomcoworkServerSettings({ ...settings, token: liveToken });
         }
       }
 
@@ -687,7 +687,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
         return false;
       }
 
-      const result = await checkOpenworkServer(url, auth.token, auth.hostToken);
+      const result = await checkVenomcoworkServer(url, auth.token, auth.hostToken);
       mutateState((current) => ({
         ...current,
         venomcoworkServerStatus: result.status,
@@ -700,10 +700,10 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     }
   };
 
-  async function ensureLocalOpenworkServerClient(): Promise<OpenworkServerClient | null> {
+  async function ensureLocalVenomcoworkServerClient(): Promise<VenomcoworkServerClient | null> {
     let hostInfo = state.venomcoworkServerHostInfo;
     if (hostInfo?.baseUrl?.trim() && hostInfo.clientToken?.trim()) {
-      const existing = createOpenworkServerClient({
+      const existing = createVenomcoworkServerClient({
         baseUrl: hostInfo.baseUrl.trim(),
         token: hostInfo.clientToken.trim(),
         hostToken: hostInfo.hostToken?.trim() || undefined,
@@ -711,7 +711,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
       try {
         await existing.health();
         if (options.startupPreference() !== "server") {
-          await reconnectOpenworkServer();
+          await reconnectVenomcoworkServer();
         }
         return existing;
       } catch {
@@ -724,7 +724,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     try {
       hostInfo = await venomcoworkServerRestart({
         remoteAccessEnabled: state.venomcoworkServerSettings.remoteAccessEnabled === true,
-      }) as OpenworkServerInfo;
+      }) as VenomcoworkServerInfo;
       mutateState((current) => ({ ...current, venomcoworkServerHostInfo: hostInfo }));
     } catch {
       return null;
@@ -736,10 +736,10 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     if (!baseUrl || !token) return null;
 
     if (options.startupPreference() !== "server") {
-      await reconnectOpenworkServer();
+      await reconnectVenomcoworkServer();
     }
 
-    return createOpenworkServerClient({
+    return createVenomcoworkServerClient({
       baseUrl,
       token,
       hostToken: hostToken || undefined,
@@ -749,7 +749,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
   const saveShareRemoteAccess = async (enabled: boolean) => {
     if (state.shareRemoteAccessBusy) return;
     const previous = state.venomcoworkServerSettings;
-    const next: OpenworkServerSettings = {
+    const next: VenomcoworkServerSettings = {
       ...previous,
       remoteAccessEnabled: enabled,
     };
@@ -759,7 +759,7 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
       shareRemoteAccessBusy: true,
       shareRemoteAccessError: null,
     }));
-    updateOpenworkServerSettings(next);
+    updateVenomcoworkServerSettings(next);
 
     try {
       if (isDesktopRuntime() && options.selectedWorkspaceDisplay().workspaceType === "local") {
@@ -767,10 +767,10 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
         if (!restarted) {
           throw new Error(t("app.error_restart_local_worker"));
         }
-        await reconnectOpenworkServer();
+        await reconnectVenomcoworkServer();
       }
     } catch (error) {
-      updateOpenworkServerSettings(previous);
+      updateVenomcoworkServerSettings(previous);
       mutateState((current) => ({
         ...current,
         shareRemoteAccessError:
@@ -801,17 +801,17 @@ export function createOpenworkServerStore(options: CreateOpenworkServerStoreOpti
     start,
     dispose,
     syncFromOptions,
-    setOpenworkServerSettings,
-    updateOpenworkServerSettings,
-    resetOpenworkServerSettings,
+    setVenomcoworkServerSettings,
+    updateVenomcoworkServerSettings,
+    resetVenomcoworkServerSettings,
     saveShareRemoteAccess,
-    checkOpenworkServer,
-    testOpenworkServerConnection,
-    reconnectOpenworkServer,
-    ensureLocalOpenworkServerClient,
+    checkVenomcoworkServer,
+    testVenomcoworkServerConnection,
+    reconnectVenomcoworkServer,
+    ensureLocalVenomcoworkServerClient,
   };
 }
 
-export function useOpenworkServerStoreSnapshot(store: OpenworkServerStore) {
+export function useVenomcoworkServerStoreSnapshot(store: VenomcoworkServerStore) {
   return useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
 }

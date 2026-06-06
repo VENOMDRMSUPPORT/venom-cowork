@@ -1,16 +1,16 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useEffect, useMemo, useReducer, useRef } from "react";
 import { RefreshCcw } from "lucide-react";
 
 import { readDevLogs } from "../../../../app/lib/dev-log";
 import { readPerfLogs } from "../../../../app/lib/perf-log";
 import {
-  buildOpenworkWorkspaceBaseUrl,
-  parseOpenworkWorkspaceIdFromUrl,
-  type OpenworkServerSettings,
-  type OpenworkServerStatus,
+  buildVenomcoworkWorkspaceBaseUrl,
+  parseVenomcoworkWorkspaceIdFromUrl,
+  type VenomcoworkServerSettings,
+  type VenomcoworkServerStatus,
 } from "../../../../app/lib/venomcowork-server";
-import type { OpenworkServerInfo } from "../../../../app/lib/desktop";
+import type { VenomcoworkServerInfo } from "../../../../app/lib/desktop";
 import { isDesktopRuntime } from "../../../../app/utils";
 import { t } from "../../../../i18n";
 import {
@@ -28,16 +28,16 @@ export type ConfigViewProps = {
   clientConnected: boolean;
   anyActiveRuns: boolean;
 
-  venomcoworkServerStatus: OpenworkServerStatus;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
   venomcoworkServerUrl: string;
-  venomcoworkServerSettings: OpenworkServerSettings;
-  venomcoworkServerHostInfo: OpenworkServerInfo | null;
+  venomcoworkServerSettings: VenomcoworkServerSettings;
+  venomcoworkServerHostInfo: VenomcoworkServerInfo | null;
   runtimeWorkspaceId: string | null;
 
-  updateOpenworkServerSettings: (next: OpenworkServerSettings) => void;
-  resetOpenworkServerSettings: () => void;
-  testOpenworkServerConnection: (
-    next: OpenworkServerSettings,
+  updateVenomcoworkServerSettings: (next: VenomcoworkServerSettings) => void;
+  resetVenomcoworkServerSettings: () => void;
+  testVenomcoworkServerConnection: (
+    next: VenomcoworkServerSettings,
   ) => Promise<boolean>;
 
   canReloadWorkspace: boolean;
@@ -54,9 +54,9 @@ function buildDiagnosticsBundleJson(input: {
   developerMode: boolean;
   hostConnectUrl: string;
   hostConnectUrlUsesMdns: boolean;
-  hostInfo: OpenworkServerInfo | null;
-  venomcoworkServerSettings: OpenworkServerSettings;
-  venomcoworkServerStatus: OpenworkServerStatus;
+  hostInfo: VenomcoworkServerInfo | null;
+  venomcoworkServerSettings: VenomcoworkServerSettings;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
   venomcoworkServerUrl: string;
   runtimeWorkspaceId: string | null;
 }) {
@@ -181,13 +181,13 @@ export function ConfigView(props: ConfigViewProps) {
   const reloadButtonDisabled =
     props.reloadBusy || Boolean(reloadAvailabilityReason);
 
-  const buildOpenworkSettings = (): OpenworkServerSettings => ({
+  const buildVenomcoworkSettings = (): VenomcoworkServerSettings => ({
     ...props.venomcoworkServerSettings,
     urlOverride: venomcoworkUrl.trim() || undefined,
     token: venomcoworkToken.trim() || undefined,
   });
 
-  const hasOpenworkChanges = (() => {
+  const hasVenomcoworkChanges = (() => {
     const currentUrl = props.venomcoworkServerSettings.urlOverride ?? "";
     const currentToken = props.venomcoworkServerSettings.token ?? "";
     return (
@@ -198,13 +198,13 @@ export function ConfigView(props: ConfigViewProps) {
   const resolvedWorkspaceId = (() => {
     const explicitId = props.runtimeWorkspaceId?.trim() ?? "";
     if (explicitId) return explicitId;
-    return parseOpenworkWorkspaceIdFromUrl(venomcoworkUrl) ?? "";
+    return parseVenomcoworkWorkspaceIdFromUrl(venomcoworkUrl) ?? "";
   })();
 
   const resolvedWorkspaceUrl = (() => {
     const baseUrl = venomcoworkUrl.trim();
     if (!baseUrl) return "";
-    return buildOpenworkWorkspaceBaseUrl(baseUrl, resolvedWorkspaceId) ?? baseUrl;
+    return buildVenomcoworkWorkspaceBaseUrl(baseUrl, resolvedWorkspaceId) ?? baseUrl;
   })();
 
   const hostInfo = props.venomcoworkServerHostInfo;
@@ -273,15 +273,15 @@ export function ConfigView(props: ConfigViewProps) {
 
   const handleTestConnection = async () => {
     if (venomcoworkTestState === "testing") return;
-    const next = buildOpenworkSettings();
-    props.updateOpenworkServerSettings(next);
+    const next = buildVenomcoworkSettings();
+    props.updateVenomcoworkServerSettings(next);
     dispatchLocal({
       type: "testState",
       testState: "testing",
       testMessage: null,
     });
     try {
-      const ok = await props.testOpenworkServerConnection(next);
+      const ok = await props.testVenomcoworkServerConnection(next);
       dispatchLocal({
         type: "testState",
         testState: ok ? "success" : "error",
@@ -347,13 +347,13 @@ export function ConfigView(props: ConfigViewProps) {
         resolvedWorkspaceId={resolvedWorkspaceId}
         venomcoworkTestState={venomcoworkTestState}
         venomcoworkTestMessage={venomcoworkTestMessage}
-        hasOpenworkChanges={hasOpenworkChanges}
+        hasVenomcoworkChanges={hasVenomcoworkChanges}
         onUrlChange={(url) => dispatchLocal({ type: "url", url })}
         onTokenChange={(token) => dispatchLocal({ type: "token", token })}
         onToggleToken={() => dispatchLocal({ type: "toggleToken", key: "venomcowork" })}
         onTestConnection={handleTestConnection}
-        onSave={() => props.updateOpenworkServerSettings(buildOpenworkSettings())}
-        onReset={props.resetOpenworkServerSettings}
+        onSave={() => props.updateVenomcoworkServerSettings(buildVenomcoworkSettings())}
+        onReset={props.resetVenomcoworkServerSettings}
       />
       <ConfigMessagingIdentitiesSection />
       {!isDesktopRuntime() ? <div className="text-xs text-gray-9">{t("config.desktop_only_hint")}</div> : null}

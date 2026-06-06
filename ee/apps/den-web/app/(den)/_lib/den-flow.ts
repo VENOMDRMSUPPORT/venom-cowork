@@ -1,4 +1,4 @@
-﻿import { DEN_WORKER_POLL_INTERVAL_MS } from "./CONSTS";
+import { DEN_WORKER_POLL_INTERVAL_MS } from "./CONSTS";
 
 export type AuthMode = "sign-in" | "sign-up";
 export type SocialAuthProvider = "github" | "google";
@@ -826,7 +826,7 @@ function buildWorkspaceUrl(instanceUrl: string, workspaceId: string): string {
   return `${normalizeUrl(instanceUrl)}/w/${encodeURIComponent(workspaceId)}`;
 }
 
-export function buildOpenworkDeepLink(
+export function buildVenomcoworkDeepLink(
   venomcoworkUrl: string | null,
   accessToken: string | null,
   workerId: string | null,
@@ -853,7 +853,7 @@ export function buildOpenworkDeepLink(
   return `venomcowork://connect-remote?${params.toString()}`;
 }
 
-export function buildOpenworkAppConnectUrl(
+export function buildVenomcoworkAppConnectUrl(
   appConnectBaseUrl: string,
   venomcoworkUrl: string | null,
   accessToken: string | null,
@@ -957,7 +957,7 @@ async function requestAbsoluteJson(url: string, init: RequestInit = {}, timeoutM
   return { response, payload };
 }
 
-export async function resolveOpenworkWorkspaceUrl(instanceUrl: string, accessToken: string): Promise<{ workspaceId: string; venomcoworkUrl: string } | null> {
+export async function resolveVenomcoworkWorkspaceUrl(instanceUrl: string, accessToken: string): Promise<{ workspaceId: string; venomcoworkUrl: string } | null> {
   const baseUrl = normalizeUrl(instanceUrl);
   const token = accessToken.trim();
   if (!baseUrl || !token) {

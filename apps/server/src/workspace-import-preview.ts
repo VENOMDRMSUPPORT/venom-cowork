@@ -1,8 +1,8 @@
-﻿import { createHash } from "node:crypto";
+import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 
-import { sanitizeOpenworkTemplateConfig } from "./blueprint-sessions.js";
+import { sanitizeVenomcoworkTemplateConfig } from "./blueprint-sessions.js";
 import { buildCommandContent } from "./commands.js";
 import { ApiError } from "./errors.js";
 import { parseFrontmatter } from "./frontmatter.js";
@@ -184,7 +184,7 @@ export function normalizeWorkspaceImportPayload(
       ? { opencode: sanitizePortableOpencodeConfig(readRecord(payload.opencode)) }
       : {}),
     ...(payload.venomcowork !== undefined
-      ? { venomcowork: sanitizeOpenworkTemplateConfig(readRecord(payload.venomcowork)) }
+      ? { venomcowork: sanitizeVenomcoworkTemplateConfig(readRecord(payload.venomcowork)) }
       : {}),
     skills: normalizeSkills(payload.skills),
     commands: normalizeCommands(payload.commands),
@@ -274,7 +274,7 @@ function fingerprintWorkspaceImportChanges(changes: WorkspaceImportPlannedChange
   );
 }
 
-async function readOpenworkConfig(path: string): Promise<Record<string, unknown>> {
+async function readVenomcoworkConfig(path: string): Promise<Record<string, unknown>> {
   const raw = await readTextIfPresent(path);
   if (raw === null) return {};
   try {
@@ -333,7 +333,7 @@ export async function buildWorkspaceImportPreview(
   if (input.venomcowork !== undefined) {
     const path = venomcoworkConfigPath(workspaceRoot);
     const existsBefore = await exists(path);
-    const before = await readOpenworkConfig(path);
+    const before = await readVenomcoworkConfig(path);
     const after = input.modes.venomcowork === "replace" ? input.venomcowork : { ...before, ...input.venomcowork };
     changes.push({
       kind: "venomcowork",

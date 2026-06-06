@@ -1,7 +1,7 @@
-﻿import { createOpencodeClient, type Message, type Part, type Session, type Todo } from "@opencode-ai/sdk/v2/client";
+import { createOpencodeClient, type Message, type Part, type Session, type Todo } from "@opencode-ai/sdk/v2/client";
 
 import { desktopFetch } from "./desktop";
-import { createOpenworkServerClient, OpenworkServerError } from "./venomcowork-server";
+import { createVenomcoworkServerClient, VenomcoworkServerError } from "./venomcowork-server";
 import { isDesktopRuntime } from "../utils";
 
 type FieldsResult<T> =
@@ -136,7 +136,7 @@ async function postSessionRequest<T>(
   return { error, request, response };
 }
 
-function resolveOpenworkWorkspaceMount(baseUrl: string): { baseUrl: string; workspaceId: string } | null {
+function resolveVenomcoworkWorkspaceMount(baseUrl: string): { baseUrl: string; workspaceId: string } | null {
   try {
     const url = new URL(baseUrl);
     const match = url.pathname
@@ -172,7 +172,7 @@ function createSyntheticResult<T>(
   return { error: input.error, request, response };
 }
 
-async function wrapOpenworkRead<T>(
+async function wrapVenomcoworkRead<T>(
   url: string,
   read: () => Promise<T>,
   options?: { throwOnError?: boolean },
@@ -184,17 +184,17 @@ async function wrapOpenworkRead<T>(
     return createSyntheticResult(url, "GET", {
       ok: false,
       error,
-      status: error instanceof OpenworkServerError ? error.status : 500,
+      status: error instanceof VenomcoworkServerError ? error.status : 500,
     });
   }
 }
 
 function shouldFallbackToLegacySessionRead(error: unknown): boolean {
-  if (!(error instanceof OpenworkServerError)) return false;
+  if (!(error instanceof VenomcoworkServerError)) return false;
   return error.status === 404 || error.status === 405 || error.status === 501;
 }
 
-async function wrapOpenworkReadWithFallback<T>(
+async function wrapVenomcoworkReadWithFallback<T>(
   url: string,
   read: () => Promise<T>,
   fallback: () => Promise<FieldsResult<T>>,
@@ -208,7 +208,7 @@ async function wrapOpenworkReadWithFallback<T>(
       return createSyntheticResult(url, "GET", {
         ok: false,
         error,
-        status: error instanceof OpenworkServerError ? error.status : 500,
+        status: error instanceof VenomcoworkServerError ? error.status : 500,
       });
     }
     return fallback();
@@ -371,10 +371,10 @@ export function createClient(baseUrl: string, directory?: string, auth?: Opencod
   });
 
   const session = client.session as typeof client.session;
-  const venomcoworkMount = auth?.mode === "venomcowork" ? resolveOpenworkWorkspaceMount(baseUrl) : null;
+  const venomcoworkMount = auth?.mode === "venomcowork" ? resolveVenomcoworkWorkspaceMount(baseUrl) : null;
   const venomcoworkSessionClient =
     venomcoworkMount && auth?.token
-      ? createOpenworkServerClient({ baseUrl: venomcoworkMount.baseUrl, token: auth.token })
+      ? createVenomcoworkServerClient({ baseUrl: venomcoworkMount.baseUrl, token: auth.token })
       : null;
   // TODO(2026-04-12): remove the old-server compatibility path here once all
   // VenomCowork servers expose the workspace-scoped session read APIs.
@@ -398,7 +398,7 @@ export function createClient(baseUrl: string, directory?: string, auth?: Opencod
     if (parameters?.search?.trim()) query.set("search", parameters.search.trim());
     if (typeof parameters?.limit === "number") query.set("limit", String(parameters.limit));
     const url = `${venomcoworkMount.baseUrl}/workspace/${encodeURIComponent(venomcoworkMount.workspaceId)}/sessions${query.size ? `?${query.toString()}` : ""}`;
-    return wrapOpenworkReadWithFallback(
+    return wrapVenomcoworkReadWithFallback(
       url,
       async () => (await venomcoworkSessionClient.listSessions(venomcoworkMount.workspaceId, parameters)).items,
       () => listOriginal(parameters, options),
@@ -412,7 +412,7 @@ export function createClient(baseUrl: string, directory?: string, auth?: Opencod
       return getOriginal(parameters, options);
     }
     const url = `${venomcoworkMount.baseUrl}/workspace/${encodeURIComponent(venomcoworkMount.workspaceId)}/sessions/${encodeURIComponent(parameters.sessionID)}`;
-    return wrapOpenworkReadWithFallback(
+    return wrapVenomcoworkReadWithFallback(
       url,
       async () => (await venomcoworkSessionClient.getSession(venomcoworkMount.workspaceId, parameters.sessionID)).item,
       () => getOriginal(parameters, options),
@@ -428,7 +428,7 @@ export function createClient(baseUrl: string, directory?: string, auth?: Opencod
     const query = new URLSearchParams();
     if (typeof parameters.limit === "number") query.set("limit", String(parameters.limit));
     const url = `${venomcoworkMount.baseUrl}/workspace/${encodeURIComponent(venomcoworkMount.workspaceId)}/sessions/${encodeURIComponent(parameters.sessionID)}/messages${query.size ? `?${query.toString()}` : ""}`;
-    return wrapOpenworkReadWithFallback(
+    return wrapVenomcoworkReadWithFallback(
       url,
       async () =>
         (await venomcoworkSessionClient.getSessionMessages(venomcoworkMount.workspaceId, parameters.sessionID, {
@@ -445,7 +445,7 @@ export function createClient(baseUrl: string, directory?: string, auth?: Opencod
       return todoOriginal(parameters, options);
     }
     const url = `${venomcoworkMount.baseUrl}/workspace/${encodeURIComponent(venomcoworkMount.workspaceId)}/sessions/${encodeURIComponent(parameters.sessionID)}/snapshot`;
-    return wrapOpenworkReadWithFallback(
+    return wrapVenomcoworkReadWithFallback(
       url,
       async () => (await venomcoworkSessionClient.getSessionSnapshot(venomcoworkMount.workspaceId, parameters.sessionID)).item.todos,
       () => todoOriginal(parameters, options),

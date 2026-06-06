@@ -1,4 +1,4 @@
-﻿import { spawn } from "node:child_process";
+import { spawn } from "node:child_process";
 import { openSync } from "node:fs";
 import { access, mkdir } from "node:fs/promises";
 import { createServer } from "node:net";
@@ -135,7 +135,7 @@ const opencodeRouterBin = path.join(
   "apps/opencode-router/dist/bin/opencode-router",
 );
 
-const ensureOpenworkServer = async () => {
+const ensureVenomcoworkServer = async () => {
   try {
     await access(venomcoworkServerBin);
   } catch {
@@ -243,7 +243,7 @@ const headlessEnv = {
   OPENCODE_ROUTER_BIN: process.env.OPENCODE_ROUTER_BIN ?? opencodeRouterBin,
 };
 
-await ensureOpenworkServer();
+await ensureVenomcoworkServer();
 if (opencodeRouterEnabled) {
   await ensureOpencodeRouter();
 }

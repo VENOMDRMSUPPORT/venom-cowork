@@ -1,9 +1,9 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useCallback } from "react";
 
 import type { McpDirectoryInfo } from "../../../app/constants";
 import { evaluateEnablement, type EnablementContext } from "../../../app/enablement";
-import type { OpenworkServerClient } from "../../../app/lib/venomcowork-server";
+import type { VenomcoworkServerClient } from "../../../app/lib/venomcowork-server";
 import type { McpServerEntry } from "../../../app/types";
 import { getExtensionConfigSlot, getExtensionConnected, type ExtensionConfigContext } from "./extension-registry";
 import type { LocalProviderInstallInput } from "./openai-image-extension";
@@ -14,8 +14,8 @@ type ProviderLike = {
 };
 
 type SettingsExtensionControllerInput = {
-  venomcoworkServerClient: OpenworkServerClient | null;
-  hostOpenworkServerClient: OpenworkServerClient | null;
+  venomcoworkServerClient: VenomcoworkServerClient | null;
+  hostVenomcoworkServerClient: VenomcoworkServerClient | null;
   enablementContext: EnablementContext;
   mcpServers: McpServerEntry[];
   mcpConnectingName: string | null;
@@ -61,7 +61,7 @@ function hasOpenAiEnv(input: Pick<SettingsExtensionControllerInput, "providers" 
 export function useSettingsExtensionController(input: SettingsExtensionControllerInput) {
   const configContextForEntry = useCallback((entry: McpDirectoryInfo): ExtensionConfigContext => ({
     venomcoworkServerClient: input.venomcoworkServerClient,
-    hostOpenworkServerClient: input.hostOpenworkServerClient,
+    hostVenomcoworkServerClient: input.hostVenomcoworkServerClient,
     restartLocalServer: input.restartLocalServer,
     extensionConnections: {
       "google-workspace": input.googleWorkspaceConnected,

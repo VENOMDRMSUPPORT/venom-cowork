@@ -1,9 +1,9 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download, ExternalLink, X } from "lucide-react";
 
-import type { OpenworkServerClient } from "@/app/lib/venomcowork-server";
+import type { VenomcoworkServerClient } from "@/app/lib/venomcowork-server";
 import { openDesktopPath } from "@/app/lib/desktop";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -24,7 +24,7 @@ const EMPTY_TRANSCRIPT_TARGETS: OpenTarget[] = [];
 type ArtifactPanelProps = {
   sessionId: string;
   tab: ArtifactPanelTab;
-  client: OpenworkServerClient | null;
+  client: VenomcoworkServerClient | null;
   workspaceId: string | null;
   workspaceRoot: string;
   isRemoteWorkspace?: boolean;
@@ -32,7 +32,7 @@ type ArtifactPanelProps = {
 };
 
 type ArtifactPanelViewProps = {
-  client: OpenworkServerClient;
+  client: VenomcoworkServerClient;
   workspaceId: string;
   workspaceRoot: string;
   isRemoteWorkspace?: boolean;

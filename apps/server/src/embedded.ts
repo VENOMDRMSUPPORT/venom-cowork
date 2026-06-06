@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Single entry point for embedding the VenomCowork server in-process.
  *
  * Handles config resolution, managed OpenCode spawn, and server start
@@ -10,7 +10,7 @@ import { resolveServerConfig, type CliArgs } from "./config.js";
 import { createManagedOpencodeServer, type ManagedOpencodeServer, type OpencodeExecutionSnapshot } from "./managed-opencode.js";
 import { startServer } from "./server.js";
 import { ensureWorkspaceFiles } from "./workspace-init.js";
-import { buildOpenworkRuntimeConfig } from "./venomcowork-runtime-config.js";
+import { buildVenomcoworkRuntimeConfig } from "./venomcowork-runtime-config.js";
 import type { ServeResult } from "./serve-node.js";
 import type { ServerConfig } from "./types.js";
 
@@ -55,7 +55,7 @@ export async function startEmbeddedServer(options: EmbeddedServerOptions): Promi
   if (!config.opencodeBaseUrl && options.manageOpencode) {
     const workspace = config.workspaces[0];
     if (workspace?.path) {
-      const venomcoworkRuntimeConfig = await buildOpenworkRuntimeConfig(config, workspace.id);
+      const venomcoworkRuntimeConfig = await buildVenomcoworkRuntimeConfig(config, workspace.id);
       const cwd = options.opencodeCwd
         || process.env.VENOMCOWORK_MANAGED_OPENCODE_CWD?.trim()
         || workspace.path;

@@ -1,4 +1,4 @@
-﻿import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -49,7 +49,7 @@ async function createWorkspaceRoot() {
   return createTempRoot("venomcowork-authorized-folders-");
 }
 
-async function startOpenworkServer(workspaceRoot: string, options?: { readOnly?: boolean }) {
+async function startVenomcoworkServer(workspaceRoot: string, options?: { readOnly?: boolean }) {
   const config: ServerConfig = {
     host: "127.0.0.1",
     port: 0,
@@ -116,7 +116,7 @@ describe("authorized folders routes", () => {
         },
       },
     }, null, 2) + "\n", "utf8");
-    const { base, config } = await startOpenworkServer(root);
+    const { base, config } = await startVenomcoworkServer(root);
 
     const response = await fetch(`${base}/workspace/ws_1/authorized-folders`, { headers: clientAuth() });
     expect(response.status).toBe(200);
@@ -142,7 +142,7 @@ describe("authorized folders routes", () => {
         },
       },
     }, null, 2) + "\n", "utf8");
-    const { base, config } = await startOpenworkServer(root);
+    const { base, config } = await startVenomcoworkServer(root);
 
     const response = await fetch(`${base}/workspace/ws_1/authorized-folders`, {
       method: "PUT",
@@ -173,7 +173,7 @@ describe("authorized folders routes", () => {
 
   test("requires client auth, collaborator scope, and writable server", async () => {
     const root = await createWorkspaceRoot();
-    const { base } = await startOpenworkServer(root);
+    const { base } = await startVenomcoworkServer(root);
 
     const unauthenticated = await fetch(`${base}/workspace/ws_1/authorized-folders`);
     expect(unauthenticated.status).toBe(401);
@@ -196,7 +196,7 @@ describe("authorized folders routes", () => {
     expect(viewerWrite.status).toBe(403);
 
     const readOnlyRoot = await createWorkspaceRoot();
-    const readOnly = await startOpenworkServer(readOnlyRoot, { readOnly: true });
+    const readOnly = await startVenomcoworkServer(readOnlyRoot, { readOnly: true });
     const readOnlyWrite = await fetch(`${readOnly.base}/workspace/ws_1/authorized-folders`, {
       method: "PUT",
       headers: clientAuth(),

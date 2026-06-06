@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import {
   createContext,
   useCallback,
@@ -11,67 +11,67 @@ import {
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export type OpenworkControlSideEffect = "none" | "navigation" | "mutation" | "external";
+export type VenomcoworkControlSideEffect = "none" | "navigation" | "mutation" | "external";
 
-export type OpenworkControlActionArg = {
+export type VenomcoworkControlActionArg = {
   name: string;
   type?: "string" | "number" | "boolean" | "object" | "array" | "unknown";
   required?: boolean;
   description?: string;
 };
 
-export type OpenworkControlActionMetadata = {
+export type VenomcoworkControlActionMetadata = {
   id: string;
   label: string;
   description?: string;
-  sideEffect: OpenworkControlSideEffect;
+  sideEffect: VenomcoworkControlSideEffect;
   requiresConfirmation: boolean;
   requiresArgs: boolean;
   hasPreviewArgs: boolean;
   previewArgs?: unknown;
-  args?: OpenworkControlActionArg[];
+  args?: VenomcoworkControlActionArg[];
   disabled: boolean;
   busy: boolean;
 };
 
-export type OpenworkControlSnapshot = {
+export type VenomcoworkControlSnapshot = {
   version: number;
   enabled: boolean;
   route: string;
   status: "off" | "ready" | "acting";
   busyActionId: string | null;
   narration: string;
-  actions: OpenworkControlActionMetadata[];
+  actions: VenomcoworkControlActionMetadata[];
 };
 
-export type OpenworkControlResult =
+export type VenomcoworkControlResult =
   | { ok: true; actionId: string; result?: unknown }
   | { ok: false; actionId: string; error: string };
 
-export type OpenworkControlHelpers = {
+export type VenomcoworkControlHelpers = {
   setNarration: (text: string) => void;
 };
 
-export type OpenworkControlTargetRef = {
+export type VenomcoworkControlTargetRef = {
   readonly current: HTMLElement | null;
 };
 
-export type OpenworkControlAction = {
+export type VenomcoworkControlAction = {
   id: string;
   label: string;
   description?: string;
-  sideEffect?: OpenworkControlSideEffect;
+  sideEffect?: VenomcoworkControlSideEffect;
   requiresConfirmation?: boolean;
   requiresArgs?: boolean;
-  args?: OpenworkControlActionArg[];
+  args?: VenomcoworkControlActionArg[];
   previewArgs?: unknown;
   disabled?: boolean;
-  targetRef?: OpenworkControlTargetRef;
-  execute: (args: unknown, helpers: OpenworkControlHelpers) => unknown | Promise<unknown>;
+  targetRef?: VenomcoworkControlTargetRef;
+  execute: (args: unknown, helpers: VenomcoworkControlHelpers) => unknown | Promise<unknown>;
 };
 
 type ControlActionRef = {
-  readonly current: OpenworkControlAction | null;
+  readonly current: VenomcoworkControlAction | null;
 };
 
 type RegisteredAction = {
@@ -87,35 +87,35 @@ type SpotlightState = {
   rect: { x: number; y: number; width: number; height: number } | null;
 };
 
-type OpenworkControlContextValue = {
+type VenomcoworkControlContextValue = {
   enabled: boolean;
   setEnabled: (enabled: boolean) => void;
   route: string;
   narration: string;
   busyActionId: string | null;
-  actions: OpenworkControlActionMetadata[];
+  actions: VenomcoworkControlActionMetadata[];
   registerAction: (actionId: string, actionRef: ControlActionRef) => () => void;
-  executeAction: (actionId: string, args?: unknown) => Promise<OpenworkControlResult>;
-  snapshot: () => OpenworkControlSnapshot;
+  executeAction: (actionId: string, args?: unknown) => Promise<VenomcoworkControlResult>;
+  snapshot: () => VenomcoworkControlSnapshot;
 };
 
-type OpenworkControlAPI = {
+type VenomcoworkControlAPI = {
   version: number;
-  snapshot: () => OpenworkControlSnapshot;
-  listActions: () => OpenworkControlActionMetadata[];
-  execute: (actionId: string, args?: unknown) => Promise<OpenworkControlResult>;
+  snapshot: () => VenomcoworkControlSnapshot;
+  listActions: () => VenomcoworkControlActionMetadata[];
+  execute: (actionId: string, args?: unknown) => Promise<VenomcoworkControlResult>;
   setEnabled: (enabled: boolean) => void;
-  subscribe: (listener: (snapshot: OpenworkControlSnapshot) => void) => () => void;
+  subscribe: (listener: (snapshot: VenomcoworkControlSnapshot) => void) => () => void;
 };
 
 declare global {
   interface Window {
-    __venomcoworkControl?: OpenworkControlAPI;
+    __venomcoworkControl?: VenomcoworkControlAPI;
   }
 }
 
 const CONTROL_API_VERSION = 1;
-const OpenworkControlContext = createContext<OpenworkControlContextValue | null>(null);
+const VenomcoworkControlContext = createContext<VenomcoworkControlContextValue | null>(null);
 const SPOTLIGHT_TIMING_MS = Object.freeze({
   missingTarget: 80,
   scrollIntoView: 180,
@@ -144,7 +144,7 @@ function isBrowser() {
   return typeof window !== "undefined" && typeof document !== "undefined";
 }
 
-function metadataForAction(registered: RegisteredAction, busyActionId: string | null): OpenworkControlActionMetadata {
+function metadataForAction(registered: RegisteredAction, busyActionId: string | null): VenomcoworkControlActionMetadata {
   const action = registered.ref.current;
   return {
     id: registered.id,
@@ -180,10 +180,10 @@ function ControlModeSpotlight({ spotlight }: { spotlight: SpotlightState }) {
   );
 }
 
-export function OpenworkControlProvider({ children }: { children: ReactNode }) {
+export function VenomcoworkControlProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
   const actionsRef = useRef(new Map<string, RegisteredAction>());
-  const listenersRef = useRef(new Set<(snapshot: OpenworkControlSnapshot) => void>());
+  const listenersRef = useRef(new Set<(snapshot: VenomcoworkControlSnapshot) => void>());
   const nextOrderRef = useRef(1);
   const [version, setVersion] = useState(0);
   const [enabledState, setEnabledState] = useState(false);
@@ -195,7 +195,7 @@ export function OpenworkControlProvider({ children }: { children: ReactNode }) {
 
   const route = `${location.pathname}${location.search}${location.hash}`;
   const enabled = enabledState;
-  const status: OpenworkControlSnapshot["status"] = !enabled ? "off" : busyActionId ? "acting" : "ready";
+  const status: VenomcoworkControlSnapshot["status"] = !enabled ? "off" : busyActionId ? "acting" : "ready";
 
   const setEnabled = useCallback((nextEnabled: boolean) => {
     setEnabledState(nextEnabled);
@@ -211,7 +211,7 @@ export function OpenworkControlProvider({ children }: { children: ReactNode }) {
     return listActionMetadata();
   }, [listActionMetadata]);
 
-  const snapshot = useCallback((): OpenworkControlSnapshot => ({
+  const snapshot = useCallback((): VenomcoworkControlSnapshot => ({
     version: CONTROL_API_VERSION,
     enabled,
     route,
@@ -241,7 +241,7 @@ export function OpenworkControlProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const playTargetChoreography = useCallback(async (action: OpenworkControlAction, runId: number) => {
+  const playTargetChoreography = useCallback(async (action: VenomcoworkControlAction, runId: number) => {
     if (!isBrowser()) return;
     const stillCurrent = () => spotlightRunRef.current === runId;
     const target = action.targetRef?.current;
@@ -273,7 +273,7 @@ export function OpenworkControlProvider({ children }: { children: ReactNode }) {
     await wait(SPOTLIGHT_TIMING_MS.release);
   }, []);
 
-  const executeAction = useCallback(async (actionId: string, args?: unknown): Promise<OpenworkControlResult> => {
+  const executeAction = useCallback(async (actionId: string, args?: unknown): Promise<VenomcoworkControlResult> => {
     const registered = actionsRef.current.get(actionId);
     const action = registered?.ref.current;
     if (!registered || !action) return { ok: false, actionId, error: `Unknown action: ${actionId}` };
@@ -324,7 +324,7 @@ export function OpenworkControlProvider({ children }: { children: ReactNode }) {
     }
   }, [playTargetChoreography, setEnabled]);
 
-  const value = useMemo<OpenworkControlContextValue>(() => ({
+  const value = useMemo<VenomcoworkControlContextValue>(() => ({
     enabled,
     setEnabled,
     route,
@@ -347,7 +347,7 @@ export function OpenworkControlProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isBrowser()) return;
 
-    const api: OpenworkControlAPI = {
+    const api: VenomcoworkControlAPI = {
       version: CONTROL_API_VERSION,
       snapshot,
       listActions: () => snapshot().actions,
@@ -380,21 +380,21 @@ export function OpenworkControlProvider({ children }: { children: ReactNode }) {
   }, [snapshot, version]);
 
   return (
-    <OpenworkControlContext.Provider value={value}>
+    <VenomcoworkControlContext.Provider value={value}>
       {children}
       <ControlModeSpotlight spotlight={spotlight} />
-    </OpenworkControlContext.Provider>
+    </VenomcoworkControlContext.Provider>
   );
 }
 
-export function useOpenworkControl() {
-  return use(OpenworkControlContext);
+export function useVenomcoworkControl() {
+  return use(VenomcoworkControlContext);
 }
 
-export function useControlAction(action: OpenworkControlAction | null | false | undefined) {
-  const control = useOpenworkControl();
+export function useControlAction(action: VenomcoworkControlAction | null | false | undefined) {
+  const control = useVenomcoworkControl();
   const registerAction = control?.registerAction;
-  const latestActionRef = useRef<OpenworkControlAction | null>(action || null);
+  const latestActionRef = useRef<VenomcoworkControlAction | null>(action || null);
   latestActionRef.current = action || null;
   const actionId = action ? action.id : null;
 
@@ -410,12 +410,12 @@ export function useControlAction(action: OpenworkControlAction | null | false | 
  * violating the rules of hooks. Each action is tracked by its stable id; the
  * latest closure for that id is always used, and removed ids are unregistered.
  */
-export function useControlActions(actions: readonly OpenworkControlAction[]) {
-  const control = useOpenworkControl();
+export function useControlActions(actions: readonly VenomcoworkControlAction[]) {
+  const control = useVenomcoworkControl();
   const registerAction = control?.registerAction;
 
   // One ref per action id, so executeAction always sees the freshest closure.
-  const refsById = useRef<Map<string, { current: OpenworkControlAction | null }>>(new Map());
+  const refsById = useRef<Map<string, { current: VenomcoworkControlAction | null }>>(new Map());
   for (const action of actions) {
     const existing = refsById.current.get(action.id);
     if (existing) {
@@ -449,10 +449,10 @@ import { SETTINGS_TAB_VALUES } from "../../../app/types";
 
 const SETTINGS_TABS: ReadonlySet<string> = new Set<string>(SETTINGS_TAB_VALUES);
 
-export function OpenworkRouteControlActions() {
+export function VenomcoworkRouteControlActions() {
   const navigate = useNavigate();
 
-  const actions = useMemo<OpenworkControlAction[]>(() => [
+  const actions = useMemo<VenomcoworkControlAction[]>(() => [
     {
       id: "route.session",
       label: "Open sessions",

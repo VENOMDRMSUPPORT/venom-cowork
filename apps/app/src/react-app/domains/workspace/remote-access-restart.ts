@@ -1,9 +1,9 @@
-﻿import { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 
-import { venomcoworkServerRestart, type OpenworkServerInfo } from "../../../app/lib/desktop";
+import { venomcoworkServerRestart, type VenomcoworkServerInfo } from "../../../app/lib/desktop";
 import {
-  readOpenworkServerSettings,
-  writeOpenworkServerSettings,
+  readVenomcoworkServerSettings,
+  writeVenomcoworkServerSettings,
 } from "../../../app/lib/venomcowork-server";
 import { t } from "../../../i18n";
 
@@ -15,7 +15,7 @@ export type RemoteAccessRestartPhase =
 
 type UseRemoteAccessRestartOptions = {
   isEnabled: () => boolean;
-  onHostInfo: (info: OpenworkServerInfo) => void;
+  onHostInfo: (info: VenomcoworkServerInfo) => void;
   onSettingsChanged: () => void;
 };
 
@@ -27,17 +27,17 @@ export function useRemoteAccessRestart(options: UseRemoteAccessRestartOptions) {
     async (enabled: boolean) => {
       if (phase === "restarting" || phase === "reconnecting") return;
 
-      const previous = readOpenworkServerSettings();
+      const previous = readVenomcoworkServerSettings();
       const next = { ...previous, remoteAccessEnabled: enabled };
 
       setPhase("restarting");
       setError(null);
-      writeOpenworkServerSettings(next);
+      writeVenomcoworkServerSettings(next);
       options.onSettingsChanged();
 
       try {
-        const info = await venomcoworkServerRestart({ remoteAccessEnabled: enabled }) as OpenworkServerInfo;
-        writeOpenworkServerSettings({
+        const info = await venomcoworkServerRestart({ remoteAccessEnabled: enabled }) as VenomcoworkServerInfo;
+        writeVenomcoworkServerSettings({
           urlOverride: info.baseUrl?.trim() || undefined,
           token:
             info.ownerToken?.trim() ||
@@ -51,7 +51,7 @@ export function useRemoteAccessRestart(options: UseRemoteAccessRestartOptions) {
         options.onSettingsChanged();
         setPhase("idle");
       } catch (caught) {
-        writeOpenworkServerSettings(previous);
+        writeVenomcoworkServerSettings(previous);
         options.onSettingsChanged();
         setError(caught instanceof Error ? caught.message : t("app.error_remote_access"));
         setPhase("failed");

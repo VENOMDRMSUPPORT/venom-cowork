@@ -1,4 +1,4 @@
-﻿import { existsSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { readFile, writeFile, rm, readdir, rename, stat, appendFile, mkdir } from "node:fs/promises";
 import { homedir, hostname } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
@@ -36,7 +36,7 @@ import {
   applyMaterializedBlueprintSessions,
   normalizeBlueprintSessionTemplates,
   readMaterializedBlueprintSessions,
-  sanitizeOpenworkTemplateConfig,
+  sanitizeVenomcoworkTemplateConfig,
 } from "./blueprint-sessions.js";
 import { inheritWorkspaceOpencodeConnection, resolveWorkspaceOpencodeConnection } from "./opencode-connection.js";
 import { seedOpencodeSessionMessages } from "./opencode-db.js";
@@ -75,11 +75,11 @@ import {
   writeRuntimeOpencodeConfig,
 } from "./runtime-opencode-config-store.js";
 import {
-  mergeOpenworkWorkspaceConfigs,
-  readOpenworkWorkspaceConfig,
-  writeOpenworkWorkspaceConfig,
+  mergeVenomcoworkWorkspaceConfigs,
+  readVenomcoworkWorkspaceConfig,
+  writeVenomcoworkWorkspaceConfig,
 } from "./venomcowork-workspace-config-store.js";
-import { buildOpenworkRuntimeConfigObject } from "./venomcowork-runtime-config.js";
+import { buildVenomcoworkRuntimeConfigObject } from "./venomcowork-runtime-config.js";
 import pkg from "../package.json" with { type: "json" };
 import constants from "../../../constants.json" with { type: "json" };
 
@@ -142,7 +142,7 @@ const USER_OPENCODE_RUNTIME_CONFIG_KEYS = ["default_agent", "plugin", "disabled_
 type LegacyRuntimeConfigKey = typeof LEGACY_RUNTIME_CONFIG_KEYS[number];
 type UserOpencodeRuntimeConfigKey = typeof USER_OPENCODE_RUNTIME_CONFIG_KEYS[number];
 
-function legacyRuntimeConfigFromOpenworkConfig(venomcowork: Record<string, unknown>): {
+function legacyRuntimeConfigFromVenomcoworkConfig(venomcowork: Record<string, unknown>): {
   config: RuntimeOpencodeConfig;
   keys: LegacyRuntimeConfigKey[];
 } {
@@ -276,7 +276,7 @@ function normalizeRemoteDirectory(value: unknown): string {
   return value.trim().replace(/\\/g, "/").replace(/\/+$/, "");
 }
 
-function parseOpenworkWorkspaceIdFromUrl(input: string | null | undefined): string | null {
+function parseVenomcoworkWorkspaceIdFromUrl(input: string | null | undefined): string | null {
   const raw = input?.trim() ?? "";
   if (!raw) return null;
   try {
@@ -299,7 +299,7 @@ function parseOpenworkWorkspaceIdFromUrl(input: string | null | undefined): stri
   }
 }
 
-function stripOpenworkWorkspaceMount(input: string | null | undefined): string | null {
+function stripVenomcoworkWorkspaceMount(input: string | null | undefined): string | null {
   const raw = input?.trim() ?? "";
   if (!raw) return null;
   try {
@@ -319,7 +319,7 @@ function stripOpenworkWorkspaceMount(input: string | null | undefined): string |
 }
 
 function venomcoworkRemoteWorkspaceId(hostUrl: string, workspaceId: string | null | undefined): string {
-  const remoteWorkspaceId = workspaceId?.trim() || parseOpenworkWorkspaceIdFromUrl(hostUrl);
+  const remoteWorkspaceId = workspaceId?.trim() || parseVenomcoworkWorkspaceIdFromUrl(hostUrl);
   return remoteWorkspaceId ? `rem_${remoteWorkspaceId}` : workspaceIdForRemote(hostUrl, null);
 }
 
@@ -330,7 +330,7 @@ function workspaceDirectoryCandidates(workspace: Record<string, unknown>): strin
     .filter(Boolean);
 }
 
-function selectOpenworkWorkspaceForConnection(list: unknown, directory: string | null): Record<string, unknown> | null {
+function selectVenomcoworkWorkspaceForConnection(list: unknown, directory: string | null): Record<string, unknown> | null {
   if (!isRecord(list)) return null;
   const rawItems = Array.isArray(list.items)
     ? list.items
@@ -357,7 +357,7 @@ function venomcoworkWorkspaceDisplayName(workspace: Record<string, unknown>): st
     || null;
 }
 
-async function fetchOpenworkWorkspaceList(hostUrl: string, token: string, hostToken: string): Promise<unknown> {
+async function fetchVenomcoworkWorkspaceList(hostUrl: string, token: string, hostToken: string): Promise<unknown> {
   const url = `${hostUrl.replace(/\/+$/, "")}/workspaces`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8_000);
@@ -385,14 +385,14 @@ async function fetchOpenworkWorkspaceList(hostUrl: string, token: string, hostTo
   }
 }
 
-async function discoverOpenworkWorkspace(input: {
+async function discoverVenomcoworkWorkspace(input: {
   hostUrl: string;
   token: string;
   hostToken: string;
   directory: string | null;
 }): Promise<Record<string, unknown> | null> {
-  const list = await fetchOpenworkWorkspaceList(input.hostUrl, input.token, input.hostToken);
-  return selectOpenworkWorkspaceForConnection(list, input.directory);
+  const list = await fetchVenomcoworkWorkspaceList(input.hostUrl, input.token, input.hostToken);
+  return selectVenomcoworkWorkspaceForConnection(list, input.directory);
 }
 
 async function resolveOpenAiRealtimeApiKey(env: EnvService): Promise<string> {
@@ -1118,7 +1118,7 @@ function buildCapabilities(config: ServerConfig): Capabilities {
       skills: {
         read: true,
         install: writeEnabled,
-        repo: { owner: "different-ai", name: "venomcowork-hub", ref: "main" },
+        repo: { owner: "venom-cowork", name: "venomcowork-hub", ref: "main" },
       },
     },
     plugins: { read: true, write: writeEnabled },
@@ -2325,10 +2325,10 @@ function createRoutes(
     const remoteType = readStringField(body, "remoteType") === "opencode" ? "opencode" : "venomcowork";
     const directory = readStringField(body, "directory") || null;
     const displayName = readStringField(body, "displayName") || null;
-    const rawOpenworkHostUrl = readStringField(body, "venomcoworkHostUrl") || null;
+    const rawVenomcoworkHostUrl = readStringField(body, "venomcoworkHostUrl") || null;
     const venomcoworkHostUrl = remoteType === "venomcowork"
-      ? stripOpenworkWorkspaceMount(rawOpenworkHostUrl ?? baseUrl)
-      : rawOpenworkHostUrl;
+      ? stripVenomcoworkWorkspaceMount(rawVenomcoworkHostUrl ?? baseUrl)
+      : rawVenomcoworkHostUrl;
     const venomcoworkToken = readStringField(body, "venomcoworkToken");
     const venomcoworkHostToken = readStringField(body, "venomcoworkHostToken");
     const sandboxBackend = readStringField(body, "sandboxBackend");
@@ -2336,13 +2336,13 @@ function createRoutes(
     const sandboxContainerName = readStringField(body, "sandboxContainerName");
     let venomcoworkWorkspaceId = remoteType === "venomcowork"
       ? readStringField(body, "venomcoworkWorkspaceId")
-        || parseOpenworkWorkspaceIdFromUrl(rawOpenworkHostUrl)
-        || parseOpenworkWorkspaceIdFromUrl(baseUrl)
+        || parseVenomcoworkWorkspaceIdFromUrl(rawVenomcoworkHostUrl)
+        || parseVenomcoworkWorkspaceIdFromUrl(baseUrl)
       : "";
     let venomcoworkWorkspaceName = readStringField(body, "venomcoworkWorkspaceName") || null;
 
     if (remoteType === "venomcowork" && !venomcoworkWorkspaceId) {
-      const discovered = await discoverOpenworkWorkspace({
+      const discovered = await discoverVenomcoworkWorkspace({
         hostUrl: venomcoworkHostUrl ?? baseUrl,
         token: venomcoworkToken,
         hostToken: venomcoworkHostToken,
@@ -2507,9 +2507,9 @@ function createRoutes(
 
   addRoute(routes, "GET", "/workspace/:id/config", "client", async (ctx) => {
     const workspace = await resolveWorkspace(config, ctx.params.id);
-    const venomcowork = mergeOpenworkWorkspaceConfigs(
-      await readOpenworkConfig(workspace.path),
-      await readOpenworkWorkspaceConfig(config, workspace.id),
+    const venomcowork = mergeVenomcoworkWorkspaceConfigs(
+      await readVenomcoworkConfig(workspace.path),
+      await readVenomcoworkWorkspaceConfig(config, workspace.id),
     );
     const opencode = mergeOpencodeConfigs(
       await readOpencodeConfig(workspace.path),
@@ -2521,9 +2521,9 @@ function createRoutes(
 
   addRoute(routes, "GET", "/workspace/:id/desktop-cloud-sync", "client", async (ctx) => {
     const workspace = await resolveWorkspace(config, ctx.params.id);
-    const venomcowork = mergeOpenworkWorkspaceConfigs(
-      await readOpenworkConfig(workspace.path),
-      await readOpenworkWorkspaceConfig(config, workspace.id),
+    const venomcowork = mergeVenomcoworkWorkspaceConfigs(
+      await readVenomcoworkConfig(workspace.path),
+      await readVenomcoworkWorkspaceConfig(config, workspace.id),
     );
     return jsonResponse(readDesktopCloudSyncState(venomcowork));
   });
@@ -2539,13 +2539,13 @@ function createRoutes(
     }
 
     const result = await enqueueDesktopCloudSync(async () => {
-      const venomcowork = mergeOpenworkWorkspaceConfigs(
-        await readOpenworkConfig(workspace.path),
-        await readOpenworkWorkspaceConfig(config, workspace.id),
+      const venomcowork = mergeVenomcoworkWorkspaceConfigs(
+        await readVenomcoworkConfig(workspace.path),
+        await readVenomcoworkWorkspaceConfig(config, workspace.id),
       );
       const cloudImports = await readInstalledCloudPlugins(config, workspace.id);
       const next = syncDesktopCloudResources({ venomcowork: { ...venomcowork, cloudImports }, snapshot });
-      await writeOpenworkWorkspaceConfig(config, workspace.id, () => next.venomcowork);
+      await writeVenomcoworkWorkspaceConfig(config, workspace.id, () => next.venomcowork);
       await recordAudit(workspace.path, {
         id: shortId(),
         workspaceId: workspace.id,
@@ -2743,8 +2743,8 @@ function createRoutes(
       paths: [configPath],
     });
 
-    const venomcowork = await readOpenworkConfigForStatus(workspace.path);
-    const legacy = legacyRuntimeConfigFromOpenworkConfig(venomcowork.data);
+    const venomcowork = await readVenomcoworkConfigForStatus(workspace.path);
+    const legacy = legacyRuntimeConfigFromVenomcoworkConfig(venomcowork.data);
     const user = userRuntimeConfigFromOpencodeConfig(await readOpencodeConfig(workspace.path));
     if (!legacy.keys.length && !user.keys.length) {
       return jsonResponse({ migrated: false, keys: [], legacyKeys: [], userOpencodeKeys: [], updatedAt: null, legacyError: venomcowork.error });
@@ -2754,7 +2754,7 @@ function createRoutes(
       mergeLegacyRuntimeConfig(mergeLegacyRuntimeConfig(current, legacy.config), user.config)
     ));
     if (legacy.keys.length && !venomcowork.error) {
-      await writeOpenworkConfig(workspace.path, removeLegacyRuntimeConfig(venomcowork.data), false);
+      await writeVenomcoworkConfig(workspace.path, removeLegacyRuntimeConfig(venomcowork.data), false);
     }
     await removeUserRuntimeConfigFromOpencode(workspace.path, user.keys);
 
@@ -2777,15 +2777,15 @@ function createRoutes(
   addRoute(routes, "GET", "/workspace/:id/runtime-config", "client", async (ctx) => {
     const workspace = await resolveWorkspace(config, ctx.params.id);
     const runtime = await readRuntimeOpencodeConfig(config, workspace.id);
-    const venomcowork = await readOpenworkConfigForStatus(workspace.path);
+    const venomcowork = await readVenomcoworkConfigForStatus(workspace.path);
     const venomcoworkConfig = venomcowork.data;
-    const legacy = legacyRuntimeConfigFromOpenworkConfig(venomcoworkConfig);
+    const legacy = legacyRuntimeConfigFromVenomcoworkConfig(venomcoworkConfig);
     const rawOpencode = await readRawOpencodeConfig(opencodeConfigPath(workspace.path));
     const persistedOpencode = await readOpencodeConfig(workspace.path);
     const globalOpencodePath = resolveOpencodeConfigFilePath("global", workspace.path);
     const rawGlobalOpencode = await readRawOpencodeConfig(globalOpencodePath);
     const globalOpencode = (await readJsoncFile(globalOpencodePath, {} as Record<string, unknown>, { allowInvalid: true })).data;
-    const effectiveRuntime = await buildOpenworkRuntimeConfigObject(config, workspace.id);
+    const effectiveRuntime = await buildVenomcoworkRuntimeConfigObject(config, workspace.id);
     const user = userRuntimeConfigFromOpencodeConfig(persistedOpencode);
 
     return jsonResponse({
@@ -2814,7 +2814,7 @@ function createRoutes(
           config: effectiveRuntime,
         },
       },
-      legacyOpenwork: {
+      legacyVenomcowork: {
         path: venomcoworkConfigPath(workspace.path),
         keys: legacy.keys,
         error: venomcowork.error,
@@ -3019,7 +3019,7 @@ function createRoutes(
       }
     }
     if (venomcowork) {
-      await writeOpenworkWorkspaceConfig(config, workspace.id, (current) => ({
+      await writeVenomcoworkWorkspaceConfig(config, workspace.id, (current) => ({
         ...current,
         ...venomcowork,
       }));
@@ -3834,7 +3834,7 @@ function createRoutes(
     const repo = ctx.url.searchParams.get("repo")?.trim();
     const ref = ctx.url.searchParams.get("ref")?.trim();
     const items = await listHubSkills({
-      owner: owner || "different-ai",
+      owner: owner || "venom-cowork",
       repo: repo || "venomcowork-hub",
       ref: ref || "main",
     });
@@ -4601,19 +4601,19 @@ function ensurePlainObject(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-type OpenworkServerConfigFile = Record<string, unknown> & {
+type VenomcoworkServerConfigFile = Record<string, unknown> & {
   workspaces?: Array<Record<string, unknown>>;
   authorizedRoots?: string[];
 };
 
-async function readServerConfigFile(configPath: string): Promise<OpenworkServerConfigFile> {
+async function readServerConfigFile(configPath: string): Promise<VenomcoworkServerConfigFile> {
   if (!(await exists(configPath))) {
     return {};
   }
 
   try {
     const raw = await readFile(configPath, "utf8");
-    return ensurePlainObject(JSON.parse(raw)) as OpenworkServerConfigFile;
+    return ensurePlainObject(JSON.parse(raw)) as VenomcoworkServerConfigFile;
   } catch (error) {
     throw new ApiError(422, "invalid_json", "Failed to parse server config", {
       path: configPath,
@@ -4651,7 +4651,7 @@ async function persistServerWorkspaceState(config: ServerConfig): Promise<boolea
   if (!configPath) return false;
 
   const parsed = await readServerConfigFile(configPath);
-  const next: OpenworkServerConfigFile = {
+  const next: VenomcoworkServerConfigFile = {
     ...parsed,
     workspaces: config.workspaces.map(serializeWorkspaceConfigEntry),
     authorizedRoots: Array.from(new Set(config.authorizedRoots.map((root) => resolve(root)))),
@@ -4721,7 +4721,7 @@ async function readOpencodeConfig(workspaceRoot: string): Promise<Record<string,
   return data;
 }
 
-async function readOpenworkConfig(workspaceRoot: string): Promise<Record<string, unknown>> {
+async function readVenomcoworkConfig(workspaceRoot: string): Promise<Record<string, unknown>> {
   const path = venomcoworkConfigPath(workspaceRoot);
   if (!(await exists(path))) return {};
   try {
@@ -4732,12 +4732,12 @@ async function readOpenworkConfig(workspaceRoot: string): Promise<Record<string,
   }
 }
 
-async function readOpenworkConfigForStatus(workspaceRoot: string): Promise<{
+async function readVenomcoworkConfigForStatus(workspaceRoot: string): Promise<{
   data: Record<string, unknown>;
   error: string | null;
 }> {
   try {
-    return { data: await readOpenworkConfig(workspaceRoot), error: null };
+    return { data: await readVenomcoworkConfig(workspaceRoot), error: null };
   } catch (error) {
     if (error instanceof ApiError && error.code === "invalid_json") {
       return { data: {}, error: error.message };
@@ -4810,9 +4810,9 @@ async function reloadOpencodeEngine(config: ServerConfig, workspace: WorkspaceIn
   });
 }
 
-async function writeOpenworkConfig(workspaceRoot: string, payload: Record<string, unknown>, merge: boolean): Promise<void> {
+async function writeVenomcoworkConfig(workspaceRoot: string, payload: Record<string, unknown>, merge: boolean): Promise<void> {
   const path = venomcoworkConfigPath(workspaceRoot);
-  const next = merge ? { ...(await readOpenworkConfig(workspaceRoot)), ...payload } : payload;
+  const next = merge ? { ...(await readVenomcoworkConfig(workspaceRoot)), ...payload } : payload;
   await ensureDir(join(workspaceRoot, ".opencode"));
   await writeFile(path, JSON.stringify(next, null, 2) + "\n", "utf8");
 }
@@ -4838,7 +4838,7 @@ async function exportWorkspace(
   const sensitiveMode = options?.sensitiveMode ?? "auto";
   const rawOpencode = await readOpencodeConfig(workspace.path);
   let opencode = sanitizePortableOpencodeConfig(rawOpencode);
-  const venomcowork = sanitizeOpenworkTemplateConfig(await readOpenworkConfig(workspace.path));
+  const venomcowork = sanitizeVenomcoworkTemplateConfig(await readVenomcoworkConfig(workspace.path));
   const skills = await listSkills(workspace.path, false);
   const commands = await listCommands(workspace.path, "workspace");
   let files = await listPortableFiles(workspace.path);
@@ -4933,9 +4933,9 @@ async function importWorkspace(workspace: WorkspaceInfo, payload: Record<string,
     changedPath("venomcowork", workspaceImportRelativePath(workspace, venomcoworkConfigPath(workspace.path)))
   ) {
     if (input.modes.venomcowork === "replace") {
-      await writeOpenworkConfig(workspace.path, input.venomcowork, false);
+      await writeVenomcoworkConfig(workspace.path, input.venomcowork, false);
     } else {
-      await writeOpenworkConfig(workspace.path, input.venomcowork, true);
+      await writeVenomcoworkConfig(workspace.path, input.venomcowork, true);
     }
   }
 
@@ -4992,7 +4992,7 @@ async function materializeBlueprintSessions(config: ServerConfig, workspace: Wor
   existing: Array<{ templateId: string; sessionId: string }>;
   openSessionId: string | null;
 }> {
-  const venomcowork = await readOpenworkConfig(workspace.path);
+  const venomcowork = await readVenomcoworkConfig(workspace.path);
   const templates = normalizeBlueprintSessionTemplates(venomcowork);
   if (!templates.length) {
     return { ok: true, created: [], existing: [], openSessionId: null };
@@ -5025,12 +5025,12 @@ async function materializeBlueprintSessions(config: ServerConfig, workspace: Wor
   }
 
   const now = Date.now();
-  const nextOpenwork = applyMaterializedBlueprintSessions(
+  const nextVenomcowork = applyMaterializedBlueprintSessions(
     venomcowork,
     created.map(({ templateId, sessionId }) => ({ templateId, sessionId })),
     now,
   );
-  await writeOpenworkConfig(workspace.path, nextOpenwork, false);
+  await writeVenomcoworkConfig(workspace.path, nextVenomcowork, false);
 
   const preferredTemplate = templates.find((template) => template.openOnFirstLoad) ?? templates[0] ?? null;
   const openSessionId = preferredTemplate

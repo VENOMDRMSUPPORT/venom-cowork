@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { createContext, createElement, useContext, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
@@ -24,8 +24,8 @@ import {
   type WorkerRuntimeSnapshot,
   type WorkerSummary,
   type WorkerStatusBucket,
-  buildOpenworkAppConnectUrl,
-  buildOpenworkDeepLink,
+  buildVenomcoworkAppConnectUrl,
+  buildVenomcoworkDeepLink,
   deriveOnboardingWorkerName,
   getAuthInfoForMode,
   getBillingSummary,
@@ -51,7 +51,7 @@ import {
   parseWorkspaceIdFromUrl,
   requestJson,
   resetPosthogUser,
-  resolveOpenworkWorkspaceUrl,
+  resolveVenomcoworkWorkspaceUrl,
   trackPosthogEvent
 } from "../_lib/den-flow";
 import {
@@ -229,18 +229,18 @@ export function DenFlowProvider({ children }: { children: ReactNode }) {
         ? listItemToWorker(selectedWorker, worker)
         : worker;
   const venomcoworkConnectUrl = activeWorker?.venomcoworkUrl ?? activeWorker?.instanceUrl ?? null;
-  const preferredOpenworkToken = activeWorker?.clientToken ?? activeWorker?.ownerToken ?? null;
+  const preferredVenomcoworkToken = activeWorker?.clientToken ?? activeWorker?.ownerToken ?? null;
   const hasWorkspaceScopedUrl = Boolean(venomcoworkConnectUrl && /\/w\/[^/?#]+/.test(venomcoworkConnectUrl));
-  const venomcoworkDeepLink = buildOpenworkDeepLink(
+  const venomcoworkDeepLink = buildVenomcoworkDeepLink(
     venomcoworkConnectUrl,
-    preferredOpenworkToken,
+    preferredVenomcoworkToken,
     activeWorker?.workerId ?? null,
     activeWorker?.workerName ?? null
   );
-  const venomcoworkAppConnectUrl = buildOpenworkAppConnectUrl(
+  const venomcoworkAppConnectUrl = buildVenomcoworkAppConnectUrl(
     VENOMCOWORK_APP_CONNECT_BASE_URL,
     venomcoworkConnectUrl,
-    preferredOpenworkToken,
+    preferredVenomcoworkToken,
     activeWorker?.workerId ?? null,
     activeWorker?.workerName ?? null,
     { autoConnect: true }
@@ -536,7 +536,7 @@ export function DenFlowProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function withResolvedOpenworkCredentials(candidate: WorkerLaunch, options: { quiet?: boolean } = {}) {
+  async function withResolvedVenomcoworkCredentials(candidate: WorkerLaunch, options: { quiet?: boolean } = {}) {
     const existingConnectUrl = candidate.venomcoworkUrl?.trim() ?? "";
     const existingWorkspaceId = candidate.workspaceId?.trim() ?? "";
     if (existingConnectUrl && existingWorkspaceId) {
@@ -567,7 +567,7 @@ export function DenFlowProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const resolved = await resolveOpenworkWorkspaceUrl(instanceUrl, accessToken);
+      const resolved = await resolveVenomcoworkWorkspaceUrl(instanceUrl, accessToken);
       if (resolved) {
         return {
           ...candidate,
@@ -1293,7 +1293,7 @@ export function DenFlowProvider({ children }: { children: ReactNode }) {
         return "error" as const;
       }
 
-      const resolvedWorker = await withResolvedOpenworkCredentials(parsedWorker);
+      const resolvedWorker = await withResolvedVenomcoworkCredentials(parsedWorker);
       setWorker(resolvedWorker);
       setWorkerLookupId(parsedWorker.workerId);
       setPendingRestoredWorkerId(null);
@@ -1408,7 +1408,7 @@ export function DenFlowProvider({ children }: { children: ReactNode }) {
 
       const shouldUpdateActiveWorker = worker?.workerId === summary.workerId || (!background && workerLookupId === summary.workerId);
       if (shouldUpdateActiveWorker) {
-        const resolvedWorker = await withResolvedOpenworkCredentials(nextWorker, { quiet: true });
+        const resolvedWorker = await withResolvedVenomcoworkCredentials(nextWorker, { quiet: true });
         setWorker(resolvedWorker);
         setPendingRestoredWorkerId(null);
         if (!background) {
@@ -1503,7 +1503,7 @@ export function DenFlowProvider({ children }: { children: ReactNode }) {
               hostToken: tokens.hostToken
             };
 
-      const resolvedWorker = await withResolvedOpenworkCredentials(nextWorker, { quiet: true });
+      const resolvedWorker = await withResolvedVenomcoworkCredentials(nextWorker, { quiet: true });
       setWorker(resolvedWorker);
       setPendingRestoredWorkerId(null);
       setLaunchStatus("Worker is ready to connect.");

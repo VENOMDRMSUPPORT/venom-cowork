@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import {
   spawn,
   type ChildProcess,
@@ -1056,7 +1056,7 @@ async function resolveDockerCandidates(): Promise<string[]> {
 
   for (const key of [
     "VENOMCOWORK_DOCKER_BIN",
-    "OPENWRK_DOCKER_BIN",
+    "VENOMCOWORK_DOCKER_BIN",
     "DOCKER_BIN",
   ]) {
     const value = process.env[key];
@@ -1332,7 +1332,7 @@ function resolveOpencodeLogLevel(requested?: string): string | undefined {
   return normalized;
 }
 
-function resolveOpenworkRemoteAccess(args: ParsedArgs): boolean {
+function resolveVenomcoworkRemoteAccess(args: ParsedArgs): boolean {
   const explicitHost =
     readFlag(args.flags, "venomcowork-host") ?? process.env.VENOMCOWORK_HOST;
   const remoteAccessRequested =
@@ -1634,7 +1634,7 @@ function resolveExtraPathEntries(): string[] {
 
   const entries: string[] = [];
   const sidecarOverride =
-    process.env.OPENWRK_SIDECAR_DIR ?? process.env.VENOMCOWORK_SIDECAR_DIR;
+    process.env.VENOMCOWORK_SIDECAR_DIR ?? process.env.VENOMCOWORK_SIDECAR_DIR;
   const sidecarCandidates = [
     sidecarOverride,
     dirname(process.execPath),
@@ -1702,7 +1702,7 @@ function resolveExtraPathEntries(): string[] {
 }
 
 // Resolves ~/.config/venomcowork/env.json (or %APPDATA%\venomcowork\env.json on
-// Windows) â€” must agree byte-for-byte with apps/server/src/env-file.ts and
+// Windows) Ã¢â‚¬â€ must agree byte-for-byte with apps/server/src/env-file.ts and
 // apps/desktop/src-tauri/src/env_file.rs. Honor VENOMCOWORK_ENV_STORE override.
 function resolveUserEnvFilePath(): string {
   const override = (process.env.VENOMCOWORK_ENV_STORE ?? "").trim();
@@ -2492,7 +2492,7 @@ async function assertSandboxBinaryFile(
   }
 }
 
-async function resolveOpenworkServerBin(options: {
+async function resolveVenomcoworkServerBin(options: {
   explicit?: string;
   manifest: VersionManifest | null;
   allowExternal: boolean;
@@ -2849,7 +2849,7 @@ function resolveRouterDataDir(flags: Map<string, string | boolean>): string {
   return join(homedir(), ".venomcowork", "venomcowork-orchestrator");
 }
 
-function resolveWorkspaceOpenworkConfigPath(workspaceRoot: string): string {
+function resolveWorkspaceVenomcoworkConfigPath(workspaceRoot: string): string {
   return join(workspaceRoot, ".opencode", "venomcowork.json");
 }
 
@@ -2869,7 +2869,7 @@ function asRecord(value: unknown): Record<string, unknown> {
     : {};
 }
 
-function readMessagingEnabledFromOpenworkConfig(
+function readMessagingEnabledFromVenomcoworkConfig(
   venomcoworkConfig: Record<string, unknown>,
 ): boolean | undefined {
   const messaging = asRecord(venomcoworkConfig.messaging);
@@ -2939,7 +2939,7 @@ async function resolveOpencodeRouterEnabled(
     return { enabled: envValue, source: "env" };
   }
 
-  const venomcoworkConfigPath = resolveWorkspaceOpenworkConfigPath(workspaceRoot);
+  const venomcoworkConfigPath = resolveWorkspaceVenomcoworkConfigPath(workspaceRoot);
   let venomcoworkConfig: Record<string, unknown> = {};
   try {
     const raw = await readFile(venomcoworkConfigPath, "utf8");
@@ -2948,7 +2948,7 @@ async function resolveOpencodeRouterEnabled(
     venomcoworkConfig = {};
   }
 
-  const configured = readMessagingEnabledFromOpenworkConfig(venomcoworkConfig);
+  const configured = readMessagingEnabledFromVenomcoworkConfig(venomcoworkConfig);
   if (configured !== undefined) {
     return { enabled: configured, source: "workspace-config" };
   }
@@ -2962,7 +2962,7 @@ async function resolveOpencodeRouterEnabled(
     inferredEnabled = false;
   }
 
-  const nextOpenworkConfig: Record<string, unknown> = {
+  const nextVenomcoworkConfig: Record<string, unknown> = {
     ...venomcoworkConfig,
     messaging: {
       ...asRecord(venomcoworkConfig.messaging),
@@ -2974,7 +2974,7 @@ async function resolveOpencodeRouterEnabled(
     await mkdir(dirname(venomcoworkConfigPath), { recursive: true });
     await writeFile(
       venomcoworkConfigPath,
-      `${JSON.stringify(nextOpenworkConfig, null, 2)}\n`,
+      `${JSON.stringify(nextVenomcoworkConfig, null, 2)}\n`,
       "utf8",
     );
   } catch (error) {
@@ -3160,7 +3160,7 @@ function opencodeRouterSendToolSource(): string {
     "  const text = String(value || '').trim()",
     "  if (!text) return ''",
     "  if (text.length <= 6) return 'hidden'",
-    "  return `${text.slice(0, 2)}â€¦${text.slice(-2)}`",
+    "  return `${text.slice(0, 2)}Ã¢â‚¬Â¦${text.slice(-2)}`",
     "}",
     "",
     "const buildGuidance = (result) => {",
@@ -3268,7 +3268,7 @@ function opencodeRouterStatusToolSource(): string {
     "  const text = String(value || '').trim()",
     "  if (!text) return ''",
     "  if (text.length <= 6) return 'hidden'",
-    "  return `${text.slice(0, 2)}â€¦${text.slice(-2)}`",
+    "  return `${text.slice(0, 2)}Ã¢â‚¬Â¦${text.slice(-2)}`",
     "}",
     "",
     "const isNumericTelegramPeerId = (value) => /^-?\\d+$/.test(String(value || '').trim())",
@@ -3510,7 +3510,7 @@ async function fetchOpenCodeRouterHealth(
   )) as OpenCodeRouterHealthSnapshot;
 }
 
-async function fetchOpenCodeRouterHealthViaOpenwork(
+async function fetchOpenCodeRouterHealthViaVenomcowork(
   venomcoworkUrl: string,
   token: string,
 ): Promise<OpenCodeRouterHealthSnapshot> {
@@ -3544,7 +3544,7 @@ async function waitForOpenCodeRouterHealthy(
   throw new Error(lastError ?? "Timed out waiting for opencodeRouter health");
 }
 
-async function waitForOpenCodeRouterHealthyViaOpenwork(
+async function waitForOpenCodeRouterHealthyViaVenomcowork(
   venomcoworkUrl: string,
   token: string,
   timeoutMs = 10_000,
@@ -3618,9 +3618,9 @@ async function waitForOpencodeHealthy(
  * /health endpoint).
  *
  * We try multiple path patterns because:
- * - `/opencode/health` â€” most common OpenCode health endpoint proxied by the
+ * - `/opencode/health` Ã¢â‚¬â€ most common OpenCode health endpoint proxied by the
  *   server's catch-all /opencode/* route.
- * - `/health` on the venomcowork-server itself â€” already verified by the caller,
+ * - `/health` on the venomcowork-server itself Ã¢â‚¬â€ already verified by the caller,
  *   but serves as a fallback signal.
  */
 async function waitForHealthyViaProxy(
@@ -3644,7 +3644,7 @@ async function waitForHealthyViaProxy(
       if (res.ok) return;
       // Some older server versions may return 401/403 on the proxy but that
       // still proves the server is up and proxying.  Accept any non-5xx as
-      // "alive" â€” the real auth validation happens in verifyOpenworkServer.
+      // "alive" Ã¢â‚¬â€ the real auth validation happens in verifyVenomcoworkServer.
       if (res.status < 500) return;
       lastError = `Proxy returned ${res.status}`;
     } catch (error) {
@@ -3869,7 +3869,7 @@ async function startOpencode(options: {
   return child;
 }
 
-async function startOpenworkServer(options: {
+async function startVenomcoworkServer(options: {
   bin: string;
   host: string;
   port: number;
@@ -4225,11 +4225,11 @@ async function stageSandboxRuntime(options: {
   const entrypointHostPath = join(baseDir, "entrypoint.sh");
 
   const stagedOpencode = join(sidecarsDir, "opencode");
-  const stagedOpenwork = join(sidecarsDir, "venomcowork-server");
+  const stagedVenomcowork = join(sidecarsDir, "venomcowork-server");
   await copyFile(options.sidecars.opencode, stagedOpencode);
-  await copyFile(options.sidecars.venomcoworkServer, stagedOpenwork);
+  await copyFile(options.sidecars.venomcoworkServer, stagedVenomcowork);
   await ensureExecutable(stagedOpencode);
-  await ensureExecutable(stagedOpenwork);
+  await ensureExecutable(stagedVenomcowork);
 
   if (options.sidecars.opencodeRouter) {
     const stagedOpenCodeRouter = join(sidecarsDir, "opencode-router");
@@ -4791,7 +4791,7 @@ async function verifyOpencodeVersion(
   return actual;
 }
 
-async function verifyOpenworkServer(input: {
+async function verifyVenomcoworkServer(input: {
   baseUrl: string;
   token: string;
   hostToken: string;
@@ -5030,7 +5030,7 @@ async function runChecks(input: {
 
 /**
  * Lighter check suite for sandbox mode.  Uses only raw HTTP against the
- * venomcowork-server endpoints â€” no OpenCode SDK calls that rely on Bearer
+ * venomcowork-server endpoints Ã¢â‚¬â€ no OpenCode SDK calls that rely on Bearer
  * auth through the proxy (since the released server binary may predate our
  * token/proxy changes).
  */
@@ -5062,7 +5062,7 @@ async function runSandboxChecks(input: {
   // 4. Approvals endpoint (host auth)
   await fetchJson(`${baseUrl}/approvals`, { headers: hostHeaders });
 
-  // 5. Proxy is reachable (even if auth is rejected â€” non-5xx proves the
+  // 5. Proxy is reachable (even if auth is rejected Ã¢â‚¬â€ non-5xx proves the
   //    server is proxying to a running opencode)
   const proxyRes = await fetch(`${baseUrl}/opencode/health`, {
     headers,
@@ -5139,7 +5139,7 @@ async function fetchJson(url: string, init?: RequestInit): Promise<any> {
   return payload;
 }
 
-async function issueOpenworkOwnerToken(
+async function issueVenomcoworkOwnerToken(
   baseUrl: string,
   hostToken: string,
   label = "VenomCowork owner token",
@@ -6430,7 +6430,7 @@ async function runRouterDaemon(args: ParsedArgs) {
   await new Promise(() => undefined);
 }
 
-function readOpenworkClientAuth(args: ParsedArgs): {
+function readVenomcoworkClientAuth(args: ParsedArgs): {
   venomcoworkUrl: string;
   token: string;
 } {
@@ -6465,7 +6465,7 @@ function readSessionId(args: ParsedArgs, fallbackIndex: number): string {
 async function runFiles(args: ParsedArgs) {
   const outputJson = readBool(args.flags, "json", false);
   const subcommand = args.positionals[1] ?? "";
-  const { venomcoworkUrl, token } = readOpenworkClientAuth(args);
+  const { venomcoworkUrl, token } = readVenomcoworkClientAuth(args);
   const baseUrl = venomcoworkUrl.replace(/\/$/, "");
   const headers = {
     "Content-Type": "application/json",
@@ -7011,7 +7011,7 @@ async function runStart(args: ParsedArgs) {
 
   const explicitOpencodeBin =
     readFlag(args.flags, "opencode-bin") ?? process.env.VENOMCOWORK_OPENCODE_BIN;
-  const explicitOpenworkServerBin =
+  const explicitVenomcoworkServerBin =
     readFlag(args.flags, "venomcowork-server-bin") ??
     process.env.VENOMCOWORK_SERVER_BIN;
   const explicitOpenCodeRouterBin =
@@ -7055,7 +7055,7 @@ async function runStart(args: ParsedArgs) {
   const opencodeUsername = opencodeCredentials.username;
   const opencodePassword = opencodeCredentials.password;
 
-  const remoteAccessEnabled = resolveOpenworkRemoteAccess(args);
+  const remoteAccessEnabled = resolveVenomcoworkRemoteAccess(args);
   const venomcoworkHost = remoteAccessEnabled ? "0.0.0.0" : "127.0.0.1";
   const venomcoworkPort = await resolvePort(
     readNumber(args.flags, "venomcowork-port", undefined, "VENOMCOWORK_PORT"),
@@ -7131,7 +7131,7 @@ async function runStart(args: ParsedArgs) {
     // accidentally pick host (darwin) bundled binaries.
     if (sidecarSourceInput === "auto") {
       sidecarSource =
-        explicitOpenworkServerBin || explicitOpenCodeRouterBin
+        explicitVenomcoworkServerBin || explicitOpenCodeRouterBin
           ? "external"
           : "downloaded";
     }
@@ -7210,8 +7210,8 @@ async function runStart(args: ParsedArgs) {
   logVerbose(
     `opencodeRouter enabled: ${opencodeRouterEnabled ? "true" : "false"} (${opencodeRouterMode.source})`,
   );
-  let venomcoworkServerBinary = await resolveOpenworkServerBin({
-    explicit: explicitOpenworkServerBin,
+  let venomcoworkServerBinary = await resolveVenomcoworkServerBin({
+    explicit: explicitVenomcoworkServerBin,
     manifest,
     allowExternal,
     sidecar,
@@ -7415,7 +7415,7 @@ async function runStart(args: ParsedArgs) {
       }),
     );
   };
-  const restartOpenworkServer = async () => {
+  const restartVenomcoworkServer = async () => {
     if (sandboxMode !== "none") {
       throw new Error(
         "Runtime upgrade is not supported while sandbox mode is enabled",
@@ -7427,7 +7427,7 @@ async function runStart(args: ParsedArgs) {
       await stopChild(venomcoworkChild);
       venomcoworkChild = null;
     }
-    const child = await startOpenworkServer({
+    const child = await startVenomcoworkServer({
       bin: venomcoworkServerBinary.bin,
       host: venomcoworkHost,
       port: venomcoworkPort,
@@ -7466,7 +7466,7 @@ async function runStart(args: ParsedArgs) {
     );
     child.on("error", (error) => handleSpawnError("venomcowork-server", error));
     await waitForHealthy(venomcoworkBaseUrl);
-    venomcoworkActualVersion = await verifyOpenworkServer({
+    venomcoworkActualVersion = await verifyVenomcoworkServer({
       baseUrl: venomcoworkBaseUrl,
       token: venomcoworkToken,
       hostToken: venomcoworkHostToken,
@@ -7552,8 +7552,8 @@ async function runStart(args: ParsedArgs) {
         ]);
       }
       if (services.includes("venomcowork-server")) {
-        venomcoworkServerBinary = await resolveOpenworkServerBin({
-          explicit: explicitOpenworkServerBin,
+        venomcoworkServerBinary = await resolveVenomcoworkServerBin({
+          explicit: explicitVenomcoworkServerBin,
           manifest,
           allowExternal,
           sidecar,
@@ -7588,7 +7588,7 @@ async function runStart(args: ParsedArgs) {
         services.includes("venomcowork-server") ||
         services.includes("opencode")
       ) {
-        await restartOpenworkServer();
+        await restartVenomcoworkServer();
       }
       runtimeUpgradeState.status = "idle";
       runtimeUpgradeState.finishedAt = Date.now();
@@ -7769,7 +7769,7 @@ async function runStart(args: ParsedArgs) {
         },
         onCopySelection: async (text) => copyToClipboard(text),
         onRouterHealth: async () =>
-          fetchOpenCodeRouterHealthViaOpenwork(venomcoworkBaseUrl, venomcoworkToken),
+          fetchOpenCodeRouterHealthViaVenomcowork(venomcoworkBaseUrl, venomcoworkToken),
         onRouterTelegramIdentities: async () => {
           const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/opencode-router/identities/telegram`;
           const result = await fetchJson(url, {
@@ -8153,7 +8153,7 @@ async function runStart(args: ParsedArgs) {
       tui?.updateService("opencode", { status: "healthy" });
 
       try {
-        venomcoworkActualVersion = await verifyOpenworkServer({
+        venomcoworkActualVersion = await verifyVenomcoworkServer({
           baseUrl: venomcoworkBaseUrl,
           token: venomcoworkToken,
           hostToken: venomcoworkHostToken,
@@ -8167,7 +8167,7 @@ async function runStart(args: ParsedArgs) {
       } catch (verifyError) {
         // In sandbox mode the released server binary may differ from the
         // expected version or lack capabilities we just added locally.  Log
-        // the mismatch but don't abort â€” the health checks above already
+        // the mismatch but don't abort Ã¢â‚¬â€ the health checks above already
         // proved the server is running and proxying correctly.
         logger.warn(
           "Sandbox server verification warning (non-fatal)",
@@ -8175,7 +8175,7 @@ async function runStart(args: ParsedArgs) {
           "venomcowork-server",
         );
       }
-      venomcoworkOwnerToken = await issueOpenworkOwnerToken(
+      venomcoworkOwnerToken = await issueVenomcoworkOwnerToken(
         venomcoworkBaseUrl,
         venomcoworkHostToken,
         "VenomCowork sandbox owner token",
@@ -8350,7 +8350,7 @@ async function runStart(args: ParsedArgs) {
         }
       }
 
-      const startedOpenworkChild = await startOpenworkServer({
+      const startedVenomcoworkChild = await startVenomcoworkServer({
         bin: venomcoworkServerBinary.bin,
         host: venomcoworkHost,
         port: venomcoworkPort,
@@ -8377,22 +8377,22 @@ async function runStart(args: ParsedArgs) {
         controlBaseUrl,
         controlToken,
       });
-      venomcoworkChild = startedOpenworkChild;
-      children.push({ name: "venomcowork-server", child: startedOpenworkChild });
+      venomcoworkChild = startedVenomcoworkChild;
+      children.push({ name: "venomcowork-server", child: startedVenomcoworkChild });
       tui?.updateService("venomcowork-server", {
         status: "running",
-        pid: startedOpenworkChild.pid ?? undefined,
+        pid: startedVenomcoworkChild.pid ?? undefined,
         port: venomcoworkPort,
       });
       logger.info(
         "Process spawned",
-        { pid: startedOpenworkChild.pid ?? 0 },
+        { pid: startedVenomcoworkChild.pid ?? 0 },
         "venomcowork-server",
       );
-      startedOpenworkChild.on("exit", (code, signal) =>
+      startedVenomcoworkChild.on("exit", (code, signal) =>
         handleExit("venomcowork-server", code, signal),
       );
-      startedOpenworkChild.on("error", (error) =>
+      startedVenomcoworkChild.on("error", (error) =>
         handleSpawnError("venomcowork-server", error),
       );
 
@@ -8405,7 +8405,7 @@ async function runStart(args: ParsedArgs) {
       logger.info("Healthy", { url: venomcoworkBaseUrl }, "venomcowork-server");
       tui?.updateService("venomcowork-server", { status: "healthy" });
 
-      venomcoworkActualVersion = await verifyOpenworkServer({
+      venomcoworkActualVersion = await verifyVenomcoworkServer({
         baseUrl: venomcoworkBaseUrl,
         token: venomcoworkToken,
         hostToken: venomcoworkHostToken,
@@ -8416,7 +8416,7 @@ async function runStart(args: ParsedArgs) {
         expectedOpencodeUsername: opencodeUsername,
         expectedOpencodePassword: opencodePassword,
       });
-      venomcoworkOwnerToken = await issueOpenworkOwnerToken(
+      venomcoworkOwnerToken = await issueVenomcoworkOwnerToken(
         venomcoworkBaseUrl,
         venomcoworkHostToken,
         "VenomCowork owner token",
@@ -8428,7 +8428,7 @@ async function runStart(args: ParsedArgs) {
 
       if (opencodeRouterReady && !opencodeRouterHealthInterval) {
         opencodeRouterHealthInterval = setInterval(() => {
-          fetchOpenCodeRouterHealthViaOpenwork(venomcoworkBaseUrl, venomcoworkToken)
+          fetchOpenCodeRouterHealthViaVenomcowork(venomcoworkBaseUrl, venomcoworkToken)
             .then((health) => {
               tui?.setRouterHealth(health);
               if (health.ok) {
@@ -8450,7 +8450,7 @@ async function runStart(args: ParsedArgs) {
         try {
           const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/opencode-router/health`;
           logger.info("Waiting for health", { url }, "opencode-router");
-          const health = await waitForOpenCodeRouterHealthyViaOpenwork(
+          const health = await waitForOpenCodeRouterHealthyViaVenomcowork(
             venomcoworkBaseUrl,
             venomcoworkToken,
           );
@@ -8472,7 +8472,7 @@ async function runStart(args: ParsedArgs) {
         }
         if (!opencodeRouterHealthInterval) {
           opencodeRouterHealthInterval = setInterval(() => {
-            fetchOpenCodeRouterHealthViaOpenwork(venomcoworkBaseUrl, venomcoworkToken)
+            fetchOpenCodeRouterHealthViaVenomcowork(venomcoworkBaseUrl, venomcoworkToken)
               .then((health) => {
                 tui?.setRouterHealth(health);
                 if (health.ok) {

@@ -1,10 +1,10 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
 
 import { isWebDeployment } from "@/app/lib/venomcowork-deployment";
-import { hydrateOpenworkServerSettingsFromEnv } from "@/app/lib/venomcowork-server";
+import { hydrateVenomcoworkServerSettingsFromEnv } from "@/app/lib/venomcowork-server";
 import { isDesktopRuntime } from "@/app/utils";
 import { DenAuthProvider } from "@/react-app/domains/cloud/den-auth-provider";
 import { DesktopConfigProvider } from "@/react-app/domains/cloud/desktop-config-provider";
@@ -15,7 +15,7 @@ import { ArchitectureMismatchGate } from "./architecture-mismatch-gate";
 import { BootStateProvider } from "./boot-state";
 import { DesktopRuntimeBoot } from "./desktop-runtime-boot";
 import { startDebugLogger, stopDebugLogger } from "./debug-logger";
-import { resolveOpenworkConnection } from "./venomcowork-connection";
+import { resolveVenomcoworkConnection } from "./venomcowork-connection";
 import { ReloadCoordinatorProvider } from "./reload-coordinator";
 
 function resolveDefaultServerUrl(): string {
@@ -45,14 +45,14 @@ type AppProvidersProps = {
 };
 
 export function AppProviders({ children }: AppProvidersProps) {
-  hydrateOpenworkServerSettingsFromEnv();
+  hydrateVenomcoworkServerSettingsFromEnv();
 
   useEffect(() => {
     // Start the dev observability forwarder. Reads the current venomcowork-server
     // URL on every flush so reconnects after port changes still work. In prod
     // builds `startDebugLogger` is a no-op.
     startDebugLogger({
-      serverUrl: async () => (await resolveOpenworkConnection()).normalizedBaseUrl,
+      serverUrl: async () => (await resolveVenomcoworkConnection()).normalizedBaseUrl,
     });
     return () => {
       stopDebugLogger();

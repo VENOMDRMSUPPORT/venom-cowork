@@ -1,19 +1,19 @@
-﻿import {
-  isLoopbackOpenworkServerUrl,
-  normalizeOpenworkServerUrl,
-  readOpenworkServerSettings,
+import {
+  isLoopbackVenomcoworkServerUrl,
+  normalizeVenomcoworkServerUrl,
+  readVenomcoworkServerSettings,
 } from "../../app/lib/venomcowork-server";
-import { venomcoworkServerInfo, type OpenworkServerInfo } from "../../app/lib/desktop";
+import { venomcoworkServerInfo, type VenomcoworkServerInfo } from "../../app/lib/desktop";
 import { isDesktopRuntime } from "../../app/utils";
 
-export type OpenworkConnectionSource = "desktop-runtime" | "stored-settings" | "empty";
+export type VenomcoworkConnectionSource = "desktop-runtime" | "stored-settings" | "empty";
 
-export type ResolvedOpenworkConnection = {
+export type ResolvedVenomcoworkConnection = {
   normalizedBaseUrl: string;
   resolvedToken: string;
   resolvedHostToken: string;
-  hostInfo: OpenworkServerInfo | null;
-  source: OpenworkConnectionSource;
+  hostInfo: VenomcoworkServerInfo | null;
+  source: VenomcoworkConnectionSource;
 };
 
 function hasUsableConnection(url: string, token: string) {
@@ -28,14 +28,14 @@ function hasUsableConnection(url: string, token: string) {
  * there. Stored settings remain the fallback for remote/manual server
  * connections and for desktop cases where the runtime bridge is unavailable.
  */
-export async function resolveOpenworkConnection(): Promise<ResolvedOpenworkConnection> {
+export async function resolveVenomcoworkConnection(): Promise<ResolvedVenomcoworkConnection> {
   let staleDesktopRuntimeBaseUrl = "";
 
   if (isDesktopRuntime()) {
     try {
-      const info = await venomcoworkServerInfo() as OpenworkServerInfo;
+      const info = await venomcoworkServerInfo() as VenomcoworkServerInfo;
       const normalizedBaseUrl =
-        normalizeOpenworkServerUrl(info.baseUrl ?? info.connectUrl ?? info.lanUrl ?? info.mdnsUrl ?? "") ??
+        normalizeVenomcoworkServerUrl(info.baseUrl ?? info.connectUrl ?? info.lanUrl ?? info.mdnsUrl ?? "") ??
         "";
       const resolvedToken = info.ownerToken?.trim() || info.clientToken?.trim() || "";
       if (info.running === true && hasUsableConnection(normalizedBaseUrl, resolvedToken)) {
@@ -53,11 +53,11 @@ export async function resolveOpenworkConnection(): Promise<ResolvedOpenworkConne
     }
   }
 
-  const settings = readOpenworkServerSettings();
-  const normalizedBaseUrl = normalizeOpenworkServerUrl(settings.urlOverride ?? "") ?? "";
+  const settings = readVenomcoworkServerSettings();
+  const normalizedBaseUrl = normalizeVenomcoworkServerUrl(settings.urlOverride ?? "") ?? "";
   const resolvedToken = settings.token?.trim() ?? "";
   const resolvedHostToken =
-    normalizedBaseUrl && isLoopbackOpenworkServerUrl(normalizedBaseUrl)
+    normalizedBaseUrl && isLoopbackVenomcoworkServerUrl(normalizedBaseUrl)
       ? settings.hostToken?.trim() ?? ""
       : "";
   const storedConnectionIsStaleDesktopRuntime = Boolean(

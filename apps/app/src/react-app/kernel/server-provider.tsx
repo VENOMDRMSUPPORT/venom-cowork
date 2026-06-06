@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import {
   createContext,
   useCallback,
@@ -61,7 +61,7 @@ function readStoredActive(): string {
   }
 }
 
-function readOpenworkToken(): string {
+function readVenomcoworkToken(): string {
   if (typeof window === "undefined") return "";
   try {
     return (window.localStorage.getItem("venomcowork.server.token") ?? "").trim();
@@ -72,7 +72,7 @@ function readOpenworkToken(): string {
 
 async function checkHealth(url: string): Promise<boolean> {
   if (!url) return false;
-  const token = readOpenworkToken();
+  const token = readVenomcoworkToken();
   const headers =
     token && url.includes("/opencode") ? { Authorization: `Bearer ${token}` } : undefined;
   const client = createOpencodeClient({

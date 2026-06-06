@@ -1,4 +1,4 @@
-﻿import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -33,7 +33,7 @@ const versions = {
   opencodeRouter: opencodeRouterPkg.version ?? null,
   opencode: pinnedOpencodeVersion || null,
   opencodeRouterVersionPinned: desktopPkg.opencodeRouterVersion ?? null,
-  orchestratorOpenworkServerRange:
+  orchestratorVenomcoworkServerRange:
     orchestratorPkg.dependencies?.["venomcowork-server"] ?? null,
 };
 
@@ -91,7 +91,7 @@ if (versions.opencode) {
   );
 }
 
-const venomcoworkServerRange = versions.orchestratorOpenworkServerRange ?? "";
+const venomcoworkServerRange = versions.orchestratorVenomcoworkServerRange ?? "";
 const venomcoworkServerPinned = /^\d+\.\d+\.\d+/.test(venomcoworkServerRange);
 if (!venomcoworkServerRange) {
   addWarning("venomcowork-orchestrator is missing an venomcowork-server dependency.");
@@ -101,7 +101,7 @@ if (!venomcoworkServerRange) {
   );
 } else {
   addCheck(
-    "Openwork-server dependency matches server version",
+    "Venomcowork-server dependency matches server version",
     versions.server && venomcoworkServerRange === versions.server,
     `${venomcoworkServerRange} vs ${versions.server ?? "?"}`,
   );

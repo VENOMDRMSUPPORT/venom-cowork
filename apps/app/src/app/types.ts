@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   Message,
   Part,
   PermissionRequest as ApiPermissionRequest,
@@ -206,7 +206,7 @@ export type WorkspaceConnectionState = {
   checkedAt?: number | null;
 };
 
-export type ResetOpenworkMode = "onboarding" | "all";
+export type ResetVenomcoworkMode = "onboarding" | "all";
 
 export type WorkspaceBlueprintStarterKind = "prompt" | "session" | "action";
 
@@ -259,7 +259,7 @@ export type WorkspaceBlueprint = {
   } | null;
 };
 
-export type WorkspaceOpenworkConfig = {
+export type WorkspaceVenomcoworkConfig = {
   version: number;
   workspace?: {
     name?: string | null;

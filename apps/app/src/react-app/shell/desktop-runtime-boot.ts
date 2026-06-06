@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useEffect } from "react";
 
 import {
@@ -12,15 +12,15 @@ import {
   workspaceSetRuntimeActive,
   workspaceSetSelected,
   type EngineInfo,
-  type OpenworkServerInfo,
+  type VenomcoworkServerInfo,
   type WorkspaceInfo,
   type WorkspaceList,
 } from "../../app/lib/desktop";
 import { ingestMigrationSnapshotOnElectronBoot } from "../../app/lib/migration";
 import {
-  hydrateOpenworkServerSettingsFromEnv,
-  readOpenworkServerSettings,
-  writeOpenworkServerSettings,
+  hydrateVenomcoworkServerSettingsFromEnv,
+  readVenomcoworkServerSettings,
+  writeVenomcoworkServerSettings,
 } from "../../app/lib/venomcowork-server";
 import { isDesktopRuntime, isElectronRuntime, safeStringify } from "../../app/utils";
 import { useServer } from "../kernel/server-provider";
@@ -31,7 +31,7 @@ import { useBootState } from "./boot-state";
 // keeps running across the transient unmount.
 let BOOT_STARTED = false;
 
-type BootOpenworkServerInfo = {
+type BootVenomcoworkServerInfo = {
   running?: boolean | null;
   baseUrl?: string | null;
   ownerToken?: string | null;
@@ -41,11 +41,11 @@ type BootOpenworkServerInfo = {
   remoteAccessEnabled?: boolean;
 };
 
-function isOpenworkServerInfoLike(info: unknown): info is BootOpenworkServerInfo {
+function isVenomcoworkServerInfoLike(info: unknown): info is BootVenomcoworkServerInfo {
   return typeof info === "object" && info !== null;
 }
 
-function isOpenworkServerReady(info?: BootOpenworkServerInfo) {
+function isVenomcoworkServerReady(info?: BootVenomcoworkServerInfo) {
   return Boolean(
     info?.running === true &&
       info.baseUrl?.trim() &&
@@ -92,12 +92,12 @@ export function useDesktopRuntimeBoot() {
             console.info(`[migration] hydrated ${hydrated} localStorage keys from Tauri snapshot`);
           }
         }
-        hydrateOpenworkServerSettingsFromEnv();
-        const preferredRemoteAccess = readOpenworkServerSettings().remoteAccessEnabled === true;
+        hydrateVenomcoworkServerSettingsFromEnv();
+        const preferredRemoteAccess = readVenomcoworkServerSettings().remoteAccessEnabled === true;
 
-        const publishOpenworkServerInfo = (serverInfo: BootOpenworkServerInfo | null | undefined) => {
+        const publishVenomcoworkServerInfo = (serverInfo: BootVenomcoworkServerInfo | null | undefined) => {
           if (!serverInfo?.baseUrl) return;
-          writeOpenworkServerSettings({
+          writeVenomcoworkServerSettings({
             urlOverride: serverInfo.baseUrl,
             token:
               serverInfo.ownerToken?.trim() ||
@@ -120,11 +120,11 @@ export function useDesktopRuntimeBoot() {
             console.warn("[desktop-boot] venomcoworkServerRestart failed:", error);
             return null;
           });
-          if (!isOpenworkServerInfoLike(serverInfo) || !isOpenworkServerReady(serverInfo)) {
+          if (!isVenomcoworkServerInfoLike(serverInfo) || !isVenomcoworkServerReady(serverInfo)) {
             setError("VenomCowork server did not finish starting. Please restart VenomCowork.");
             return;
           }
-          publishOpenworkServerInfo(serverInfo);
+          publishVenomcoworkServerInfo(serverInfo);
           markReady();
         };
 
@@ -160,7 +160,7 @@ export function useDesktopRuntimeBoot() {
             skipped?: boolean;
             error?: string;
             engine?: { baseUrl?: string | null };
-            venomcoworkServer?: BootOpenworkServerInfo;
+            venomcoworkServer?: BootVenomcoworkServerInfo;
           };
 
           if (boot.ok === false) {
@@ -168,7 +168,7 @@ export function useDesktopRuntimeBoot() {
             return;
           }
 
-          if (!boot.skipped && !isOpenworkServerReady(boot.venomcoworkServer)) {
+          if (!boot.skipped && !isVenomcoworkServerReady(boot.venomcoworkServer)) {
             setError("VenomCowork server did not finish starting. Please restart VenomCowork.");
             return;
           }
@@ -182,9 +182,9 @@ export function useDesktopRuntimeBoot() {
               console.warn("[desktop-boot] venomcoworkServerRestart failed:", error);
               return null;
             });
-            if (isOpenworkServerInfoLike(restarted)) serverInfo = restarted;
+            if (isVenomcoworkServerInfoLike(restarted)) serverInfo = restarted;
           }
-          publishOpenworkServerInfo(serverInfo);
+          publishVenomcoworkServerInfo(serverInfo);
           markReady();
           return;
         }
@@ -198,9 +198,9 @@ export function useDesktopRuntimeBoot() {
           const engine = await engineInfo() as EngineInfo | null;
           if (engine?.running && engine.baseUrl) {
             setActive(engine.baseUrl);
-            const fresh = await venomcoworkServerInfo().catch(() => null) as OpenworkServerInfo | null;
+            const fresh = await venomcoworkServerInfo().catch(() => null) as VenomcoworkServerInfo | null;
             if (fresh?.baseUrl) {
-              writeOpenworkServerSettings({
+              writeVenomcoworkServerSettings({
                 urlOverride: fresh.baseUrl,
                 token:
                   fresh.ownerToken?.trim() ||
@@ -247,7 +247,7 @@ export function useDesktopRuntimeBoot() {
         let engineStartResult = await engineStart(workspaceRoot, {
           runtime: "direct",
           workspacePaths: workspacePathsFor(workspaceRoot),
-          venomcoworkRemoteAccess: readOpenworkServerSettings().remoteAccessEnabled === true,
+          venomcoworkRemoteAccess: readVenomcoworkServerSettings().remoteAccessEnabled === true,
         }).catch((error) => {
           console.warn("[desktop-boot] engineStart failed:", error);
           return null;
@@ -268,7 +268,7 @@ export function useDesktopRuntimeBoot() {
             engineStartResult = await engineStart(fallbackRoot, {
               runtime: "direct",
               workspacePaths: workspacePathsFor(fallbackRoot).filter((path) => path !== workspaceRoot),
-              venomcoworkRemoteAccess: readOpenworkServerSettings().remoteAccessEnabled === true,
+              venomcoworkRemoteAccess: readVenomcoworkServerSettings().remoteAccessEnabled === true,
             }).catch((error) => {
               console.warn("[desktop-boot] fallback engineStart failed:", error);
               setError(error instanceof Error ? error.message : safeStringify(error));
@@ -288,9 +288,9 @@ export function useDesktopRuntimeBoot() {
             setActive(engineStartResult.baseUrl);
           }
           try {
-            const freshInfo = await venomcoworkServerInfo() as OpenworkServerInfo | null;
+            const freshInfo = await venomcoworkServerInfo() as VenomcoworkServerInfo | null;
             if (freshInfo?.baseUrl) {
-              writeOpenworkServerSettings({
+              writeVenomcoworkServerSettings({
                 urlOverride: freshInfo.baseUrl,
                 token:
                   freshInfo.ownerToken?.trim() ||

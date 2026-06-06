@@ -1,17 +1,17 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { ChevronDown, ChevronRight, Loader2, Mic2, MicOff, Radio, SendHorizontal, Sparkles, Square, X } from "lucide-react";
 import { PaperGrainGradient } from "@venom-cowork/ui/react";
 
 import { desktopFetch } from "@/app/lib/desktop";
-import type { OpenworkServerClient } from "@/app/lib/venomcowork-server";
+import type { VenomcoworkServerClient } from "@/app/lib/venomcowork-server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupTextarea } from "@/components/ui/input-group";
 import { ScrollArea, ScrollAreaViewport } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { publishInspectorSlice, recordInspectorEvent } from "../../../shell/app-inspector";
-import { useControlAction, type OpenworkControlAction } from "../../../shell/control/control-provider";
+import { useControlAction, type VenomcoworkControlAction } from "../../../shell/control/control-provider";
 
 type VoiceStatus = "idle" | "connecting" | "listening" | "muted" | "speaking" | "error";
 
@@ -36,7 +36,7 @@ type VoiceRuntimeSnapshot = {
 };
 
 type VoicePanelProps = {
-  client: OpenworkServerClient | null;
+  client: VenomcoworkServerClient | null;
   sessionId: string | null;
   onClose: () => void;
 };
@@ -645,7 +645,7 @@ export function VoicePanel(props: VoicePanelProps) {
     return dispose;
   }, [assistantPreview, connected, entries, latestUserTranscript, micDiagnostics, micMuted, props.sessionId, realtimeDiagnostics, status, statusText, textCommand.length]);
 
-  const startAction = useMemo<OpenworkControlAction>(() => ({
+  const startAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "voice.start",
     label: "Start Voice Mode",
     description: "Connect the Voice Mode panel to OpenAI Realtime and start listening.",
@@ -656,7 +656,7 @@ export function VoicePanel(props: VoicePanelProps) {
   }), [connected, props.client, startVoice, status]);
   useControlAction(startAction);
 
-  const stopAction = useMemo<OpenworkControlAction>(() => ({
+  const stopAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "voice.stop",
     label: "Stop Voice Mode",
     description: "Disconnect the active Voice Mode Realtime session.",
@@ -667,7 +667,7 @@ export function VoicePanel(props: VoicePanelProps) {
   }), [connected, stopVoice]);
   useControlAction(stopAction);
 
-  const muteAction = useMemo<OpenworkControlAction>(() => ({
+  const muteAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "voice.toggle_mute",
     label: micMuted ? "Unmute Voice Mode" : "Mute Voice Mode",
     description: "Toggle the microphone track without closing the Realtime session.",
@@ -678,7 +678,7 @@ export function VoicePanel(props: VoicePanelProps) {
   }), [connected, micMuted, toggleMic]);
   useControlAction(muteAction);
 
-  const injectTranscriptAction = useMemo<OpenworkControlAction>(() => ({
+  const injectTranscriptAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "voice.inject_transcript",
     label: "Inject a voice transcript",
     description: "Deterministic eval hook: add a transcript to Voice Mode and place it in the composer.",
@@ -691,7 +691,7 @@ export function VoicePanel(props: VoicePanelProps) {
   }), [injectTranscript]);
   useControlAction(injectTranscriptAction);
 
-  const sendTextAction = useMemo<OpenworkControlAction>(() => ({
+  const sendTextAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "voice.send_text",
     label: "Send text through Voice Mode",
     description: "Send a deterministic text command through the active OpenAI Realtime voice session.",
@@ -704,7 +704,7 @@ export function VoicePanel(props: VoicePanelProps) {
   }), [sendTextCommand]);
   useControlAction(sendTextAction);
 
-  const injectAudioAction = useMemo<OpenworkControlAction>(() => ({
+  const injectAudioAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "voice.inject_audio",
     label: "Inject voice audio",
     description: "Deterministic eval hook: send PCM16 audio through the active OpenAI Realtime input buffer.",
@@ -716,7 +716,7 @@ export function VoicePanel(props: VoicePanelProps) {
   }), [injectAudio]);
   useControlAction(injectAudioAction);
 
-  const statusAction = useMemo<OpenworkControlAction>(() => ({
+  const statusAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "voice.status",
     label: "Read Voice Mode status",
     description: "Return the Voice Mode runtime state for tests and agents.",

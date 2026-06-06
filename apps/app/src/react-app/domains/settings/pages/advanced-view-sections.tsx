@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import type { ComponentProps, ReactNode } from "react";
 import { CircleAlert, Cpu, Database, Info, RefreshCcw, Server } from "lucide-react";
 
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import type { OpenworkRuntimeConfigStatus, OpenworkServerStatus } from "@/app/lib/venomcowork-server";
+import type { VenomcoworkRuntimeConfigStatus, VenomcoworkServerStatus } from "@/app/lib/venomcowork-server";
 import { isDesktopRuntime } from "@/app/utils";
 import { t } from "@/i18n";
 import {
@@ -109,7 +109,7 @@ interface AdvancedRuntimeMigrationSectionProps {
   canMigrate: boolean;
   migrationBusy: boolean;
   migrationStatus: string | null;
-  configStatus: OpenworkRuntimeConfigStatus | null;
+  configStatus: VenomcoworkRuntimeConfigStatus | null;
   configStatusBusy: boolean;
   configStatusError: string | null;
   onRefresh: () => Promise<void>;
@@ -307,11 +307,11 @@ export function AdvancedRuntimeMigrationSection(props: AdvancedRuntimeMigrationS
             </div>
             <div>
               <div className="font-medium text-gray-12">Legacy VenomCowork metadata</div>
-              <div className="break-all">{props.configStatus.legacyOpenwork.path}</div>
-              {props.configStatus.legacyOpenwork.error ? (
-                <div className="text-amber-11">{props.configStatus.legacyOpenwork.error}; fix this file before moving legacy config.</div>
+              <div className="break-all">{props.configStatus.legacyVenomcowork.path}</div>
+              {props.configStatus.legacyVenomcowork.error ? (
+                <div className="text-amber-11">{props.configStatus.legacyVenomcowork.error}; fix this file before moving legacy config.</div>
               ) : null}
-              <div>Migratable keys: {formatKeys(props.configStatus.legacyOpenwork.keys)}</div>
+              <div>Migratable keys: {formatKeys(props.configStatus.legacyVenomcowork.keys)}</div>
             </div>
             <div>
               <div className="font-medium text-gray-12">User opencode.jsonc</div>
@@ -498,7 +498,7 @@ interface AdvancedConnectionSectionProps {
   headerStatus: string;
   baseUrl: string;
   venomcoworkServerUrl: string;
-  venomcoworkServerStatus: OpenworkServerStatus;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
   venomcoworkReconnectBusy: boolean;
   isLocalEngineRunning: boolean;
   restartBusy: boolean;

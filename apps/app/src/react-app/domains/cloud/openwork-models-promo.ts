@@ -1,4 +1,4 @@
-﻿import { INFERENCE_MODEL_ALIASES } from "@venom-cowork/types/den/inference";
+import { INFERENCE_MODEL_ALIASES } from "@venom-cowork/types/den/inference";
 
 import {
   buildDenAuthUrl,
@@ -12,7 +12,7 @@ export const VENOMCOWORK_MODELS_PROVIDER_NAME = "VenomCowork Models";
 export const VENOMCOWORK_MODELS_PROMO_HIDDEN_KEY = "venomcowork.venomcoworkModelsPromo.hidden";
 export const VENOMCOWORK_MODELS_PROMO_LAST_SHOWN_KEY = "venomcowork.venomcoworkModelsPromo.lastShownAt";
 export const VENOMCOWORK_MODELS_STARTUP_PROMO_SHOWN_KEY = "venomcowork.venomcoworkModelsPromo.startupShown";
-export const openWorkModelsPromoChangedEvent = "venomcowork-venomcowork-models-promo-changed";
+export const venomCoworkModelsPromoChangedEvent = "venomcowork-venomcowork-models-promo-changed";
 export const VENOMCOWORK_MODELS_PROMO_SHOW_DELAY_MS = 4_000;
 export const VENOMCOWORK_MODELS_PROMO_VISIBLE_MS = 14_000;
 export const VENOMCOWORK_MODELS_PROMO_REPEAT_MS = 6 * 60 * 60 * 1000;
@@ -56,7 +56,7 @@ export function hideVenomCoworkModelsPromo() {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(VENOMCOWORK_MODELS_PROMO_HIDDEN_KEY, "1");
-    window.dispatchEvent(new Event(openWorkModelsPromoChangedEvent));
+    window.dispatchEvent(new Event(venomCoworkModelsPromoChangedEvent));
   } catch {}
 }
 

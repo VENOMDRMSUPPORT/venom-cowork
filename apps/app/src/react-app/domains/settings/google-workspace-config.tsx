@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useEffect, useState } from "react";
 import { CalendarDays, CheckCircle2, FileText, Loader2, MailPlus, ShieldCheck, XCircle } from "lucide-react";
 
@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import type { GoogleWorkspaceAuthStatus, OpenworkServerClient } from "../../../app/lib/venomcowork-server";
+import type { GoogleWorkspaceAuthStatus, VenomcoworkServerClient } from "../../../app/lib/venomcowork-server";
 import { usePlatform } from "../../kernel/platform";
 import type { ExtensionConfigContext } from "./extension-registry";
 import { registerExtensionRuntime } from "./extension-registry";
@@ -82,7 +82,7 @@ function sleep(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
-async function waitForGoogleWorkspaceConnection(client: OpenworkServerClient, flowId: string, expiresAt: number) {
+async function waitForGoogleWorkspaceConnection(client: VenomcoworkServerClient, flowId: string, expiresAt: number) {
   while (Date.now() < expiresAt + 5_000) {
     const result = await client.googleWorkspaceConnectStatus(flowId);
     if (result.status === "connected" && result.googleWorkspace) return result.googleWorkspace;
@@ -94,14 +94,14 @@ async function waitForGoogleWorkspaceConnection(client: OpenworkServerClient, fl
   throw new Error("Google Workspace OAuth timed out.");
 }
 
-function GoogleWorkspaceConfig({ venomcoworkServerClient, hostOpenworkServerClient, onExtensionConnectionChange, restartLocalServer }: ExtensionConfigContext) {
+function GoogleWorkspaceConfig({ venomcoworkServerClient, hostVenomcoworkServerClient, onExtensionConnectionChange, restartLocalServer }: ExtensionConfigContext) {
   const platform = usePlatform();
   const [status, setStatus] = useState<GoogleWorkspaceAuthStatus | null>(null);
   const [busyAction, setBusyAction] = useState<BusyAction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState("");
   const serverAvailable = Boolean(venomcoworkServerClient);
-  const hostServerAvailable = Boolean(hostOpenworkServerClient);
+  const hostServerAvailable = Boolean(hostVenomcoworkServerClient);
   const canConnect = serverAvailable && status?.configured === true && status.vault !== "unavailable";
   const canTest = serverAvailable && status?.connected === true;
 
@@ -154,7 +154,7 @@ function GoogleWorkspaceConfig({ venomcoworkServerClient, hostOpenworkServerClie
   };
 
   const saveGoogleClientSecret = async () => {
-    if (!hostOpenworkServerClient) {
+    if (!hostVenomcoworkServerClient) {
       setError("Google OAuth settings can only be saved from the local desktop app.");
       return;
     }
@@ -166,8 +166,8 @@ function GoogleWorkspaceConfig({ venomcoworkServerClient, hostOpenworkServerClie
     setBusyAction("save-secret");
     setError(null);
     try {
-      await hostOpenworkServerClient.upsertUserEnv([{ key: "GOOGLE_WORKSPACE_OAUTH_CLIENT_SECRET", value }]);
-      await hostOpenworkServerClient.setUserEnvPendingChanges(true);
+      await hostVenomcoworkServerClient.upsertUserEnv([{ key: "GOOGLE_WORKSPACE_OAUTH_CLIENT_SECRET", value }]);
+      await hostVenomcoworkServerClient.setUserEnvPendingChanges(true);
       setClientSecret("");
       if (restartLocalServer) {
         const restarted = await restartLocalServer();

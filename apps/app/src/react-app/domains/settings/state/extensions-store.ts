@@ -1,4 +1,4 @@
-﻿import * as React from "react";
+import * as React from "react";
 
 import { applyEdits, modify } from "jsonc-parser";
 
@@ -32,17 +32,17 @@ import {
   readOpencodeConfig,
   revealDesktopItemInDir,
   uninstallSkill as uninstallSkillCommand,
-  workspaceOpenworkRead,
-  workspaceOpenworkWrite,
+  workspaceVenomcoworkRead,
+  workspaceVenomcoworkWrite,
   writeLocalSkill,
   writeOpencodeConfig,
   type OpencodeConfigFile,
 } from "../../../../app/lib/desktop";
 import type {
-  OpenworkHubRepo,
-  OpenworkServerCapabilities,
-  OpenworkServerClient,
-  OpenworkServerStatus,
+  VenomcoworkHubRepo,
+  VenomcoworkServerCapabilities,
+  VenomcoworkServerClient,
+  VenomcoworkServerStatus,
 } from "../../../../app/lib/venomcowork-server";
 import {
   createDenClient,
@@ -63,13 +63,13 @@ import {
   type CloudImportedSkillHub,
 } from "../../../../app/cloud/import-state";
 import { refreshDesktopCloudSync } from "../../../../app/cloud/desktop-cloud-sync";
-import type { OpenworkServerStore } from "../../connections/venomcowork-server-store";
+import type { VenomcoworkServerStore } from "../../connections/venomcowork-server-store";
 
 const OPENCODE_SKILL_NAME_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const OPENCODE_MCP_NAME_RE = /^[A-Za-z0-9_][A-Za-z0-9_-]*$/;
 const OPENCODE_MCP_IMPORT_PATH_PREFIX = "opencode.jsonc#mcp.";
 const DEFAULT_HUB_REPO: HubSkillRepo = {
-  owner: "different-ai",
+  owner: "venom-cowork",
   repo: "venomcowork-hub",
   ref: "main",
 };
@@ -269,11 +269,11 @@ export function createExtensionsStore(options: {
   selectedWorkspaceId: () => string;
   selectedWorkspaceRoot: () => string;
   workspaceType: () => "local" | "remote";
-  venomcoworkServer: OpenworkServerStore;
+  venomcoworkServer: VenomcoworkServerStore;
   venomcoworkServerConnection?: () => {
-    venomcoworkServerClient: OpenworkServerClient | null;
-    venomcoworkServerStatus: OpenworkServerStatus;
-    venomcoworkServerCapabilities: OpenworkServerCapabilities | null;
+    venomcoworkServerClient: VenomcoworkServerClient | null;
+    venomcoworkServerStatus: VenomcoworkServerStatus;
+    venomcoworkServerCapabilities: VenomcoworkServerCapabilities | null;
   };
   runtimeWorkspaceId: () => string | null;
   ensureRuntimeWorkspaceId?: () => Promise<string | null | undefined>;
@@ -287,7 +287,7 @@ export function createExtensionsStore(options: {
 
   let disposed = false;
   let started = false;
-  let stopOpenworkSubscription: (() => void) | null = null;
+  let stopVenomcoworkSubscription: (() => void) | null = null;
   let stopDenSessionListener: (() => void) | null = null;
   let lastWorkspaceContextKey = "";
   let snapshot: ExtensionsStoreSnapshot;
@@ -362,7 +362,7 @@ export function createExtensionsStore(options: {
     return `${workspaceType}:${workspaceId}:${root}:${runtimeWorkspaceId}`;
   };
 
-  const getOpenworkServerSnapshot = () => {
+  const getVenomcoworkServerSnapshot = () => {
     const snapshot = options.venomcoworkServer.getSnapshot();
     const connection = options.venomcoworkServerConnection?.();
     if (!connection?.venomcoworkServerClient) return snapshot;
@@ -375,20 +375,20 @@ export function createExtensionsStore(options: {
   };
 
   const resolveWorkspaceServerTarget = async () => {
-    const venomcoworkSnapshot = getOpenworkServerSnapshot();
+    const venomcoworkSnapshot = getVenomcoworkServerSnapshot();
     const venomcoworkClient = venomcoworkSnapshot.venomcoworkServerClient;
     let venomcoworkWorkspaceId = options.runtimeWorkspaceId()?.trim() || null;
     if (!venomcoworkWorkspaceId && venomcoworkSnapshot.venomcoworkServerStatus === "connected" && venomcoworkClient) {
       venomcoworkWorkspaceId = (await options.ensureRuntimeWorkspaceId?.())?.trim() || null;
     }
-    const hasOpenworkTarget =
+    const hasVenomcoworkTarget =
       venomcoworkSnapshot.venomcoworkServerStatus === "connected" &&
       Boolean(venomcoworkClient && venomcoworkWorkspaceId);
     return {
       venomcoworkSnapshot,
       venomcoworkClient,
       venomcoworkWorkspaceId,
-      hasOpenworkTarget,
+      hasVenomcoworkTarget,
     };
   };
 
@@ -475,51 +475,51 @@ export function createExtensionsStore(options: {
     return next;
   };
 
-  const readWorkspaceOpenworkConfigRecord = async (): Promise<Record<string, unknown>> => {
+  const readWorkspaceVenomcoworkConfigRecord = async (): Promise<Record<string, unknown>> => {
     const root = options.selectedWorkspaceRoot().trim();
     const isLocalWorkspace = options.workspaceType() === "local";
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.config?.read !== false;
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       const config = await venomcoworkClient.getConfig(venomcoworkWorkspaceId);
       return config.venomcowork ?? {};
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       return {};
     }
 
     if (isLocalWorkspace && isDesktopRuntime() && root) {
-      return await workspaceOpenworkRead({ workspacePath: root }) as unknown as Record<string, unknown>;
+      return await workspaceVenomcoworkRead({ workspacePath: root }) as unknown as Record<string, unknown>;
     }
 
     return {};
   };
 
-  const writeWorkspaceOpenworkConfigRecord = async (config: Record<string, unknown>) => {
+  const writeWorkspaceVenomcoworkConfigRecord = async (config: Record<string, unknown>) => {
     const root = options.selectedWorkspaceRoot().trim();
     const isLocalWorkspace = options.workspaceType() === "local";
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.config?.write !== false;
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       await venomcoworkClient.patchConfig(venomcoworkWorkspaceId, { venomcowork: config });
       return true;
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       return false;
     }
 
     if (isLocalWorkspace && isDesktopRuntime() && root) {
-      const result = (await workspaceOpenworkWrite({
+      const result = (await workspaceVenomcoworkWrite({
         workspacePath: root,
         config: config as never,
       })) as { ok: boolean; stderr?: string; stdout?: string };
@@ -534,7 +534,7 @@ export function createExtensionsStore(options: {
 
   const refreshImportedCloudSkillHubs = async () => {
     try {
-      const config = await readWorkspaceOpenworkConfigRecord();
+      const config = await readWorkspaceVenomcoworkConfigRecord();
       const cloudImports = readWorkspaceCloudImports(config);
       setStateField("importedCloudSkillHubs", cloudImports.skillHubs);
       return cloudImports.skillHubs;
@@ -546,7 +546,7 @@ export function createExtensionsStore(options: {
 
   const refreshImportedCloudSkills = async () => {
     try {
-      const config = await readWorkspaceOpenworkConfigRecord();
+      const config = await readWorkspaceVenomcoworkConfigRecord();
       const cloudImports = readWorkspaceCloudImports(config);
       setStateField("importedCloudSkills", cloudImports.skills);
       return cloudImports.skills;
@@ -565,7 +565,7 @@ export function createExtensionsStore(options: {
         setStateField("importedCloudPlugins", result.plugins);
         return result.plugins;
       }
-      const config = await readWorkspaceOpenworkConfigRecord();
+      const config = await readWorkspaceVenomcoworkConfigRecord();
       const cloudImports = readWorkspaceCloudImports(config);
       setStateField("importedCloudMarketplaces", cloudImports.marketplaces);
       setStateField("importedCloudPlugins", cloudImports.plugins);
@@ -578,14 +578,14 @@ export function createExtensionsStore(options: {
   };
 
   const persistImportedCloudMarketplaces = async (nextMarketplaces: Record<string, CloudImportedMarketplace>) => {
-    const config = await readWorkspaceOpenworkConfigRecord();
+    const config = await readWorkspaceVenomcoworkConfigRecord();
     const cloudImports = readWorkspaceCloudImports(config);
     const nextCloudImports = {
       ...cloudImports,
       marketplaces: nextMarketplaces,
     };
     const nextConfig = withWorkspaceCloudImports(config, nextCloudImports);
-    const persisted = await writeWorkspaceOpenworkConfigRecord(nextConfig);
+    const persisted = await writeWorkspaceVenomcoworkConfigRecord(nextConfig);
     if (!persisted) {
       throw new Error("VenomCowork server unavailable. Connect to manage imported cloud marketplaces.");
     }
@@ -598,13 +598,13 @@ export function createExtensionsStore(options: {
   };
 
   const persistImportedCloudSkillHubs = async (nextSkillHubs: Record<string, CloudImportedSkillHub>) => {
-    const config = await readWorkspaceOpenworkConfigRecord();
+    const config = await readWorkspaceVenomcoworkConfigRecord();
     const cloudImports = readWorkspaceCloudImports(config);
     const nextConfig = withWorkspaceCloudImports(config, {
       ...cloudImports,
       skillHubs: nextSkillHubs,
     });
-    const persisted = await writeWorkspaceOpenworkConfigRecord(nextConfig);
+    const persisted = await writeWorkspaceVenomcoworkConfigRecord(nextConfig);
     if (!persisted) {
       throw new Error("VenomCowork server unavailable. Connect to manage imported cloud skill hubs.");
     }
@@ -612,13 +612,13 @@ export function createExtensionsStore(options: {
   };
 
   const persistImportedCloudSkills = async (nextSkills: Record<string, CloudImportedSkill>) => {
-    const config = await readWorkspaceOpenworkConfigRecord();
+    const config = await readWorkspaceVenomcoworkConfigRecord();
     const cloudImports = readWorkspaceCloudImports(config);
     const nextConfig = withWorkspaceCloudImports(config, {
       ...cloudImports,
       skills: nextSkills,
     });
-    const persisted = await writeWorkspaceOpenworkConfigRecord(nextConfig);
+    const persisted = await writeWorkspaceVenomcoworkConfigRecord(nextConfig);
     if (!persisted) {
       throw new Error("VenomCowork server unavailable. Connect to manage imported cloud skills.");
     }
@@ -626,14 +626,14 @@ export function createExtensionsStore(options: {
   };
 
   const persistImportedCloudPlugins = async (nextPlugins: Record<string, CloudImportedPlugin>) => {
-    const config = await readWorkspaceOpenworkConfigRecord();
+    const config = await readWorkspaceVenomcoworkConfigRecord();
     const cloudImports = readWorkspaceCloudImports(config);
     const nextCloudImports = {
       ...cloudImports,
       plugins: nextPlugins,
     };
     const nextConfig = withWorkspaceCloudImports(config, nextCloudImports);
-    const persisted = await writeWorkspaceOpenworkConfigRecord(nextConfig);
+    const persisted = await writeWorkspaceVenomcoworkConfigRecord(nextConfig);
     if (!persisted) {
       throw new Error("VenomCowork server unavailable. Connect to manage imported cloud plugins.");
     }
@@ -670,13 +670,13 @@ export function createExtensionsStore(options: {
     const isRemoteWorkspace = options.workspaceType() === "remote";
     const isLocalWorkspace = options.workspaceType() === "local";
     const root = options.selectedWorkspaceRoot().trim();
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.skills?.write !== false;
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       await venomcoworkClient.upsertSkill(venomcoworkWorkspaceId, {
         name,
         content,
@@ -685,7 +685,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       throw new Error("VenomCowork server cannot write skills for this workspace.");
     }
 
@@ -745,18 +745,18 @@ export function createExtensionsStore(options: {
     const isRemoteWorkspace = options.workspaceType() === "remote";
     const isLocalWorkspace = options.workspaceType() === "local";
     const root = options.selectedWorkspaceRoot().trim();
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.skills?.write !== false;
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       await venomcoworkClient.deleteSkill(venomcoworkWorkspaceId, name);
       return;
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       throw new Error("VenomCowork server cannot remove skills for this workspace.");
     }
 
@@ -969,7 +969,7 @@ export function createExtensionsStore(options: {
   };
 
   const upsertPluginMcpConfig = async (name: string, config: Record<string, unknown>) => {
-    const venomcoworkSnapshot = getOpenworkServerSnapshot();
+    const venomcoworkSnapshot = getVenomcoworkServerSnapshot();
     const venomcoworkClient = venomcoworkSnapshot.venomcoworkServerClient;
     const venomcoworkWorkspaceId = options.runtimeWorkspaceId();
     if (
@@ -985,7 +985,7 @@ export function createExtensionsStore(options: {
   };
 
   const deletePluginMcpConfig = async (name: string) => {
-    const venomcoworkSnapshot = getOpenworkServerSnapshot();
+    const venomcoworkSnapshot = getVenomcoworkServerSnapshot();
     const venomcoworkClient = venomcoworkSnapshot.venomcoworkServerClient;
     const venomcoworkWorkspaceId = options.runtimeWorkspaceId();
     if (
@@ -1016,10 +1016,10 @@ export function createExtensionsStore(options: {
   };
 
   const writePluginWorkspaceFile = async (path: string, content: string) => {
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
     if (
-      hasOpenworkTarget &&
+      hasVenomcoworkTarget &&
       venomcoworkClient &&
       venomcoworkWorkspaceId &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.config?.write !== false &&
@@ -1177,9 +1177,9 @@ export function createExtensionsStore(options: {
     const root = options.selectedWorkspaceRoot().trim();
     const repo = snapshot.hubRepo;
     const loadKey = `${root}::${repo ? hubRepoKey(repo) : "none"}`;
-    const venomcoworkSnapshot = getOpenworkServerSnapshot();
+    const venomcoworkSnapshot = getVenomcoworkServerSnapshot();
     const venomcoworkClient = venomcoworkSnapshot.venomcoworkServerClient;
-    const canUseOpenworkServer =
+    const canUseVenomcoworkServer =
       venomcoworkSnapshot.venomcoworkServerStatus === "connected" &&
       venomcoworkClient &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.hub?.skills?.read;
@@ -1208,7 +1208,7 @@ export function createExtensionsStore(options: {
         return;
       }
 
-      if (canUseOpenworkServer) {
+      if (canUseVenomcoworkServer) {
         const response = await venomcoworkClient.listHubSkills({
           repo: {
             owner: repo.owner,
@@ -1725,13 +1725,13 @@ export function createExtensionsStore(options: {
     if (!repo) return { ok: false, message: "Select a hub repo before installing skills." };
 
     const isRemoteWorkspace = options.workspaceType() === "remote";
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.hub?.skills?.install !== false;
 
-    if (!canUseOpenworkServer) {
+    if (!canUseVenomcoworkServer) {
       if (isRemoteWorkspace) return { ok: false, message: "VenomCowork server unavailable. Connect to install skills." };
       return { ok: false, message: "Hub install requires VenomCowork server." };
     }
@@ -1741,7 +1741,7 @@ export function createExtensionsStore(options: {
     setStateField("skillsStatus", null);
 
     try {
-      const repoOverride: OpenworkHubRepo = { owner: repo.owner, repo: repo.repo, ref: repo.ref };
+      const repoOverride: VenomcoworkHubRepo = { owner: repo.owner, repo: repo.repo, ref: repo.ref };
       if (!venomcoworkClient || !venomcoworkWorkspaceId) return { ok: false, message: "Hub install requires VenomCowork server." };
       const result = await venomcoworkClient.installHubSkill(venomcoworkWorkspaceId, trimmed, { repo: repoOverride });
       await Promise.all([refreshSkills({ force: true }), refreshHubSkills({ force: true })]);
@@ -1852,13 +1852,13 @@ export function createExtensionsStore(options: {
   async function refreshSkills(optionsOverride?: { force?: boolean }) {
     const root = options.selectedWorkspaceRoot().trim();
     const isLocalWorkspace = options.workspaceType() === "local";
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.skills?.read !== false;
 
-    if (!root && !hasOpenworkTarget) {
+    if (!root && !hasVenomcoworkTarget) {
       mutateState((current) => ({
         ...current,
         skills: [],
@@ -1867,7 +1867,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       const skillCacheKey = root || venomcoworkWorkspaceId;
       if (skillCacheKey !== skillsRoot) skillsLoaded = false;
       if (!optionsOverride?.force && skillsLoaded) return;
@@ -1908,7 +1908,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       mutateState((current) => ({
         ...current,
         skills: [],
@@ -2017,10 +2017,10 @@ export function createExtensionsStore(options: {
   async function refreshPlugins(scopeOverride?: PluginScope) {
     const isRemoteWorkspace = options.workspaceType() === "remote";
     const isLocalWorkspace = options.workspaceType() === "local";
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.plugins?.read !== false;
 
     if (refreshPluginsInFlight) return;
@@ -2042,7 +2042,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (scope === "project" && canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (scope === "project" && canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       mutateState((current) => ({
         ...current,
         pluginConfig: null,
@@ -2079,7 +2079,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (scope === "project" && hasOpenworkTarget) {
+    if (scope === "project" && hasVenomcoworkTarget) {
       mutateState((current) => ({
         ...current,
         pluginStatus: "VenomCowork server cannot read plugins for this workspace.",
@@ -2103,7 +2103,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (!isLocalWorkspace && !canUseOpenworkServer) {
+    if (!isLocalWorkspace && !canUseVenomcoworkServer) {
       mutateState((current) => ({
         ...current,
         pluginStatus: "VenomCowork server unavailable. Connect to manage plugins.",
@@ -2196,10 +2196,10 @@ export function createExtensionsStore(options: {
     const triggerName = stripPluginVersion(pluginName);
 
     const isLocalWorkspace = options.workspaceType() === "local";
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.plugins?.write !== false;
 
     if (!pluginName) {
@@ -2212,7 +2212,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (snapshot.pluginScope === "project" && canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (snapshot.pluginScope === "project" && canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       try {
         setStateField("pluginStatus", null);
         await venomcoworkClient.addPlugin(venomcoworkWorkspaceId, pluginName);
@@ -2225,7 +2225,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (snapshot.pluginScope === "project" && hasOpenworkTarget) {
+    if (snapshot.pluginScope === "project" && hasVenomcoworkTarget) {
       setStateField("pluginStatus", "VenomCowork server cannot write plugins for this workspace.");
       return;
     }
@@ -2292,10 +2292,10 @@ export function createExtensionsStore(options: {
     }
 
     const isLocalWorkspace = options.workspaceType() === "local";
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.plugins?.write !== false;
 
     if (snapshot.pluginScope !== "project" && !isLocalWorkspace) {
@@ -2303,7 +2303,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (snapshot.pluginScope === "project" && canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (snapshot.pluginScope === "project" && canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       try {
         setStateField("pluginStatus", null);
         await venomcoworkClient.removePlugin(venomcoworkWorkspaceId, name);
@@ -2315,7 +2315,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (snapshot.pluginScope === "project" && hasOpenworkTarget) {
+    if (snapshot.pluginScope === "project" && hasVenomcoworkTarget) {
       setStateField("pluginStatus", "VenomCowork server cannot write plugins for this workspace.");
       return;
     }
@@ -2407,13 +2407,13 @@ export function createExtensionsStore(options: {
   async function installSkillCreator(): Promise<{ ok: boolean; message: string }> {
     const isRemoteWorkspace = options.workspaceType() === "remote";
     const isLocalWorkspace = options.workspaceType() === "local";
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.skills?.write !== false;
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       options.setBusy(true);
       options.setError(null);
       setStateField("skillsStatus", t("skills.installing_skill_creator"));
@@ -2435,7 +2435,7 @@ export function createExtensionsStore(options: {
       }
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       const message = "VenomCowork server cannot write skills for this workspace.";
       setStateField("skillsStatus", message);
       return { ok: false, message };
@@ -2559,13 +2559,13 @@ export function createExtensionsStore(options: {
     const root = options.selectedWorkspaceRoot().trim();
     const isRemoteWorkspace = options.workspaceType() === "remote";
     const isLocalWorkspace = options.workspaceType() === "local";
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.skills?.read !== false;
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       try {
         setStateField("skillsStatus", null);
         const result = await venomcoworkClient.getSkill(venomcoworkWorkspaceId, trimmed, { includeGlobal: isLocalWorkspace });
@@ -2576,7 +2576,7 @@ export function createExtensionsStore(options: {
       }
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       setStateField("skillsStatus", "VenomCowork server cannot read skills for this workspace.");
       return null;
     }
@@ -2615,13 +2615,13 @@ export function createExtensionsStore(options: {
     const root = options.selectedWorkspaceRoot().trim();
     const isRemoteWorkspace = options.workspaceType() === "remote";
     const isLocalWorkspace = options.workspaceType() === "local";
-    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget } =
+    const { venomcoworkSnapshot, venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget } =
       await resolveWorkspaceServerTarget();
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.skills?.write !== false;
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       options.setBusy(true);
       options.setError(null);
       setStateField("skillsStatus", null);
@@ -2643,7 +2643,7 @@ export function createExtensionsStore(options: {
       return;
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       setStateField("skillsStatus", "VenomCowork server cannot write skills for this workspace.");
       return;
     }
@@ -2808,7 +2808,7 @@ export function createExtensionsStore(options: {
       stopDenSessionListener = () => window.removeEventListener("venomcowork-den-session-updated", onDenSessionUpdated);
     }
 
-    stopOpenworkSubscription = options.venomcoworkServer.subscribe(() => {
+    stopVenomcoworkSubscription = options.venomcoworkServer.subscribe(() => {
       syncFromOptions();
     });
 
@@ -2820,8 +2820,8 @@ export function createExtensionsStore(options: {
     disposed = true;
     started = false;
     abortRefreshes();
-    stopOpenworkSubscription?.();
-    stopOpenworkSubscription = null;
+    stopVenomcoworkSubscription?.();
+    stopVenomcoworkSubscription = null;
     stopDenSessionListener?.();
     stopDenSessionListener = null;
     listeners.clear();

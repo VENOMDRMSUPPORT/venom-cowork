@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bun
+#!/usr/bin/env bun
 
 import { mkdir } from "node:fs/promises";
 
@@ -6,7 +6,7 @@ import { parseCliArgs, printHelp, resolveServerConfig } from "./config.js";
 import { createManagedOpencodeServer, type ManagedOpencodeServer } from "./managed-opencode.js";
 import { createServerLogger, startServer } from "./server.js";
 import { ensureWorkspaceFiles } from "./workspace-init.js";
-import { buildOpenworkRuntimeConfig } from "./venomcowork-runtime-config.js";
+import { buildVenomcoworkRuntimeConfig } from "./venomcowork-runtime-config.js";
 import pkg from "../package.json" with { type: "json" };
 
 const args = parseCliArgs(process.argv.slice(2));
@@ -35,7 +35,7 @@ if (!config.readOnly) {
 if (!config.opencodeBaseUrl && process.env.VENOMCOWORK_MANAGE_OPENCODE === "1") {
   const workspace = config.workspaces[0];
   if (workspace?.path) {
-    const venomcoworkRuntimeConfig = await buildOpenworkRuntimeConfig(config, workspace.id);
+    const venomcoworkRuntimeConfig = await buildVenomcoworkRuntimeConfig(config, workspace.id);
     const managedOpencodeCwd = process.env.VENOMCOWORK_MANAGED_OPENCODE_CWD?.trim() || workspace.path;
     await mkdir(managedOpencodeCwd, { recursive: true });
     managedOpencode = await createManagedOpencodeServer({

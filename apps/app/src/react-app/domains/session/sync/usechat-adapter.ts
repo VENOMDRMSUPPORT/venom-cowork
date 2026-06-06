@@ -1,8 +1,8 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import type { UIMessage } from "ai";
 import type { FilePart, Part, ToolPart } from "@opencode-ai/sdk/v2/client";
 
-import type { OpenworkSessionSnapshot } from "../../../../app/lib/venomcowork-server";
+import type { VenomcoworkSessionSnapshot } from "../../../../app/lib/venomcowork-server";
 import { safeStringify } from "../../../../app/utils";
 import { SYNTHETIC_SESSION_ERROR_MESSAGE_PREFIX } from "../../../../app/types";
 import {
@@ -176,7 +176,7 @@ function mapSnapshotToolParts(part: ToolPart): UIMessage["parts"] {
   return [mapped];
 }
 
-export function snapshotToUIMessages(snapshot: OpenworkSessionSnapshot): UIMessage[] {
+export function snapshotToUIMessages(snapshot: VenomcoworkSessionSnapshot): UIMessage[] {
   return snapshot.messages.flatMap((message) => {
     const created = message.info.time?.created;
     const uiMessage = {

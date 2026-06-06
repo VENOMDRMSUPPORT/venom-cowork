@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -130,7 +130,7 @@ export function MemberDashboardScreen() {
   });
 
   const customProviders = llmProviders.filter((provider) => provider.source !== "venomcowork");
-  const openWorkProviders = llmProviders.filter((provider) => provider.source === "venomcowork");
+  const venomCoworkProviders = llmProviders.filter((provider) => provider.source === "venomcowork");
   const visiblePluginParts = plugins.reduce(
     (count, plugin) => count + plugin.skills.length + plugin.hooks.length + plugin.mcps.length + plugin.agents.length + plugin.commands.length,
     0,
@@ -172,7 +172,7 @@ export function MemberDashboardScreen() {
           icon={Sparkles}
           title="VenomCowork Models"
           value={inferenceLabel}
-          detail={inference?.enabled ? `${openWorkProviders.length} model key group${openWorkProviders.length === 1 ? "" : "s"} visible to you.` : "Ask an admin to enable org-provided models."}
+          detail={inference?.enabled ? `${venomCoworkProviders.length} model key group${venomCoworkProviders.length === 1 ? "" : "s"} visible to you.` : "Ask an admin to enable org-provided models."}
           tone={inference?.enabled ? "emerald" : "amber"}
         />
         <SummaryCard

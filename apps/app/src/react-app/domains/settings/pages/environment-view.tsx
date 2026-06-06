@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useEffect, useId, useState, type SetStateAction } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus, RefreshCw } from "lucide-react";
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { OpenworkServerClient } from "@/app/lib/venomcowork-server";
+import type { VenomcoworkServerClient } from "@/app/lib/venomcowork-server";
 import { t } from "@/i18n";
 import {
   EnvironmentVariableProvider,
@@ -60,7 +60,7 @@ type EnvItem = EnvironmentVariableItem;
 type EnvironmentEditorState = EnvironmentEditorDraft | null;
 
 export type EnvironmentViewProps = {
-  client: OpenworkServerClient | null;
+  client: VenomcoworkServerClient | null;
   isRemoteWorkspace: boolean;
   onApplyChanges?: () => Promise<ApplyEnvironmentChangesResult>;
   applyBlocked?: boolean;
@@ -114,7 +114,7 @@ function EnvironmentViewContent(props: EnvironmentViewProps) {
 }
 
 type EnvironmentSettingsPanelProps = {
-  client: OpenworkServerClient | null;
+  client: VenomcoworkServerClient | null;
   isRemoteWorkspace: boolean;
   canEdit: boolean;
   runtimeKey?: string | null;

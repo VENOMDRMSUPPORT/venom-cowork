@@ -1,25 +1,25 @@
-﻿export type OpenworkTestState = "idle" | "testing" | "success" | "error";
+export type VenomcoworkTestState = "idle" | "testing" | "success" | "error";
 
-export type OpenworkConnectionState = {
+export type VenomcoworkConnectionState = {
   url: string;
   token: string;
-  testState: OpenworkTestState;
+  testState: VenomcoworkTestState;
   testMessage: string | null;
 };
 
 export type TokenVisibilityKey = "venomcowork" | "client" | "owner" | "host";
 
 type ConfigLocalState = {
-  venomcoworkConnection: OpenworkConnectionState;
+  venomcoworkConnection: VenomcoworkConnectionState;
   tokenVisible: Record<TokenVisibilityKey, boolean>;
   copyingField: string | null;
 };
 
 type ConfigLocalAction =
-  | { type: "serverSettings"; connection: OpenworkConnectionState }
+  | { type: "serverSettings"; connection: VenomcoworkConnectionState }
   | { type: "url"; url: string }
   | { type: "token"; token: string }
-  | { type: "testState"; testState: OpenworkTestState; testMessage: string | null }
+  | { type: "testState"; testState: VenomcoworkTestState; testMessage: string | null }
   | { type: "toggleToken"; key: TokenVisibilityKey }
   | { type: "copyingField"; field: string | null };
 

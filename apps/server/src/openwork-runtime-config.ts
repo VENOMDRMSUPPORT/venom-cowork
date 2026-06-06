@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Runtime OpenCode configuration injected via OPENCODE_CONFIG_CONTENT.
  *
  * This is the single source of truth for the venomcowork agent definition,
@@ -43,7 +43,7 @@ VenomCowork can preview, edit, and download standard artifacts when you create o
 - For websites or React/UI previews, start the dev server when useful and mention the http://localhost:<port> URL.
 - For spreadsheets, use .csv for simple tabular data and .xlsx when the user asks for Excel/XLS specifically.`;
 
-export async function buildOpenworkRuntimeConfigObject(
+export async function buildVenomcoworkRuntimeConfigObject(
   config?: ServerConfig,
   workspaceId?: string,
 ): Promise<Record<string, unknown>> {
@@ -71,6 +71,6 @@ export async function buildOpenworkRuntimeConfigObject(
   };
 }
 
-export async function buildOpenworkRuntimeConfig(config?: ServerConfig, workspaceId?: string): Promise<string> {
-  return JSON.stringify(await buildOpenworkRuntimeConfigObject(config, workspaceId));
+export async function buildVenomcoworkRuntimeConfig(config?: ServerConfig, workspaceId?: string): Promise<string> {
+  return JSON.stringify(await buildVenomcoworkRuntimeConfigObject(config, workspaceId));
 }

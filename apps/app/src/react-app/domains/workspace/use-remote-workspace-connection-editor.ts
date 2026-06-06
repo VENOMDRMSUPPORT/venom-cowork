@@ -1,11 +1,11 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useCallback, useMemo, useState } from "react";
 
 import {
   workspaceUpdateRemote,
   type WorkspaceInfo,
 } from "../../../app/lib/desktop";
-import { buildOpenworkWorkspaceBaseUrl } from "../../../app/lib/venomcowork-server";
+import { buildVenomcoworkWorkspaceBaseUrl } from "../../../app/lib/venomcowork-server";
 import { t } from "../../../i18n";
 import type { RemoteWorkspaceInput } from "./types";
 
@@ -44,7 +44,7 @@ export function useRemoteWorkspaceConnectionEditor<TWorkspace extends WorkspaceI
     () => {
       const hostUrl = workspace?.venomcoworkHostUrl ?? workspace?.baseUrl ?? "";
       const mountedUrl = workspace?.remoteType === "venomcowork"
-        ? buildOpenworkWorkspaceBaseUrl(hostUrl, workspace.venomcoworkWorkspaceId) ?? hostUrl
+        ? buildVenomcoworkWorkspaceBaseUrl(hostUrl, workspace.venomcoworkWorkspaceId) ?? hostUrl
         : hostUrl;
       return {
         venomcoworkHostUrl: mountedUrl,

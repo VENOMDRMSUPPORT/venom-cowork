@@ -1,12 +1,12 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { ArrowRight, ChevronRight, Copy, Link, RefreshCcw, Shield } from "lucide-react";
 
 import { t } from "../../../../i18n";
 import type {
-  OpenworkOpenCodeRouterHealthSnapshot,
-  OpenworkOpenCodeRouterIdentityItem,
-  OpenworkOpenCodeRouterSendResult,
-  OpenworkServerStatus,
+  VenomcoworkOpenCodeRouterHealthSnapshot,
+  VenomcoworkOpenCodeRouterIdentityItem,
+  VenomcoworkOpenCodeRouterSendResult,
+  VenomcoworkServerStatus,
 } from "../../../../app/lib/venomcowork-server";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "../../../design-system/modals/confirm-modal";
@@ -21,16 +21,16 @@ export type MessagingViewExpandedChannel = MessagingChannel | null;
 export type MessagingViewProps = {
   busy: boolean;
   showHeader?: boolean;
-  venomcoworkServerStatus: OpenworkServerStatus;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
   venomcoworkServerUrl: string;
-  scopedOpenworkBaseUrl?: string;
+  scopedVenomcoworkBaseUrl?: string;
   workspaceId: string | null;
   selectedWorkspaceRoot: string;
   refreshing: boolean;
   venomcoworkReconnectBusy: boolean;
   reconnectStatus: string | null;
   reconnectError: string | null;
-  health: OpenworkOpenCodeRouterHealthSnapshot | null;
+  health: VenomcoworkOpenCodeRouterHealthSnapshot | null;
   healthError: string | null;
   messagingEnabled: boolean;
   messagingSaving: boolean;
@@ -41,7 +41,7 @@ export type MessagingViewProps = {
   activeTab: MessagingViewTab;
   expandedChannel: MessagingViewExpandedChannel;
   telegram: {
-    identities: OpenworkOpenCodeRouterIdentityItem[];
+    identities: VenomcoworkOpenCodeRouterIdentityItem[];
     identitiesError: string | null;
     token: string;
     enabled: boolean;
@@ -52,7 +52,7 @@ export type MessagingViewProps = {
     pairingCode: string | null;
   };
   slack: {
-    identities: OpenworkOpenCodeRouterIdentityItem[];
+    identities: VenomcoworkOpenCodeRouterIdentityItem[];
     identitiesError: string | null;
     botToken: string;
     appToken: string;
@@ -79,7 +79,7 @@ export type MessagingViewProps = {
     busy: boolean;
     status: string | null;
     error: string | null;
-    result: OpenworkOpenCodeRouterSendResult | null;
+    result: VenomcoworkOpenCodeRouterSendResult | null;
   };
   modals: {
     messagingRiskOpen: boolean;
@@ -178,7 +178,7 @@ export function MessagingView(props: MessagingViewProps) {
   const serverReady = props.venomcoworkServerStatus === "connected";
   const scopedWorkspaceReady = Boolean(props.workspaceId?.trim());
   const workspaceScopeLabel =
-    props.scopedOpenworkBaseUrl?.trim() || props.venomcoworkServerUrl.trim() || t("identities.not_set");
+    props.scopedVenomcoworkBaseUrl?.trim() || props.venomcoworkServerUrl.trim() || t("identities.not_set");
   const defaultRoutingDirectory = props.selectedWorkspaceRoot.trim() || t("identities.not_set");
   const telegramBotLink = props.telegram.botUsername?.trim()
     ? `https://t.me/${props.telegram.botUsername.trim().replace(/^@+/, "")}`

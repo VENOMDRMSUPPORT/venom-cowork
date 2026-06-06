@@ -1,4 +1,4 @@
-﻿import { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 import { applyEdits, modify, parse, printParseErrorCode } from "jsonc-parser";
 
@@ -22,7 +22,7 @@ import {
   removeMcpFromConfig,
   validateMcpServerName,
 } from "../../../app/mcp";
-import { buildOpenworkWorkspaceBaseUrl } from "../../../app/lib/venomcowork-server";
+import { buildVenomcoworkWorkspaceBaseUrl } from "../../../app/lib/venomcowork-server";
 import type {
   Client,
   McpServerEntry,
@@ -32,7 +32,7 @@ import type {
 } from "../../../app/types";
 import { isDesktopRuntime, normalizeDirectoryPath, safeStringify } from "../../../app/utils";
 
-import type { OpenworkServerStore } from "./venomcowork-server-store";
+import type { VenomcoworkServerStore } from "./venomcowork-server-store";
 
 type SetStateAction<T> = T | ((current: T) => T);
 
@@ -59,7 +59,7 @@ export function createConnectionsStore(options: {
   selectedWorkspaceId: () => string;
   selectedWorkspaceRoot: () => string;
   workspaceType: () => "local" | "remote";
-  venomcoworkServer: OpenworkServerStore;
+  venomcoworkServer: VenomcoworkServerStore;
   runtimeWorkspaceId: () => string | null;
   ensureRuntimeWorkspaceId?: () => Promise<string | null | undefined>;
   setProjectDir?: (value: string) => void;
@@ -126,12 +126,12 @@ export function createConnectionsStore(options: {
     return `${workspaceType}:${workspaceId}:${root}:${runtimeWorkspaceId}`;
   };
 
-  const getOpenworkSnapshot = () => options.venomcoworkServer.getSnapshot();
+  const getVenomcoworkSnapshot = () => options.venomcoworkServer.getSnapshot();
 
-  const resolveOpenworkWorkspaceId = async () => {
+  const resolveVenomcoworkWorkspaceId = async () => {
     const current = options.runtimeWorkspaceId()?.trim();
     if (current) return current;
-    const venomcoworkSnapshot = getOpenworkSnapshot();
+    const venomcoworkSnapshot = getVenomcoworkSnapshot();
     if (venomcoworkSnapshot.venomcoworkServerStatus !== "connected" || !venomcoworkSnapshot.venomcoworkServerClient) {
       return null;
     }
@@ -140,39 +140,39 @@ export function createConnectionsStore(options: {
     return options.workspaceType() === "local" ? options.selectedWorkspaceId().trim() || null : null;
   };
 
-  const resolveConfigOpenworkTarget = async (mode: "read" | "write") => {
-    const venomcoworkSnapshot = getOpenworkSnapshot();
+  const resolveConfigVenomcoworkTarget = async (mode: "read" | "write") => {
+    const venomcoworkSnapshot = getVenomcoworkSnapshot();
     const venomcoworkClient = venomcoworkSnapshot.venomcoworkServerClient;
-    const venomcoworkWorkspaceId = await resolveOpenworkWorkspaceId();
-    const hasOpenworkTarget =
+    const venomcoworkWorkspaceId = await resolveVenomcoworkWorkspaceId();
+    const hasVenomcoworkTarget =
       venomcoworkSnapshot.venomcoworkServerStatus === "connected" &&
       Boolean(venomcoworkClient && venomcoworkWorkspaceId);
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.config?.[mode] !== false;
     return {
       venomcoworkClient,
       venomcoworkWorkspaceId,
-      hasOpenworkTarget,
-      canUseOpenworkServer,
+      hasVenomcoworkTarget,
+      canUseVenomcoworkServer,
     };
   };
 
-  const resolveMcpOpenworkTarget = async (mode: "read" | "write") => {
-    const venomcoworkSnapshot = getOpenworkSnapshot();
+  const resolveMcpVenomcoworkTarget = async (mode: "read" | "write") => {
+    const venomcoworkSnapshot = getVenomcoworkSnapshot();
     const venomcoworkClient = venomcoworkSnapshot.venomcoworkServerClient;
-    const venomcoworkWorkspaceId = await resolveOpenworkWorkspaceId();
-    const hasOpenworkTarget =
+    const venomcoworkWorkspaceId = await resolveVenomcoworkWorkspaceId();
+    const hasVenomcoworkTarget =
       venomcoworkSnapshot.venomcoworkServerStatus === "connected" &&
       Boolean(venomcoworkClient && venomcoworkWorkspaceId);
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.mcp?.[mode] !== false;
     return {
       venomcoworkClient,
       venomcoworkWorkspaceId,
-      hasOpenworkTarget,
-      canUseOpenworkServer,
+      hasVenomcoworkTarget,
+      canUseVenomcoworkServer,
     };
   };
 
@@ -185,14 +185,14 @@ export function createConnectionsStore(options: {
 
   const readMcpConfigFile = async (scope: "project" | "global"): Promise<OpencodeConfigFile | null> => {
     const projectDir = options.projectDir().trim();
-    const { venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget, canUseOpenworkServer } =
-      await resolveConfigOpenworkTarget("read");
+    const { venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget, canUseVenomcoworkServer } =
+      await resolveConfigVenomcoworkTarget("read");
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       return venomcoworkClient.readOpencodeConfigFile(venomcoworkWorkspaceId, scope);
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       return null;
     }
 
@@ -209,7 +209,7 @@ export function createConnectionsStore(options: {
       return activeClient;
     }
 
-    const venomcoworkSnapshot = getOpenworkSnapshot();
+    const venomcoworkSnapshot = getVenomcoworkSnapshot();
     const venomcoworkBaseUrl = venomcoworkSnapshot.venomcoworkServerBaseUrl.trim();
     const token = venomcoworkSnapshot.venomcoworkServerAuth.token?.trim();
     if (!venomcoworkBaseUrl || !token) {
@@ -217,7 +217,7 @@ export function createConnectionsStore(options: {
     }
 
     const mountedBaseUrl =
-      buildOpenworkWorkspaceBaseUrl(venomcoworkBaseUrl, await resolveOpenworkWorkspaceId()) ?? venomcoworkBaseUrl;
+      buildVenomcoworkWorkspaceBaseUrl(venomcoworkBaseUrl, await resolveVenomcoworkWorkspaceId()) ?? venomcoworkBaseUrl;
     activeClient = createClient(`${mountedBaseUrl.replace(/\/+$/, "")}/opencode`, undefined, {
       token,
       mode: "venomcowork",
@@ -226,8 +226,8 @@ export function createConnectionsStore(options: {
     return activeClient;
   };
 
-  const resolveWritableOpenworkTarget = async () => {
-    return resolveMcpOpenworkTarget("write");
+  const resolveWritableVenomcoworkTarget = async () => {
+    return resolveMcpVenomcoworkTarget("write");
   };
 
   const resolveProjectDir = async (activeClient: Client | null, currentProjectDir: string) => {
@@ -249,27 +249,27 @@ export function createConnectionsStore(options: {
     return resolvedProjectDir;
   };
 
-  const listMcpFromOpenworkServer = async (projectDir: string) => {
-    const venomcoworkSnapshot = getOpenworkSnapshot();
-    const { venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget, canUseOpenworkServer } =
-      await resolveMcpOpenworkTarget("read");
-    const canTryOpenworkServer = canUseOpenworkServer;
+  const listMcpFromVenomcoworkServer = async (projectDir: string) => {
+    const venomcoworkSnapshot = getVenomcoworkSnapshot();
+    const { venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget, canUseVenomcoworkServer } =
+      await resolveMcpVenomcoworkTarget("read");
+    const canTryVenomcoworkServer = canUseVenomcoworkServer;
 
     recordPerfLog(options.developerMode(), "mcp.refresh", "server-path-check", {
       workspaceType: options.workspaceType(),
       projectDir: projectDir || null,
       venomcoworkStatus: venomcoworkSnapshot.venomcoworkServerStatus,
-      hasOpenworkClient: Boolean(venomcoworkClient),
+      hasVenomcoworkClient: Boolean(venomcoworkClient),
       venomcoworkWorkspaceId: venomcoworkWorkspaceId ?? null,
       canReadMcp: venomcoworkSnapshot.venomcoworkServerCapabilities?.mcp?.read ?? null,
-      canTryOpenworkServer,
+      canTryVenomcoworkServer,
     });
 
-    if (hasOpenworkTarget && !canTryOpenworkServer) {
+    if (hasVenomcoworkTarget && !canTryVenomcoworkServer) {
       throw new Error("VenomCowork server cannot read MCP config for this workspace.");
     }
 
-    if (!canTryOpenworkServer || !venomcoworkClient || !venomcoworkWorkspaceId) return null;
+    if (!canTryVenomcoworkServer || !venomcoworkClient || !venomcoworkWorkspaceId) return null;
 
     const response = await venomcoworkClient.listMcp(venomcoworkWorkspaceId);
     const next = response.items.map((entry) => ({
@@ -322,7 +322,7 @@ export function createConnectionsStore(options: {
       return command ?? entry.command;
     }
     if (mcpResource?.localCommandRef === "venomcowork.uiMcp" || entry.serverName === "venomcowork-ui") {
-      const command = await resolveDesktopCommand("getOpenworkUiMcpCommand");
+      const command = await resolveDesktopCommand("getVenomcoworkUiMcpCommand");
       return command ?? entry.command;
     }
     return entry.command;
@@ -331,7 +331,7 @@ export function createConnectionsStore(options: {
   const resolveLocalMcpEnvironment = async (entry: McpDirectoryInfo) => {
     if (entry.serverName !== "venomcowork-ui") return undefined;
     try {
-      const environment = await (window as any).__VENOMCOWORK_ELECTRON__?.invokeDesktop?.("getOpenworkUiMcpEnvironment");
+      const environment = await (window as any).__VENOMCOWORK_ELECTRON__?.invokeDesktop?.("getVenomcoworkUiMcpEnvironment");
       if (environment && typeof environment === "object" && !Array.isArray(environment)) {
         return Object.fromEntries(
           Object.entries(environment).filter((entry): entry is [string, string] =>
@@ -353,7 +353,7 @@ export function createConnectionsStore(options: {
 
     try {
       setStateField("mcpStatus", null);
-      const serverResult = await listMcpFromOpenworkServer(projectDir);
+      const serverResult = await listMcpFromVenomcoworkServer(projectDir);
       if (serverResult) {
         mutateState((current) => ({
           ...current,
@@ -368,8 +368,8 @@ export function createConnectionsStore(options: {
       recordPerfLog(options.developerMode(), "mcp.refresh", "server-path-error", {
         message: error instanceof Error ? error.message : String(error),
       });
-      const serverTarget = await resolveMcpOpenworkTarget("read").catch(() => null);
-      if (isRemoteWorkspace || serverTarget?.hasOpenworkTarget) {
+      const serverTarget = await resolveMcpVenomcoworkTarget("read").catch(() => null);
+      if (isRemoteWorkspace || serverTarget?.hasVenomcoworkTarget) {
         mutateState((current) => ({
           ...current,
           mcpServers: [],
@@ -482,7 +482,7 @@ export function createConnectionsStore(options: {
 
   async function connectMcp(entry: McpDirectoryInfo) {
     const startedAt = perfNow();
-    const venomcoworkSnapshot = getOpenworkSnapshot();
+    const venomcoworkSnapshot = getVenomcoworkSnapshot();
     const isRemoteWorkspace =
       options.workspaceType() === "remote" ||
       (!isDesktopRuntime() && venomcoworkSnapshot.venomcoworkServerStatus === "connected");
@@ -496,10 +496,10 @@ export function createConnectionsStore(options: {
       projectDir: projectDir || null,
     });
 
-    const { venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget, canUseOpenworkServer } =
-      await resolveWritableOpenworkTarget();
+    const { venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget, canUseVenomcoworkServer } =
+      await resolveWritableVenomcoworkTarget();
 
-    if (isRemoteWorkspace && !canUseOpenworkServer) {
+    if (isRemoteWorkspace && !canUseVenomcoworkServer) {
       setStateField("mcpStatus", "VenomCowork server unavailable. MCP config is read-only.");
       finishPerf(options.developerMode(), "mcp.connect", "blocked", startedAt, {
         reason: "venomcowork-server-unavailable",
@@ -507,7 +507,7 @@ export function createConnectionsStore(options: {
       return;
     }
 
-    if (hasOpenworkTarget && !canUseOpenworkServer) {
+    if (hasVenomcoworkTarget && !canUseVenomcoworkServer) {
       setStateField("mcpStatus", "VenomCowork server MCP config is read-only.");
       finishPerf(options.developerMode(), "mcp.connect", "blocked", startedAt, {
         reason: "venomcowork-server-read-only",
@@ -515,7 +515,7 @@ export function createConnectionsStore(options: {
       return;
     }
 
-    if (!canUseOpenworkServer && !isDesktopRuntime()) {
+    if (!canUseVenomcoworkServer && !isDesktopRuntime()) {
       setStateField("mcpStatus", t("mcp.desktop_required"));
       finishPerf(options.developerMode(), "mcp.connect", "blocked", startedAt, {
         reason: "desktop-required",
@@ -523,7 +523,7 @@ export function createConnectionsStore(options: {
       return;
     }
 
-    if (!isRemoteWorkspace && !projectDir && !canUseOpenworkServer) {
+    if (!isRemoteWorkspace && !projectDir && !canUseVenomcoworkServer) {
       setStateField("mcpStatus", t("mcp.pick_workspace_first"));
       finishPerf(options.developerMode(), "mcp.connect", "blocked", startedAt, {
         reason: "missing-workspace",
@@ -531,8 +531,8 @@ export function createConnectionsStore(options: {
       return;
     }
 
-    const activeClient = canUseOpenworkServer ? options.client() ?? await ensureActiveClient().catch(() => null) : await ensureActiveClient();
-    if (!activeClient && !canUseOpenworkServer) {
+    const activeClient = canUseVenomcoworkServer ? options.client() ?? await ensureActiveClient().catch(() => null) : await ensureActiveClient();
+    if (!activeClient && !canUseVenomcoworkServer) {
       setStateField("mcpStatus", t("mcp.connect_server_first"));
       finishPerf(options.developerMode(), "mcp.connect", "blocked", startedAt, {
         reason: "no-active-client",
@@ -541,7 +541,7 @@ export function createConnectionsStore(options: {
     }
 
     const resolvedProjectDir = activeClient ? await resolveProjectDir(activeClient, projectDir) : projectDir;
-    if (!resolvedProjectDir && !canUseOpenworkServer) {
+    if (!resolvedProjectDir && !canUseVenomcoworkServer) {
       setStateField("mcpStatus", t("mcp.pick_workspace_first"));
       finishPerf(options.developerMode(), "mcp.connect", "blocked", startedAt, {
         reason: "missing-workspace-after-discovery",
@@ -601,7 +601,7 @@ export function createConnectionsStore(options: {
         }
       }
 
-      if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+      if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
         await venomcoworkClient.addMcp(venomcoworkWorkspaceId, {
           name: slug,
           config: mcpEntryConfig,
@@ -646,7 +646,7 @@ export function createConnectionsStore(options: {
         }
       }
 
-      if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+      if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
         // The VenomCowork server is the source of truth for workspace-scoped MCP
         // config in the React port. Avoid also calling the OpenCode SDK's MCP
         // hot-add endpoint here: when the SDK client is rooted at the aggregate
@@ -744,38 +744,38 @@ export function createConnectionsStore(options: {
   }
 
   async function logoutMcpAuth(name: string) {
-    const venomcoworkSnapshot = getOpenworkSnapshot();
+    const venomcoworkSnapshot = getVenomcoworkSnapshot();
     const isRemoteWorkspace =
       options.workspaceType() === "remote" ||
       (!isDesktopRuntime() && venomcoworkSnapshot.venomcoworkServerStatus === "connected");
     const projectDir = options.projectDir().trim();
 
-    const { venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget, canUseOpenworkServer } =
-      await resolveWritableOpenworkTarget();
+    const { venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget, canUseVenomcoworkServer } =
+      await resolveWritableVenomcoworkTarget();
 
-    if (isRemoteWorkspace && !canUseOpenworkServer) {
+    if (isRemoteWorkspace && !canUseVenomcoworkServer) {
       setStateField("mcpStatus", "VenomCowork server unavailable. MCP auth is read-only.");
       return;
     }
 
-    if (hasOpenworkTarget && !canUseOpenworkServer) {
+    if (hasVenomcoworkTarget && !canUseVenomcoworkServer) {
       setStateField("mcpStatus", "VenomCowork server MCP auth is read-only.");
       return;
     }
 
-    if (!canUseOpenworkServer && !isDesktopRuntime()) {
+    if (!canUseVenomcoworkServer && !isDesktopRuntime()) {
       setStateField("mcpStatus", t("mcp.desktop_required"));
       return;
     }
 
-    const activeClient = canUseOpenworkServer ? options.client() : await ensureActiveClient();
-    if (!activeClient && !canUseOpenworkServer) {
+    const activeClient = canUseVenomcoworkServer ? options.client() : await ensureActiveClient();
+    if (!activeClient && !canUseVenomcoworkServer) {
       setStateField("mcpStatus", t("mcp.connect_server_first"));
       return;
     }
 
     const resolvedProjectDir = activeClient ? await resolveProjectDir(activeClient, projectDir) : projectDir;
-    if (!resolvedProjectDir && !canUseOpenworkServer) {
+    if (!resolvedProjectDir && !canUseVenomcoworkServer) {
       setStateField("mcpStatus", t("mcp.pick_workspace_first"));
       return;
     }
@@ -784,7 +784,7 @@ export function createConnectionsStore(options: {
     setStateField("mcpStatus", null);
 
     try {
-      if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+      if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
         await venomcoworkClient.logoutMcpAuth(venomcoworkWorkspaceId, safeName);
       } else {
         if (!activeClient || !resolvedProjectDir) {
@@ -821,13 +821,13 @@ export function createConnectionsStore(options: {
     try {
       setStateField("mcpStatus", null);
 
-      const { venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget, canUseOpenworkServer } =
-        await resolveWritableOpenworkTarget();
+      const { venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget, canUseVenomcoworkServer } =
+        await resolveWritableVenomcoworkTarget();
 
-      if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+      if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
         await venomcoworkClient.removeMcp(venomcoworkWorkspaceId, name);
       } else {
-        if (hasOpenworkTarget) {
+        if (hasVenomcoworkTarget) {
           setStateField("mcpStatus", "VenomCowork server MCP config is read-only.");
           return;
         }
@@ -897,10 +897,10 @@ export function createConnectionsStore(options: {
   // from the existing reload-required popup; no extra banner here.
   async function setMcpEnabled(name: string, enabled: boolean) {
     try {
-      const { venomcoworkClient, venomcoworkWorkspaceId, canUseOpenworkServer } =
-        await resolveWritableOpenworkTarget();
+      const { venomcoworkClient, venomcoworkWorkspaceId, canUseVenomcoworkServer } =
+        await resolveWritableVenomcoworkTarget();
 
-      if (!canUseOpenworkServer || !venomcoworkClient || !venomcoworkWorkspaceId) {
+      if (!canUseVenomcoworkServer || !venomcoworkClient || !venomcoworkWorkspaceId) {
         setStateField("mcpStatus", t("mcp.toggle_requires_server"));
         return;
       }
@@ -943,7 +943,7 @@ export function createConnectionsStore(options: {
       return;
     }
 
-    if (!isDesktopRuntime() && getOpenworkSnapshot().venomcoworkServerStatus !== "connected") {
+    if (!isDesktopRuntime() && getVenomcoworkSnapshot().venomcoworkServerStatus !== "connected") {
       return;
     }
 

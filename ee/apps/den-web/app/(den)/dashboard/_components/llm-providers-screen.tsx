@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -33,7 +33,7 @@ export function LlmProvidersScreen() {
   const { llmProviders, busy, error } = useOrgLlmProviders(orgId);
   const [query, setQuery] = useState("");
 
-  const openWorkProviders = useMemo(
+  const venomCoworkProviders = useMemo(
     () => llmProviders.filter((provider) => provider.source === "venomcowork"),
     [llmProviders],
   );
@@ -62,8 +62,8 @@ export function LlmProvidersScreen() {
     });
   }, [customProviders, query]);
 
-  const openWorkKeyRows = useMemo(() => {
-    const rows = openWorkProviders.flatMap((provider) =>
+  const venomCoworkKeyRows = useMemo(() => {
+    const rows = venomCoworkProviders.flatMap((provider) =>
       provider.access.members.map((member) => ({
         id: `${provider.id}:${member.id}`,
         name: member.user.name || member.user.email,
@@ -73,7 +73,7 @@ export function LlmProvidersScreen() {
     );
     rows.sort((a, b) => a.name.localeCompare(b.name));
     return rows;
-  }, [openWorkProviders]);
+  }, [venomCoworkProviders]);
 
   return (
     <DashboardPageTemplate
@@ -110,7 +110,7 @@ export function LlmProvidersScreen() {
         </div>
       ) : (
       <div className="grid gap-8">
-        {openWorkKeyRows.length > 0 ? (
+        {venomCoworkKeyRows.length > 0 ? (
           <section className="overflow-hidden rounded-[28px] border border-gray-200 bg-white">
             <div className="border-b border-gray-100 px-6 py-4">
               <h2 className="text-[16px] font-medium tracking-[-0.02em] text-gray-950">VenomCowork Model Keys</h2>
@@ -125,7 +125,7 @@ export function LlmProvidersScreen() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {openWorkKeyRows.map((row) => (
+                  {venomCoworkKeyRows.map((row) => (
                     <tr key={row.id}>
                       <td className="px-6 py-3">
                         <p className="text-[14px] font-medium text-gray-950">{row.name}</p>

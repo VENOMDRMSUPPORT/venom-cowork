@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import * as React from "react";
 import {
   ArrowLeft,
@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useDragControls } from "motion/react";
 
-import type { OpenworkServerClient } from "@/app/lib/venomcowork-server";
+import type { VenomcoworkServerClient } from "@/app/lib/venomcowork-server";
 import { PanelTab, PanelTabClose, PanelTabItem, PanelTabList } from "@/components/panel-tabs";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,7 +40,7 @@ import {
 
 type SidePanelProps = {
   sessionId: string;
-  client: OpenworkServerClient | null;
+  client: VenomcoworkServerClient | null;
   workspaceId: string | null;
   workspaceRoot: string;
   isRemoteWorkspace?: boolean;

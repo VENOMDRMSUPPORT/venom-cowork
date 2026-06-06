@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, BookOpen, Cloud, MessageCircleMore, Settings, Sparkles, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -10,9 +10,9 @@ import { t } from "@/i18n";
 import { buildDenAuthUrl, readDenBootstrapConfig } from "@/app/lib/den";
 import { usePlatform } from "../../../kernel/platform";
 import { useDenAuth } from "../../cloud/den-auth-provider";
-import { useControlAction, type OpenworkControlAction } from "../../../shell/control/control-provider";
+import { useControlAction, type VenomcoworkControlAction } from "../../../shell/control/control-provider";
 import { useShellConfig } from "../../../shell/shell-config";
-import type { OpenworkServerStatus } from "../../../../app/lib/venomcowork-server";
+import type { VenomcoworkServerStatus } from "../../../../app/lib/venomcowork-server";
 import {
   getVenomCoworkModelsActionUrl,
   hasVenomCoworkModelsProvider,
@@ -21,7 +21,7 @@ import {
   markVenomCoworkModelsPromoShown,
   VENOMCOWORK_MODELS_PROMO_SHOW_DELAY_MS,
   VENOMCOWORK_MODELS_PROMO_VISIBLE_MS,
-  openWorkModelsPromoChangedEvent,
+  venomCoworkModelsPromoChangedEvent,
   shouldShowVenomCoworkModelsPromo,
 } from "../../cloud/venomcowork-models-promo";
 
@@ -58,7 +58,7 @@ function StatusDot({ variant }: StatusDotProps) {
 
 type StatusIndicatorProps = {
   clientConnected: boolean;
-  venomcoworkServerStatus: OpenworkServerStatus;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
   developerMode: boolean;
   mcpConnectedCount: number;
   loading?: boolean;
@@ -134,7 +134,7 @@ function StatusIndicator(props: StatusIndicatorProps) {
 
 export type StatusBarProps = {
   clientConnected: boolean;
-  venomcoworkServerStatus: OpenworkServerStatus;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
   developerMode: boolean;
   settingsOpen: boolean;
   onSendFeedback: () => void;
@@ -154,7 +154,7 @@ export function StatusBar(props: StatusBarProps) {
   const docsButtonRef = useRef<HTMLButtonElement>(null);
   const feedbackButtonRef = useRef<HTMLButtonElement>(null);
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
-  const [openWorkModelsHintVisible, setVenomCoworkModelsHintVisible] = useState(false);
+  const [venomCoworkModelsHintVisible, setVenomCoworkModelsHintVisible] = useState(false);
   const hasVenomCoworkModels = useMemo(
     () => hasVenomCoworkModelsProvider(props.providerConnectedIds),
     [props.providerConnectedIds],
@@ -179,8 +179,8 @@ export function StatusBar(props: StatusBarProps) {
         setVenomCoworkModelsHintVisible(false);
       }
     };
-    window.addEventListener(openWorkModelsPromoChangedEvent, handlePromoChanged);
-    return () => window.removeEventListener(openWorkModelsPromoChangedEvent, handlePromoChanged);
+    window.addEventListener(venomCoworkModelsPromoChangedEvent, handlePromoChanged);
+    return () => window.removeEventListener(venomCoworkModelsPromoChangedEvent, handlePromoChanged);
   }, []);
 
   useEffect(() => {
@@ -212,13 +212,13 @@ export function StatusBar(props: StatusBarProps) {
   }, [denAuth.status, hasVenomCoworkModels, shellConfig.cloudSignin]);
 
   useEffect(() => {
-    if (!openWorkModelsHintVisible) return;
+    if (!venomCoworkModelsHintVisible) return;
     const timeout = window.setTimeout(
       () => setVenomCoworkModelsHintVisible(false),
       VENOMCOWORK_MODELS_PROMO_VISIBLE_MS,
     );
     return () => window.clearTimeout(timeout);
-  }, [openWorkModelsHintVisible]);
+  }, [venomCoworkModelsHintVisible]);
 
   const openVenomCoworkModels = useCallback(() => {
     setVenomCoworkModelsHintVisible(false);
@@ -233,7 +233,7 @@ export function StatusBar(props: StatusBarProps) {
     hideVenomCoworkModelsPromo();
   }, []);
 
-  const docsControlAction = useMemo<OpenworkControlAction>(() => ({
+  const docsControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "status.docs.open",
     label: "Open VenomCowork docs",
     description: "Open the documentation from the status bar.",
@@ -243,7 +243,7 @@ export function StatusBar(props: StatusBarProps) {
   }), [platform]);
   useControlAction(docsControlAction);
 
-  const feedbackControlAction = useMemo<OpenworkControlAction>(() => ({
+  const feedbackControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "status.feedback.open",
     label: "Send feedback",
     description: "Open the VenomCowork feedback surface from the status bar.",
@@ -253,7 +253,7 @@ export function StatusBar(props: StatusBarProps) {
   }), [props.onSendFeedback]);
   useControlAction(feedbackControlAction);
 
-  const settingsControlAction = useMemo<OpenworkControlAction>(() => ({
+  const settingsControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "status.settings.open",
     label: props.settingsOpen ? "Go back from settings" : "Open settings from the status bar",
     description: "Use the visible settings button in the status bar.",
@@ -277,7 +277,7 @@ export function StatusBar(props: StatusBarProps) {
         />
 
         <div className="flex items-center gap-1">
-          {openWorkModelsHintVisible ? (
+          {venomCoworkModelsHintVisible ? (
             <div className="mr-1 flex h-6 items-center overflow-hidden rounded-full border border-blue-6/60 bg-blue-2/70 shadow-[0_0_18px_rgba(var(--dls-accent-rgb),0.16)] animate-in fade-in slide-in-from-bottom-1 zoom-in-95 duration-300">
               <button
                 type="button"

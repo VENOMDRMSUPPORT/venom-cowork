@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 #
 # venomcowork-debug.sh â€” one-stop observability + lifecycle control for the
 # VenomCowork dev stack.
@@ -122,7 +122,7 @@ discover_venomcowork_server_port() {
 
 electron_renderer_stats() {
   ps -axo pid,ppid,pcpu,pmem,rss,command \
-    | awk '/Electron Helper \(Renderer\)/ && /com\.differentai\.venomcowork/ && !/awk/ && !/grep/ {print; found=1} END {exit found ? 0 : 1}' \
+    | awk '/Electron Helper \(Renderer\)/ && /com\.venom\.cowork/ && !/awk/ && !/grep/ {print; found=1} END {exit found ? 0 : 1}' \
     || true
 }
 

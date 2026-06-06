@@ -1,10 +1,10 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useEffect, useReducer, useState } from "react";
 
 import { Separator } from "@/components/ui/separator";
 
 import type { OpencodeConnectStatus } from "@/app/types";
-import type { OpenworkRuntimeConfigStatus, OpenworkServerStatus } from "@/app/lib/venomcowork-server";
+import type { VenomcoworkRuntimeConfigStatus, VenomcoworkServerStatus } from "@/app/lib/venomcowork-server";
 import { t } from "@/i18n";
 import { LayoutStack } from "../settings-layout";
 
@@ -19,14 +19,14 @@ export type AdvancedViewProps = {
   busy: boolean;
   clientConnected: boolean;
   opencodeConnectStatus: OpencodeConnectStatus | null;
-  venomcoworkServerStatus: OpenworkServerStatus;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
   developerMode: boolean;
   toggleDeveloperMode: () => void;
   opencodeDevModeEnabled: boolean;
   openDebugDeepLink: (rawUrl: string) => Promise<{ ok: boolean; message: string }>;
   canMigrateRuntimeConfig: boolean;
   migrateRuntimeConfig: () => Promise<{ migrated: boolean; keys: string[] }>;
-  getRuntimeConfigStatus: () => Promise<OpenworkRuntimeConfigStatus>;
+  getRuntimeConfigStatus: () => Promise<VenomcoworkRuntimeConfigStatus>;
 };
 
 type AdvancedStatusTone = "ready" | "warning" | "error" | "neutral";
@@ -36,7 +36,7 @@ export function AdvancedView(props: AdvancedViewProps) {
     advancedLocalReducer,
     initialAdvancedLocalState,
   );
-  const [configStatus, setConfigStatus] = useState<OpenworkRuntimeConfigStatus | null>(null);
+  const [configStatus, setConfigStatus] = useState<VenomcoworkRuntimeConfigStatus | null>(null);
   const [configStatusBusy, setConfigStatusBusy] = useState(false);
   const [configStatusError, setConfigStatusError] = useState<string | null>(null);
   const {

@@ -1,4 +1,4 @@
-﻿import { createHash } from "node:crypto";
+import { createHash } from "node:crypto";
 import { basename, resolve } from "node:path";
 import type { WorkspaceConfig, WorkspaceInfo } from "./types.js";
 
@@ -20,7 +20,7 @@ export function workspaceIdForRemote(baseUrl: string, directory?: string | null)
   return workspaceIdForKey(key);
 }
 
-export function workspaceIdForOpenwork(hostUrl: string, workspaceId?: string | null): string {
+export function workspaceIdForVenomcowork(hostUrl: string, workspaceId?: string | null): string {
   const normalizedHostUrl = hostUrl.trim();
   const normalizedWorkspaceId = workspaceId?.trim() ?? "";
   const key = normalizedWorkspaceId
@@ -41,7 +41,7 @@ export function buildWorkspaceInfos(
     const id = workspace.id?.trim()
       || (workspaceType === "remote"
         ? remoteType === "venomcowork"
-          ? workspaceIdForOpenwork(workspace.venomcoworkHostUrl ?? workspace.baseUrl ?? "", workspace.venomcoworkWorkspaceId)
+          ? workspaceIdForVenomcowork(workspace.venomcoworkHostUrl ?? workspace.baseUrl ?? "", workspace.venomcoworkWorkspaceId)
           : workspaceIdForRemote(workspace.baseUrl ?? "", workspace.directory)
         : workspaceIdForPath(resolvedPath));
     const name = workspace.name?.trim()

@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import {
   useCallback,
   useEffect,
@@ -32,7 +32,7 @@ import {
   isVenomCoworkModelsPromoHidden,
   VENOMCOWORK_MODELS_PROVIDER_ID,
   VENOMCOWORK_MODELS_PROVIDER_NAME,
-  openWorkModelsPromoChangedEvent,
+  venomCoworkModelsPromoChangedEvent,
 } from "../../cloud/venomcowork-models-promo";
 
 export type ModelPickerModalProps = {
@@ -83,8 +83,8 @@ export function ModelPickerModal(props: ModelPickerModalProps) {
 
   useEffect(() => {
     const handlePromoChanged = () => setPromoHidden(isVenomCoworkModelsPromoHidden());
-    window.addEventListener(openWorkModelsPromoChangedEvent, handlePromoChanged);
-    return () => window.removeEventListener(openWorkModelsPromoChangedEvent, handlePromoChanged);
+    window.addEventListener(venomCoworkModelsPromoChangedEvent, handlePromoChanged);
+    return () => window.removeEventListener(venomCoworkModelsPromoChangedEvent, handlePromoChanged);
   }, []);
 
   // Focus search

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import {
@@ -19,8 +19,8 @@ import { DenInput } from "../../_components/ui/input";
 import { DashboardPageTemplate } from "../../_components/ui/dashboard-page-template";
 import {
   VENOMCOWORK_APP_CONNECT_BASE_URL,
-  buildOpenworkAppConnectUrl,
-  buildOpenworkDeepLink,
+  buildVenomcoworkAppConnectUrl,
+  buildVenomcoworkDeepLink,
   getErrorMessage,
   getWorkerStatusMeta,
   getWorkerTokens,
@@ -332,7 +332,7 @@ export function BackgroundAgentsScreen() {
         venomcoworkUrl: tokens.venomcoworkUrl,
         ownerToken: tokens.ownerToken,
         clientToken: tokens.clientToken,
-        venomcoworkAppConnectUrl: buildOpenworkAppConnectUrl(
+        venomcoworkAppConnectUrl: buildVenomcoworkAppConnectUrl(
           VENOMCOWORK_APP_CONNECT_BASE_URL,
           tokens.venomcoworkUrl,
           tokens.clientToken,
@@ -340,7 +340,7 @@ export function BackgroundAgentsScreen() {
           workerName,
           { autoConnect: true },
         ),
-        venomcoworkDeepLink: buildOpenworkDeepLink(
+        venomcoworkDeepLink: buildVenomcoworkDeepLink(
           tokens.venomcoworkUrl,
           tokens.clientToken,
           workerId,

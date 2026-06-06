@@ -1,9 +1,9 @@
-﻿import { create } from "zustand";
+import { create } from "zustand";
 
 import type {
-  OpenworkServerCapabilities,
-  OpenworkServerDiagnostics,
-  OpenworkWorkspaceInfo,
+  VenomcoworkServerCapabilities,
+  VenomcoworkServerDiagnostics,
+  VenomcoworkWorkspaceInfo,
 } from "../../app/lib/venomcowork-server";
 
 export type ServerState = {
@@ -12,8 +12,8 @@ export type ServerState = {
   status: "idle" | "connecting" | "connected" | "error";
   error: string | null;
   version: string | null;
-  capabilities: OpenworkServerCapabilities | null;
-  diagnostics: OpenworkServerDiagnostics | null;
+  capabilities: VenomcoworkServerCapabilities | null;
+  diagnostics: VenomcoworkServerDiagnostics | null;
 };
 
 const INITIAL_SERVER: ServerState = {
@@ -26,23 +26,23 @@ const INITIAL_SERVER: ServerState = {
   diagnostics: null,
 };
 
-export type OpenworkStore = {
+export type VenomcoworkStore = {
   bootstrapping: boolean;
   server: ServerState;
-  workspaces: OpenworkWorkspaceInfo[];
+  workspaces: VenomcoworkWorkspaceInfo[];
   activeWorkspaceId: string | null;
   selectedSessionId: string | null;
   errorBanner: string | null;
   setBootstrapping: (value: boolean) => void;
   setServer: (server: ServerState) => void;
-  setWorkspaces: (workspaces: OpenworkWorkspaceInfo[]) => void;
+  setWorkspaces: (workspaces: VenomcoworkWorkspaceInfo[]) => void;
   setActiveWorkspaceId: (workspaceId: string | null) => void;
   setSelectedSessionId: (sessionId: string | null) => void;
   setErrorBanner: (message: string | null) => void;
   clearErrorBanner: () => void;
 };
 
-export const useOpenworkStore = create<OpenworkStore>((set) => ({
+export const useVenomcoworkStore = create<VenomcoworkStore>((set) => ({
   bootstrapping: true,
   server: INITIAL_SERVER,
   workspaces: [],

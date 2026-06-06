@@ -1,12 +1,12 @@
-﻿import type { OpenworkServerClient } from "../../../../app/lib/venomcowork-server";
-import { readOpenworkEnvPendingChanges } from "../../../../app/lib/venomcowork-env-runtime";
+import type { VenomcoworkServerClient } from "../../../../app/lib/venomcowork-server";
+import { readVenomcoworkEnvPendingChanges } from "../../../../app/lib/venomcowork-env-runtime";
 
 const DEFAULT_CACHE_KEY = "__venomcowork_env_default__";
 const MAX_CONTEXT_CACHE_ENTRIES = 100;
 
 const envSystemContextCache = new Map<string, string | undefined>();
 
-export function clearOpenworkEnvSystemContextCache(): void {
+export function clearVenomcoworkEnvSystemContextCache(): void {
   envSystemContextCache.clear();
 }
 
@@ -21,8 +21,8 @@ function normalizeEnvKeys(keys: string[]): string[] {
   ).sort((a, b) => a.localeCompare(b));
 }
 
-export async function buildOpenworkEnvSystemContext(
-  client: OpenworkServerClient | null,
+export async function buildVenomcoworkEnvSystemContext(
+  client: VenomcoworkServerClient | null,
   options: {
     cacheKey?: string;
     runtimeKey?: string | null;
@@ -31,7 +31,7 @@ export async function buildOpenworkEnvSystemContext(
 ): Promise<string | undefined> {
   if (!client) return undefined;
   const readPendingChanges = options.readPendingChanges ??
-    (() => readOpenworkEnvPendingChanges(options.runtimeKey));
+    (() => readVenomcoworkEnvPendingChanges(options.runtimeKey));
   if (readPendingChanges()) return undefined;
 
   const cacheKey = `${client.baseUrl}:${options.cacheKey ?? DEFAULT_CACHE_KEY}`;

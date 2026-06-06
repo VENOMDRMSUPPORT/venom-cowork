@@ -1,11 +1,11 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { RefreshCcw } from "lucide-react";
 
-import type { OpenworkServerInfo } from "../../../../app/lib/desktop";
+import type { VenomcoworkServerInfo } from "../../../../app/lib/desktop";
 import { t } from "../../../../i18n";
 import { Button } from "@/components/ui/button";
 import { TextInput } from "../../../design-system/text-input";
-import type { OpenworkTestState, TokenVisibilityKey } from "./config-view-state";
+import type { VenomcoworkTestState, TokenVisibilityKey } from "./config-view-state";
 
 export function ConfigWorkspaceSummary(props: { runtimeWorkspaceId: string | null }) {
   return (
@@ -109,7 +109,7 @@ function TokenRow(props: {
 }
 
 export function ConfigServerSharingSection(props: {
-  hostInfo: OpenworkServerInfo;
+  hostInfo: VenomcoworkServerInfo;
   hostConnectUrl: string;
   hostRemoteAccessEnabled: boolean;
   hostConnectUrlUsesMdns: boolean;
@@ -163,9 +163,9 @@ export function ConfigServerConnectionSection(props: {
   venomcoworkStatusStyle: string;
   resolvedWorkspaceUrl: string;
   resolvedWorkspaceId: string;
-  venomcoworkTestState: OpenworkTestState;
+  venomcoworkTestState: VenomcoworkTestState;
   venomcoworkTestMessage: string | null;
-  hasOpenworkChanges: boolean;
+  hasVenomcoworkChanges: boolean;
   onUrlChange: (url: string) => void;
   onTokenChange: (token: string) => void;
   onToggleToken: () => void;
@@ -201,7 +201,7 @@ export function ConfigServerConnectionSection(props: {
       </div>
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" onClick={() => void props.onTestConnection()} disabled={props.busy || props.venomcoworkTestState === "testing"}>{props.venomcoworkTestState === "testing" ? t("config.testing") : t("config.test_connection")}</Button>
-        <Button onClick={props.onSave} disabled={props.busy || !props.hasOpenworkChanges}>{t("common.save")}</Button>
+        <Button onClick={props.onSave} disabled={props.busy || !props.hasVenomcoworkChanges}>{t("common.save")}</Button>
         <Button variant="outline" onClick={props.onReset} disabled={props.busy}>{t("common.reset")}</Button>
       </div>
       {props.venomcoworkTestState !== "idle" ? <ConfigConnectionTestStatus state={props.venomcoworkTestState} message={props.venomcoworkTestMessage} /> : null}
@@ -210,7 +210,7 @@ export function ConfigServerConnectionSection(props: {
   );
 }
 
-function ConfigConnectionTestStatus(props: { state: OpenworkTestState; message: string | null }) {
+function ConfigConnectionTestStatus(props: { state: VenomcoworkTestState; message: string | null }) {
   return (
     <div className={`text-xs ${props.state === "success" ? "text-green-11" : props.state === "error" ? "text-red-11" : "text-gray-9"}`} role="status" aria-live="polite">
       {props.state === "testing" ? t("config.testing_connection") : (props.message ?? t("config.connection_status_updated"))}

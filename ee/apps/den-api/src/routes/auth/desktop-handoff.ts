@@ -1,4 +1,4 @@
-﻿import { randomBytes } from "node:crypto"
+import { randomBytes } from "node:crypto"
 import { and, eq, gt, isNull } from "@venom-cowork-ee/den-db/drizzle"
 import { AuthSessionTable, AuthUserTable, DesktopHandoffGrantTable } from "@venom-cowork-ee/den-db/schema"
 import { normalizeDenTypeId } from "@venom-cowork-ee/utils/typeid"
@@ -125,7 +125,7 @@ function resolveDesktopDenBaseUrl(request: Request) {
   return origin
 }
 
-function buildOpenworkDeepLink(input: {
+function buildVenomcoworkDeepLink(input: {
   scheme?: string | null
   grant: string
   denBaseUrl: string
@@ -180,7 +180,7 @@ export function registerDesktopAuthRoutes<T extends { Variables: AuthContextVari
     return c.json({
       grant,
       expiresAt: expiresAt.toISOString(),
-      venomcoworkUrl: buildOpenworkDeepLink({
+      venomcoworkUrl: buildVenomcoworkDeepLink({
         scheme: input.desktopScheme || "venomcowork",
         grant,
         denBaseUrl,

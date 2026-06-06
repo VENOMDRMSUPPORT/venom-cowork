@@ -1,4 +1,4 @@
-﻿import type { UIMessage } from "ai";
+import type { UIMessage } from "ai";
 import type { FilePart, Part, PermissionRequest, QuestionRequest, SessionStatus, Todo } from "@opencode-ai/sdk/v2/client";
 
 import { getReactQueryClient } from "../../../infra/query-client";
@@ -11,7 +11,7 @@ import {
   parseStructuredOutputUIPart,
   STRUCTURED_OUTPUT_TOOL,
 } from "./parse-tool-parts";
-import type { OpenworkSessionSnapshot } from "@/app/lib/venomcowork-server";
+import type { VenomcoworkSessionSnapshot } from "@/app/lib/venomcowork-server";
 import { reconcileTranscriptMessages } from "./transcript-reconcile";
 import {
   useSessionActivityStore,
@@ -1002,7 +1002,7 @@ function releaseWorkspaceSessionSync(input: SyncOptions) {
   }
 }
 
-export function seedSessionState(workspaceId: string, snapshot: OpenworkSessionSnapshot) {
+export function seedSessionState(workspaceId: string, snapshot: VenomcoworkSessionSnapshot) {
   const queryClient = getReactQueryClient();
   const key = transcriptKey(workspaceId, snapshot.session.id);
   const incoming = snapshotToUIMessages(snapshot);

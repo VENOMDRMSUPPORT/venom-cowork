@@ -11,7 +11,7 @@ import { projectSkillsDir } from "./workspace-files.js";
 type HubRepo = { owner: string; repo: string; ref: string };
 
 const DEFAULT_HUB_REPO: HubRepo = {
-  owner: "different-ai",
+  owner: "venom-cowork",
   repo: "venomcowork-hub",
   ref: "main",
 };

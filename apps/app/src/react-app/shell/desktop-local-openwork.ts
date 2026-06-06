@@ -1,11 +1,11 @@
-﻿import {
+import {
   engineInfo,
   engineStart,
   venomcoworkServerInfo,
   type EngineInfo,
-  type OpenworkServerInfo,
+  type VenomcoworkServerInfo,
 } from "../../app/lib/desktop";
-import { readOpenworkServerSettings, writeOpenworkServerSettings } from "../../app/lib/venomcowork-server";
+import { readVenomcoworkServerSettings, writeVenomcoworkServerSettings } from "../../app/lib/venomcowork-server";
 import { safeStringify } from "../../app/utils";
 import { recordInspectorEvent } from "./app-inspector";
 
@@ -17,13 +17,13 @@ type LocalWorkspaceLike = {
   workspaceType?: "local" | "remote" | string | null;
 };
 
-type EnsureDesktopLocalOpenworkOptions = {
+type EnsureDesktopLocalVenomcoworkOptions = {
   route: "session" | "settings";
   workspace: LocalWorkspaceLike | null | undefined;
   allWorkspaces: LocalWorkspaceLike[];
 };
 
-function emitOpenworkSettingsChanged() {
+function emitVenomcoworkSettingsChanged() {
   try {
     window.dispatchEvent(new CustomEvent("venomcowork-server-settings-changed"));
   } catch {
@@ -37,8 +37,8 @@ function describeError(error: unknown) {
   return serialized && serialized !== "{}" ? serialized : "Unknown error";
 }
 
-export async function ensureDesktopLocalOpenworkConnection(
-  options: EnsureDesktopLocalOpenworkOptions,
+export async function ensureDesktopLocalVenomcoworkConnection(
+  options: EnsureDesktopLocalVenomcoworkOptions,
 ) {
   const workspace = options.workspace;
   const workspaceRoot = workspace?.path?.trim() ?? "";
@@ -70,23 +70,23 @@ export async function ensureDesktopLocalOpenworkConnection(
       await engineStart(workspaceRoot, {
         runtime: "direct",
         workspacePaths,
-        venomcoworkRemoteAccess: readOpenworkServerSettings().remoteAccessEnabled === true,
+        venomcoworkRemoteAccess: readVenomcoworkServerSettings().remoteAccessEnabled === true,
       });
     }
 
-    const info = await venomcoworkServerInfo() as OpenworkServerInfo | null;
+    const info = await venomcoworkServerInfo() as VenomcoworkServerInfo | null;
     if (!info?.baseUrl) {
       throw new Error("VenomCowork server did not report a base URL after activation.");
     }
 
-    writeOpenworkServerSettings({
+    writeVenomcoworkServerSettings({
       urlOverride: info.baseUrl,
       token: info.ownerToken?.trim() || info.clientToken?.trim() || undefined,
       hostToken: info.hostToken?.trim() || undefined,
       portOverride: info.port ?? undefined,
       remoteAccessEnabled: info.remoteAccessEnabled === true,
     });
-    emitOpenworkSettingsChanged();
+    emitVenomcoworkSettingsChanged();
 
     recordInspectorEvent("route.local_venomcowork.ensure.success", {
       route: options.route,

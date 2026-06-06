@@ -1,11 +1,11 @@
-﻿import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import type {
   ReloadReason,
   ReloadTrigger,
-  ResetOpenworkMode,
+  ResetVenomcoworkMode,
 } from "../../app/types";
-import { relaunchDesktopApp, resetOpenworkState } from "../../app/lib/desktop";
+import { relaunchDesktopApp, resetVenomcoworkState } from "../../app/lib/desktop";
 import {
   addOpencodeCacheHint,
   isDesktopRuntime,
@@ -24,7 +24,7 @@ export type ReloadState = {
 
 export type ResetState = {
   resetModalOpen: boolean;
-  resetModalMode: ResetOpenworkMode;
+  resetModalMode: ResetVenomcoworkMode;
   resetModalText: string;
   resetModalBusy: boolean;
 };
@@ -37,14 +37,14 @@ export type SystemStateControls = {
   reloadWorkspaceEngine: () => Promise<void>;
   canReloadWorkspaceEngine: boolean;
   reset: ResetState;
-  openResetModal: (mode: ResetOpenworkMode) => void;
+  openResetModal: (mode: ResetVenomcoworkMode) => void;
   closeResetModal: () => void;
   setResetModalText: (value: string) => void;
   confirmReset: () => Promise<void>;
   setError: (message: string | null) => void;
 };
 
-function clearOpenworkLocalStorage(mode: ResetOpenworkMode) {
+function clearVenomcoworkLocalStorage(mode: ResetVenomcoworkMode) {
   if (typeof window === "undefined") return;
   try {
     if (mode === "all") {
@@ -83,7 +83,7 @@ export function useSystemState(
 
   const [resetModalOpen, setResetModalOpen] = useState(false);
   const [resetModalMode, setResetModalMode] =
-    useState<ResetOpenworkMode>("onboarding");
+    useState<ResetVenomcoworkMode>("onboarding");
   const [resetModalText, setResetModalText] = useState("");
   const [resetModalBusy, setResetModalBusy] = useState(false);
 
@@ -172,7 +172,7 @@ export function useSystemState(
   }, [clearReloadRequired, options, reloadBusy]);
 
   const openResetModal = useCallback(
-    (mode: ResetOpenworkMode) => {
+    (mode: ResetVenomcoworkMode) => {
       if (options.hasActiveRuns()) {
         options.setError(t("system.stop_active_runs_before_reset"));
         return;
@@ -203,9 +203,9 @@ export function useSystemState(
 
     try {
       if (isDesktopRuntime()) {
-        await resetOpenworkState(resetModalMode);
+        await resetVenomcoworkState(resetModalMode);
       }
-      clearOpenworkLocalStorage(resetModalMode);
+      clearVenomcoworkLocalStorage(resetModalMode);
       if (isDesktopRuntime()) {
         await relaunchDesktopApp();
       } else {

@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import {
   createContext,
   use,
@@ -62,7 +62,7 @@ const GlobalSDKContext = createContext<GlobalSDKContextValue | undefined>(
   undefined,
 );
 
-function readOpenworkToken(): string {
+function readVenomcoworkToken(): string {
   if (typeof window === "undefined") return "";
   try {
     return (window.localStorage.getItem("venomcowork.server.token") ?? "").trim();
@@ -84,7 +84,7 @@ export function GlobalSDKProvider({ children }: GlobalSDKProviderProps) {
   }
   const emitter = emitterRef.current;
 
-  const token = readOpenworkToken();
+  const token = readVenomcoworkToken();
   const headers =
     token && server.url.includes("/opencode")
       ? { Authorization: `Bearer ${token}` }

@@ -1,17 +1,17 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 
 import {
-  buildOpenworkWorkspaceBaseUrl,
-  createOpenworkServerClient,
-  parseOpenworkWorkspaceIdFromUrl,
+  buildVenomcoworkWorkspaceBaseUrl,
+  createVenomcoworkServerClient,
+  parseVenomcoworkWorkspaceIdFromUrl,
 } from "../../../app/lib/venomcowork-server";
 import type {
   EngineInfo,
-  OpenworkServerInfo,
+  VenomcoworkServerInfo,
   WorkspaceInfo,
 } from "../../../app/lib/desktop";
-import type { OpenworkServerSettings } from "../../../app/lib/venomcowork-server";
+import type { VenomcoworkServerSettings } from "../../../app/lib/venomcowork-server";
 import { t } from "../../../i18n";
 import { isDesktopRuntime, normalizeDirectoryPath } from "../../../app/utils";
 
@@ -19,8 +19,8 @@ export type ShareWorkspaceState = ReturnType<typeof useShareWorkspaceState>;
 
 type UseShareWorkspaceStateOptions = {
   workspaces: WorkspaceInfo[];
-  venomcoworkServerHostInfo: OpenworkServerInfo | null;
-  venomcoworkServerSettings: OpenworkServerSettings;
+  venomcoworkServerHostInfo: VenomcoworkServerInfo | null;
+  venomcoworkServerSettings: VenomcoworkServerSettings;
   engineInfo: EngineInfo | null;
   exportWorkspaceBusy: boolean;
   openLink: (url: string) => void;
@@ -29,17 +29,17 @@ type UseShareWorkspaceStateOptions = {
 
 type ShareWorkspaceLocalState = {
   shareWorkspaceId: string | null;
-  shareLocalOpenworkWorkspaceId: string | null;
+  shareLocalVenomcoworkWorkspaceId: string | null;
 };
 
 type ShareWorkspaceLocalAction =
   | { type: "open"; workspaceId: string }
   | { type: "close" }
-  | { type: "localOpenworkWorkspace"; workspaceId: string | null };
+  | { type: "localVenomcoworkWorkspace"; workspaceId: string | null };
 
 const initialShareWorkspaceLocalState: ShareWorkspaceLocalState = {
   shareWorkspaceId: null,
-  shareLocalOpenworkWorkspaceId: null,
+  shareLocalVenomcoworkWorkspaceId: null,
 };
 
 function shareWorkspaceLocalReducer(
@@ -51,13 +51,13 @@ function shareWorkspaceLocalReducer(
       return { ...state, shareWorkspaceId: action.workspaceId };
     case "close":
       return { ...state, shareWorkspaceId: null };
-    case "localOpenworkWorkspace":
-      return { ...state, shareLocalOpenworkWorkspaceId: action.workspaceId };
+    case "localVenomcoworkWorkspace":
+      return { ...state, shareLocalVenomcoworkWorkspaceId: action.workspaceId };
   }
 }
 
 export function useShareWorkspaceState(options: UseShareWorkspaceStateOptions) {
-  const [{ shareWorkspaceId, shareLocalOpenworkWorkspaceId }, dispatchShareWorkspace] = useReducer(
+  const [{ shareWorkspaceId, shareLocalVenomcoworkWorkspaceId }, dispatchShareWorkspace] = useReducer(
     shareWorkspaceLocalReducer,
     initialShareWorkspaceLocalState,
   );
@@ -86,7 +86,7 @@ export function useShareWorkspaceState(options: UseShareWorkspaceStateOptions) {
     if (workspace.workspaceType === "remote") {
       if (workspace.remoteType === "venomcowork") {
         const hostUrl = workspace.venomcoworkHostUrl?.trim() || workspace.baseUrl?.trim() || "";
-        const mounted = buildOpenworkWorkspaceBaseUrl(
+        const mounted = buildVenomcoworkWorkspaceBaseUrl(
           hostUrl,
           workspace.venomcoworkWorkspaceId,
         );
@@ -117,16 +117,16 @@ export function useShareWorkspaceState(options: UseShareWorkspaceStateOptions) {
       !baseUrl ||
       !token
     ) {
-      dispatchShareWorkspace({ type: "localOpenworkWorkspace", workspaceId: null });
+      dispatchShareWorkspace({ type: "localVenomcoworkWorkspace", workspaceId: null });
       return;
     }
 
     let cancelled = false;
-    dispatchShareWorkspace({ type: "localOpenworkWorkspace", workspaceId: null });
+    dispatchShareWorkspace({ type: "localVenomcoworkWorkspace", workspaceId: null });
 
     void (async () => {
       try {
-        const client = createOpenworkServerClient({ baseUrl, token });
+        const client = createVenomcoworkServerClient({ baseUrl, token });
         const response = await client.listWorkspaces();
         if (cancelled) return;
         const items = Array.isArray(response.items) ? response.items : [];
@@ -134,10 +134,10 @@ export function useShareWorkspaceState(options: UseShareWorkspaceStateOptions) {
         const match = items.find(
           (entry) => normalizeDirectoryPath(entry.path) === targetPath,
         );
-        dispatchShareWorkspace({ type: "localOpenworkWorkspace", workspaceId: match?.id ?? null });
+        dispatchShareWorkspace({ type: "localVenomcoworkWorkspace", workspaceId: match?.id ?? null });
       } catch {
         if (!cancelled) {
-          dispatchShareWorkspace({ type: "localOpenworkWorkspace", workspaceId: null });
+          dispatchShareWorkspace({ type: "localVenomcoworkWorkspace", workspaceId: null });
         }
       }
     })();
@@ -169,8 +169,8 @@ export function useShareWorkspaceState(options: UseShareWorkspaceStateOptions) {
         options.venomcoworkServerHostInfo?.mdnsUrl?.trim() ||
         options.venomcoworkServerHostInfo?.baseUrl?.trim() ||
         "";
-      const mountedUrl = shareLocalOpenworkWorkspaceId
-        ? buildOpenworkWorkspaceBaseUrl(hostUrl, shareLocalOpenworkWorkspaceId)
+      const mountedUrl = shareLocalVenomcoworkWorkspaceId
+        ? buildVenomcoworkWorkspaceBaseUrl(hostUrl, shareLocalVenomcoworkWorkspaceId)
         : null;
       const url = mountedUrl || hostUrl;
       const collaboratorToken = options.venomcoworkServerHostInfo?.clientToken?.trim() || "";
@@ -213,7 +213,7 @@ export function useShareWorkspaceState(options: UseShareWorkspaceStateOptions) {
     if (workspace.remoteType === "venomcowork") {
       const hostUrl = workspace.venomcoworkHostUrl?.trim() || workspace.baseUrl?.trim() || "";
       const url =
-        buildOpenworkWorkspaceBaseUrl(hostUrl, workspace.venomcoworkWorkspaceId) ||
+        buildVenomcoworkWorkspaceBaseUrl(hostUrl, workspace.venomcoworkWorkspaceId) ||
         hostUrl;
       const token =
         workspace.venomcoworkToken?.trim() ||
@@ -250,7 +250,7 @@ export function useShareWorkspaceState(options: UseShareWorkspaceStateOptions) {
   }, [
     options.venomcoworkServerHostInfo,
     options.venomcoworkServerSettings,
-    shareLocalOpenworkWorkspaceId,
+    shareLocalVenomcoworkWorkspaceId,
     shareWorkspace,
   ]);
 

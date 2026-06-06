@@ -14,7 +14,7 @@ import { LoadingOverlay } from "./loading-overlay";
 import { DevProfiler, DevProfilerOverlay } from "./dev-profiler";
 import { ReactRenderWatchdogOverlay } from "./react-render-watchdog-overlay";
 import { AppMenuProvider } from "./app-menu";
-import { OpenworkControlProvider, OpenworkRouteControlActions } from "./control/control-provider";
+import { VenomcoworkControlProvider, VenomcoworkRouteControlActions } from "./control/control-provider";
 import { SessionRoute } from "./session-route";
 import { SettingsRoute } from "./settings-route";
 import { ShellConfigProvider } from "./shell-config";
@@ -41,7 +41,7 @@ const subscribeToRequireSignin = (onStoreChange: () => void) => {
  * When the desktop bootstrap config has `requireSignin: true` (persisted by
  * the Tauri shell via `desktop-bootstrap.json`), the UI is held at `/signin`
  * until the user authenticates with Den. When sign-in is NOT required, we
- * never let users land on `/signin` — redirect them to `/session` instead.
+ * never let users land on `/signin` â€” redirect them to `/session` instead.
  *
  * While we're still checking the Den session AND sign-in is required, we
  * render nothing so the transcript/settings never flash behind the gate.
@@ -71,7 +71,7 @@ function DenSigninGate({ children }: DenSigninGateProps) {
       if (!denAuth.isSignedIn && !onSignin) {
         navigate("/signin", { replace: true });
       } else if (denAuth.isSignedIn && onSignin) {
-        // Signed in — route to onboarding so the user sees their org resources.
+        // Signed in â€” route to onboarding so the user sees their org resources.
         navigate("/onboarding", { replace: true });
       }
     } else if (onSignin) {
@@ -93,7 +93,7 @@ function DenSigninGate({ children }: DenSigninGateProps) {
   // After a fresh sign-in, navigate to the onboarding page so the
   // user sees what their org provides.
   // Poll for activeOrgId (set asynchronously by refreshOrgs) rather
-  // than using a fixed delay — handles both fast and slow org lookups.
+  // than using a fixed delay â€” handles both fast and slow org lookups.
   useEffect(() => {
     const handler = (event: WindowEventMap[typeof denSessionUpdatedEvent]) => {
       if (event.detail?.status !== "success") return;
@@ -104,7 +104,7 @@ function DenSigninGate({ children }: DenSigninGateProps) {
         if (settings.authToken?.trim() && settings.activeOrgId?.trim()) {
           navigate("/onboarding", { replace: true });
         } else if (attempts < 10) {
-          // Org not selected yet — retry (max ~5 seconds)
+          // Org not selected yet â€” retry (max ~5 seconds)
           setTimeout(check, 500);
         }
       };
@@ -130,8 +130,8 @@ export function AppRoot() {
       <DevProfiler id="AppRoot">
         <ShellConfigProvider>
         <AppMenuProvider>
-        <OpenworkControlProvider>
-          <OpenworkRouteControlActions />
+        <VenomcoworkControlProvider>
+          <VenomcoworkRouteControlActions />
           <DenSigninGate>
             <Routes>
               <Route
@@ -212,7 +212,7 @@ export function AppRoot() {
               <Route path="*" element={<Navigate to="/session" replace />} />
             </Routes>
           </DenSigninGate>
-        </OpenworkControlProvider>
+        </VenomcoworkControlProvider>
         </AppMenuProvider>
         </ShellConfigProvider>
         <LoadingOverlay />

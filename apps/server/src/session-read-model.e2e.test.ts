@@ -1,4 +1,4 @@
-﻿import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtemp, mkdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -121,7 +121,7 @@ function startMockOpencode(input?: { invalidList?: boolean; holdCommand?: Promis
   return { server, requests };
 }
 
-async function startOpenworkServer(input: { workspaceRoot: string; opencodeBaseUrl: string }) {
+async function startVenomcoworkServer(input: { workspaceRoot: string; opencodeBaseUrl: string }) {
   const config: ServerConfig = {
     host: "127.0.0.1",
     port: 0,
@@ -172,7 +172,7 @@ describe("workspace session read APIs", () => {
   test("lists sessions and returns session details, messages, and snapshot", async () => {
     const workspaceRoot = await createWorkspaceRoot();
     const mock = startMockOpencode();
-    const venomcowork = await startOpenworkServer({
+    const venomcowork = await startVenomcoworkServer({
       workspaceRoot,
       opencodeBaseUrl: `http://127.0.0.1:${mock.server.port}`,
     });
@@ -241,7 +241,7 @@ describe("workspace session read APIs", () => {
   test("accepts guest-side rem_ workspace aliases for session reads", async () => {
     const workspaceRoot = await createWorkspaceRoot();
     const mock = startMockOpencode();
-    const venomcowork = await startOpenworkServer({
+    const venomcowork = await startVenomcoworkServer({
       workspaceRoot,
       opencodeBaseUrl: `http://127.0.0.1:${mock.server.port}`,
     });
@@ -259,7 +259,7 @@ describe("workspace session read APIs", () => {
   test("encodes non-ASCII workspace directory headers for session reads", async () => {
     const workspaceRoot = await createWorkspaceRoot("é¡¹ç›®");
     const mock = startMockOpencode();
-    const venomcowork = await startOpenworkServer({
+    const venomcowork = await startVenomcoworkServer({
       workspaceRoot,
       opencodeBaseUrl: `http://127.0.0.1:${mock.server.port}`,
     });
@@ -278,7 +278,7 @@ describe("workspace session read APIs", () => {
   test("encodes non-ASCII workspace directory headers for opencode proxy requests", async () => {
     const workspaceRoot = await createWorkspaceRoot("é¡¹ç›®");
     const mock = startMockOpencode();
-    const venomcowork = await startOpenworkServer({
+    const venomcowork = await startVenomcoworkServer({
       workspaceRoot,
       opencodeBaseUrl: `http://127.0.0.1:${mock.server.port}`,
     });
@@ -295,7 +295,7 @@ describe("workspace session read APIs", () => {
   test("returns 404 when the upstream session is missing", async () => {
     const workspaceRoot = await createWorkspaceRoot();
     const mock = startMockOpencode();
-    const venomcowork = await startOpenworkServer({
+    const venomcowork = await startVenomcoworkServer({
       workspaceRoot,
       opencodeBaseUrl: `http://127.0.0.1:${mock.server.port}`,
     });
@@ -315,7 +315,7 @@ describe("workspace session read APIs", () => {
     const workspaceRoot = await createWorkspaceRoot();
     const command = deferred();
     const mock = startMockOpencode({ holdCommand: command.promise });
-    const venomcowork = await startOpenworkServer({
+    const venomcowork = await startVenomcoworkServer({
       workspaceRoot,
       opencodeBaseUrl: `http://127.0.0.1:${mock.server.port}`,
     });
@@ -340,7 +340,7 @@ describe("workspace session read APIs", () => {
   test("keeps legacy /w workspace opencode proxy alias", async () => {
     const workspaceRoot = await createWorkspaceRoot();
     const mock = startMockOpencode();
-    const venomcowork = await startOpenworkServer({
+    const venomcowork = await startVenomcoworkServer({
       workspaceRoot,
       opencodeBaseUrl: `http://127.0.0.1:${mock.server.port}`,
     });
@@ -358,7 +358,7 @@ describe("workspace session read APIs", () => {
   test("returns 502 when OpenCode returns an invalid session list payload", async () => {
     const workspaceRoot = await createWorkspaceRoot();
     const mock = startMockOpencode({ invalidList: true });
-    const venomcowork = await startOpenworkServer({
+    const venomcowork = await startVenomcoworkServer({
       workspaceRoot,
       opencodeBaseUrl: `http://127.0.0.1:${mock.server.port}`,
     });

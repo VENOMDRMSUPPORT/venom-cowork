@@ -1,4 +1,4 @@
-﻿import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { execFileSync, spawn } from "node:child_process";
 import { createServer } from "node:http";
 import net from "node:net";
@@ -27,7 +27,7 @@ import { registerUpdaterIpc } from "./updater.mjs";
 import { exportWorkspaceConfig, importWorkspaceConfig } from "./workspace-archive.mjs";
 import {
   venomcoworkWorkspaceDisplayName,
-  selectOpenworkWorkspaceForConnection,
+  selectVenomcoworkWorkspaceForConnection,
 } from "./remote-workspace.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -415,7 +415,7 @@ if (remoteDebugPort > 0) {
   app.commandLine.appendSwitch("remote-debugging-address", "127.0.0.1");
 }
 // Make the resolved port available to the embedded server so it flows into
-// agent instructions via ensureOpenworkAgent â†’ resolveAgentTemplate.
+// agent instructions via ensureVenomcoworkAgent â†’ resolveAgentTemplate.
 process.env.VENOMCOWORK_ELECTRON_REMOTE_DEBUG_PORT = String(remoteDebugPort);
 
 // Apply extra Chromium flags from ELECTRON_EXTRA_LAUNCH_ARGS.
@@ -1539,7 +1539,7 @@ function validateSkillName(raw) {
   return trimmed;
 }
 
-function defaultWorkspaceOpenworkConfig(workspacePath, preset = null) {
+function defaultWorkspaceVenomcoworkConfig(workspacePath, preset = null) {
   return {
     version: 1,
     workspace: workspacePath
@@ -1586,7 +1586,7 @@ function remoteWorkspaceId(baseUrl, directory) {
   return stableWorkspaceId(key);
 }
 
-function parseOpenworkWorkspaceIdFromUrl(input) {
+function parseVenomcoworkWorkspaceIdFromUrl(input) {
   const raw = String(input ?? "").trim();
   if (!raw) return null;
   try {
@@ -1609,7 +1609,7 @@ function parseOpenworkWorkspaceIdFromUrl(input) {
   }
 }
 
-function stripOpenworkWorkspaceMount(input) {
+function stripVenomcoworkWorkspaceMount(input) {
   const raw = String(input ?? "").trim();
   if (!raw) return null;
   try {
@@ -1629,12 +1629,12 @@ function stripOpenworkWorkspaceMount(input) {
 }
 
 function venomcoworkRemoteWorkspaceId(hostUrl, workspaceId) {
-  const remoteWorkspaceId = String(workspaceId ?? "").trim() || parseOpenworkWorkspaceIdFromUrl(hostUrl);
+  const remoteWorkspaceId = String(workspaceId ?? "").trim() || parseVenomcoworkWorkspaceIdFromUrl(hostUrl);
   if (remoteWorkspaceId) return `rem_${remoteWorkspaceId}`;
   return `rem_${createHash("sha256").update(`venomcowork::${hostUrl}`).digest("hex").slice(0, 12)}`;
 }
 
-async function fetchOpenworkWorkspaceList(hostUrl, token, hostToken) {
+async function fetchVenomcoworkWorkspaceList(hostUrl, token, hostToken) {
   const url = `${String(hostUrl ?? "").replace(/\/+$/, "")}/workspaces`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8_000);
@@ -1655,21 +1655,21 @@ async function fetchOpenworkWorkspaceList(hostUrl, token, hostToken) {
   }
 }
 
-async function discoverOpenworkWorkspace({ hostUrl, token, hostToken, directory }) {
-  const list = await fetchOpenworkWorkspaceList(hostUrl, token, hostToken);
-  return selectOpenworkWorkspaceForConnection(list, directory);
+async function discoverVenomcoworkWorkspace({ hostUrl, token, hostToken, directory }) {
+  const list = await fetchVenomcoworkWorkspaceList(hostUrl, token, hostToken);
+  return selectVenomcoworkWorkspaceForConnection(list, directory);
 }
 
-async function readWorkspaceOpenworkConfig(workspacePath) {
+async function readWorkspaceVenomcoworkConfig(workspacePath) {
   const venomcoworkPath = path.join(workspacePath, ".opencode", "venomcowork.json");
   if (!(await pathExists(venomcoworkPath))) {
-    return defaultWorkspaceOpenworkConfig(workspacePath);
+    return defaultWorkspaceVenomcoworkConfig(workspacePath);
   }
   const raw = await readFile(venomcoworkPath, "utf8");
   return JSON.parse(raw);
 }
 
-async function writeWorkspaceOpenworkConfig(workspacePath, config) {
+async function writeWorkspaceVenomcoworkConfig(workspacePath, config) {
   const venomcoworkPath = path.join(workspacePath, ".opencode", "venomcowork.json");
   await mkdir(path.dirname(venomcoworkPath), { recursive: true });
   await writeFile(venomcoworkPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
@@ -1701,11 +1701,11 @@ async function readWorkspaceState() {
     if (workspace.workspaceType !== "remote" || workspace.remoteType !== "venomcowork") return workspace;
 
     const remoteWorkspaceId = String(workspace.venomcoworkWorkspaceId ?? "").trim()
-      || parseOpenworkWorkspaceIdFromUrl(workspace.venomcoworkHostUrl)
-      || parseOpenworkWorkspaceIdFromUrl(workspace.baseUrl);
+      || parseVenomcoworkWorkspaceIdFromUrl(workspace.venomcoworkHostUrl)
+      || parseVenomcoworkWorkspaceIdFromUrl(workspace.baseUrl);
     if (!remoteWorkspaceId) return workspace;
 
-    const hostUrl = stripOpenworkWorkspaceMount(workspace.venomcoworkHostUrl) || stripOpenworkWorkspaceMount(workspace.baseUrl);
+    const hostUrl = stripVenomcoworkWorkspaceMount(workspace.venomcoworkHostUrl) || stripVenomcoworkWorkspaceMount(workspace.baseUrl);
     const nextId = venomcoworkRemoteWorkspaceId(hostUrl ?? workspace.baseUrl, remoteWorkspaceId);
     idMap.set(workspace.id, nextId);
     const nextWorkspace = {
@@ -1839,7 +1839,7 @@ async function disposeRuntimeBeforeQuit() {
   }
 }
 
-function assertOpenworkServerReady(info) {
+function assertVenomcoworkServerReady(info) {
   if (!info?.running) {
     throw new Error("VenomCowork server did not stay running after startup.");
   }
@@ -1911,7 +1911,7 @@ async function bootRuntimeForSelectedWorkspace() {
     workspacePath: bootWorkspaceRoot,
     name: bootWorkspace.name ?? bootWorkspace.displayName ?? null,
   }).catch(() => undefined);
-  const venomcoworkServer = assertOpenworkServerReady(await runtimeManager.venomcoworkServerInfo());
+  const venomcoworkServer = assertVenomcoworkServerReady(await runtimeManager.venomcoworkServerInfo());
   return { ok: true, skipped: false, engine, venomcoworkServer, workspaceId: bootWorkspace.id ?? null };
 }
 
@@ -2265,7 +2265,7 @@ async function handleDesktopInvoke(event, command, ...args) {
         workspaceType: "local",
       });
       await mkdir(path.join(folderPath, ".opencode"), { recursive: true });
-      await writeWorkspaceOpenworkConfig(folderPath, defaultWorkspaceOpenworkConfig(folderPath, preset));
+      await writeWorkspaceVenomcoworkConfig(folderPath, defaultWorkspaceVenomcoworkConfig(folderPath, preset));
 
       return mutateWorkspaceState((state) => {
         const workspacePathKey = normalizeWorkspacePathKey(workspace.path);
@@ -2288,21 +2288,21 @@ async function handleDesktopInvoke(event, command, ...args) {
       }
       const remoteType = input.remoteType === "opencode" ? "opencode" : "venomcowork";
       const directory = typeof input.directory === "string" && input.directory.trim() ? input.directory.trim() : null;
-      const rawOpenworkHostUrl = typeof input.venomcoworkHostUrl === "string" && input.venomcoworkHostUrl.trim()
+      const rawVenomcoworkHostUrl = typeof input.venomcoworkHostUrl === "string" && input.venomcoworkHostUrl.trim()
         ? input.venomcoworkHostUrl.trim()
         : null;
       const venomcoworkHostUrl = remoteType === "venomcowork"
-        ? stripOpenworkWorkspaceMount(rawOpenworkHostUrl ?? baseUrl)
-        : rawOpenworkHostUrl;
+        ? stripVenomcoworkWorkspaceMount(rawVenomcoworkHostUrl ?? baseUrl)
+        : rawVenomcoworkHostUrl;
       const venomcoworkWorkspaceId = typeof input.venomcoworkWorkspaceId === "string" && input.venomcoworkWorkspaceId.trim()
         ? input.venomcoworkWorkspaceId.trim()
         : remoteType === "venomcowork"
-          ? parseOpenworkWorkspaceIdFromUrl(rawOpenworkHostUrl) || parseOpenworkWorkspaceIdFromUrl(baseUrl)
+          ? parseVenomcoworkWorkspaceIdFromUrl(rawVenomcoworkHostUrl) || parseVenomcoworkWorkspaceIdFromUrl(baseUrl)
           : null;
-      let resolvedOpenworkWorkspaceId = venomcoworkWorkspaceId;
-      let resolvedOpenworkWorkspaceName = input.venomcoworkWorkspaceName ?? null;
-      if (remoteType === "venomcowork" && !resolvedOpenworkWorkspaceId) {
-        const discovered = await discoverOpenworkWorkspace({
+      let resolvedVenomcoworkWorkspaceId = venomcoworkWorkspaceId;
+      let resolvedVenomcoworkWorkspaceName = input.venomcoworkWorkspaceName ?? null;
+      if (remoteType === "venomcowork" && !resolvedVenomcoworkWorkspaceId) {
+        const discovered = await discoverVenomcoworkWorkspace({
           hostUrl: venomcoworkHostUrl ?? baseUrl,
           token: input.venomcoworkToken,
           hostToken: input.venomcoworkHostToken,
@@ -2315,15 +2315,15 @@ async function handleDesktopInvoke(event, command, ...args) {
               : "VenomCowork server returned no workspaces.",
           );
         }
-        resolvedOpenworkWorkspaceId = String(discovered.id).trim();
-        resolvedOpenworkWorkspaceName = venomcoworkWorkspaceDisplayName(discovered);
+        resolvedVenomcoworkWorkspaceId = String(discovered.id).trim();
+        resolvedVenomcoworkWorkspaceName = venomcoworkWorkspaceDisplayName(discovered);
       }
       const id = remoteType === "venomcowork"
-        ? venomcoworkRemoteWorkspaceId(venomcoworkHostUrl ?? baseUrl, resolvedOpenworkWorkspaceId)
+        ? venomcoworkRemoteWorkspaceId(venomcoworkHostUrl ?? baseUrl, resolvedVenomcoworkWorkspaceId)
         : remoteWorkspaceId(baseUrl, directory);
       const workspace = normalizeWorkspaceEntry({
         id,
-        name: String(input.displayName ?? resolvedOpenworkWorkspaceName ?? "Remote workspace"),
+        name: String(input.displayName ?? resolvedVenomcoworkWorkspaceName ?? "Remote workspace"),
         displayName: input.displayName ?? null,
         path: directory ?? "",
         preset: "remote",
@@ -2335,8 +2335,8 @@ async function handleDesktopInvoke(event, command, ...args) {
         venomcoworkToken: input.venomcoworkToken ?? null,
         venomcoworkClientToken: input.venomcoworkClientToken ?? null,
         venomcoworkHostToken: input.venomcoworkHostToken ?? null,
-        venomcoworkWorkspaceId: resolvedOpenworkWorkspaceId,
-        venomcoworkWorkspaceName: resolvedOpenworkWorkspaceName,
+        venomcoworkWorkspaceId: resolvedVenomcoworkWorkspaceId,
+        venomcoworkWorkspaceName: resolvedVenomcoworkWorkspaceName,
         sandboxBackend: input.sandboxBackend ?? null,
         sandboxRunId: input.sandboxRunId ?? null,
         sandboxContainerName: input.sandboxContainerName ?? null,
@@ -2365,11 +2365,11 @@ async function handleDesktopInvoke(event, command, ...args) {
             ? nextWorkspace.venomcoworkHostUrl.trim()
             : null;
           const nextBaseUrl = String(nextWorkspace.baseUrl ?? "").trim();
-          const hostUrl = stripOpenworkWorkspaceMount(rawHostUrl ?? nextBaseUrl);
+          const hostUrl = stripVenomcoworkWorkspaceMount(rawHostUrl ?? nextBaseUrl);
           const directory = typeof nextWorkspace.directory === "string" && nextWorkspace.directory.trim()
             ? nextWorkspace.directory.trim()
             : null;
-          const parsedWorkspaceId = parseOpenworkWorkspaceIdFromUrl(rawHostUrl) || parseOpenworkWorkspaceIdFromUrl(nextBaseUrl);
+          const parsedWorkspaceId = parseVenomcoworkWorkspaceIdFromUrl(rawHostUrl) || parseVenomcoworkWorkspaceIdFromUrl(nextBaseUrl);
           let remoteWorkspaceId = parsedWorkspaceId || (
             typeof nextWorkspace.venomcoworkWorkspaceId === "string" && nextWorkspace.venomcoworkWorkspaceId.trim()
               ? nextWorkspace.venomcoworkWorkspaceId.trim()
@@ -2377,7 +2377,7 @@ async function handleDesktopInvoke(event, command, ...args) {
           );
           let remoteWorkspaceName = nextWorkspace.venomcoworkWorkspaceName ?? null;
           if (!remoteWorkspaceId) {
-            const discovered = await discoverOpenworkWorkspace({
+            const discovered = await discoverVenomcoworkWorkspace({
               hostUrl: hostUrl ?? nextBaseUrl,
               token: nextWorkspace.venomcoworkToken,
               hostToken: nextWorkspace.venomcoworkHostToken,
@@ -2446,21 +2446,21 @@ async function handleDesktopInvoke(event, command, ...args) {
       if (!workspacePath || !authorizedRoot) {
         throw new Error("workspacePath and folderPath are required");
       }
-      const config = await readWorkspaceOpenworkConfig(workspacePath);
+      const config = await readWorkspaceVenomcoworkConfig(workspacePath);
       if (!Array.isArray(config.authorizedRoots)) {
         config.authorizedRoots = [];
       }
       if (!config.authorizedRoots.includes(authorizedRoot)) {
         config.authorizedRoots.push(authorizedRoot);
       }
-      return writeWorkspaceOpenworkConfig(workspacePath, config);
+      return writeWorkspaceVenomcoworkConfig(workspacePath, config);
     }
-    case "workspaceOpenworkRead":
-      return readWorkspaceOpenworkConfig(String(args[0]?.workspacePath ?? "").trim());
-    case "workspaceOpenworkWrite":
-      return writeWorkspaceOpenworkConfig(
+    case "workspaceVenomcoworkRead":
+      return readWorkspaceVenomcoworkConfig(String(args[0]?.workspacePath ?? "").trim());
+    case "workspaceVenomcoworkWrite":
+      return writeWorkspaceVenomcoworkConfig(
         String(args[0]?.workspacePath ?? "").trim(),
-        args[0]?.config ?? defaultWorkspaceOpenworkConfig(""),
+        args[0]?.config ?? defaultWorkspaceVenomcoworkConfig(""),
       );
     case "workspaceExportConfig": {
       const input = args[0] ?? {};
@@ -2562,7 +2562,7 @@ async function handleDesktopInvoke(event, command, ...args) {
       } catch {
         return null;
       }
-    case "getOpenworkUiMcpCommand": {
+    case "getVenomcoworkUiMcpCommand": {
       if (process.env.VENOMCOWORK_DEV_MODE === "1") {
         return ["node", path.resolve(__dirname, "../../..", "packages/venomcowork-ui-mcp/index.mjs")];
       }
@@ -2586,7 +2586,7 @@ async function handleDesktopInvoke(event, command, ...args) {
       await openComputerUseSetupApp();
       return checkComputerUsePermissions();
     }
-    case "getOpenworkUiMcpEnvironment": {
+    case "getVenomcoworkUiMcpEnvironment": {
       return {
         VENOMCOWORK_UI_CONTROL_DISCOVERY: path.join(app.getPath("userData"), "venomcowork-ui-control.json"),
       };
@@ -2597,7 +2597,7 @@ async function handleDesktopInvoke(event, command, ...args) {
       return debugDesktopBootstrapConfig();
     case "setDesktopBootstrapConfig":
       return setDesktopBootstrapConfig(args[0] ?? {});
-    case "nukeOpenworkAndOpencodeConfigAndExit": {
+    case "nukeVenomcoworkAndOpencodeConfigAndExit": {
       await rm(app.getPath("userData"), { recursive: true, force: true });
       app.exit(0);
       return undefined;
@@ -2609,8 +2609,8 @@ async function handleDesktopInvoke(event, command, ...args) {
       return runtimeManager.sandboxDoctor();
     case "sandboxStop":
       return runtimeManager.sandboxStop(String(args[0] ?? "").trim());
-    case "sandboxCleanupOpenworkContainers":
-      return runtimeManager.sandboxCleanupOpenworkContainers();
+    case "sandboxCleanupVenomcoworkContainers":
+      return runtimeManager.sandboxCleanupVenomcoworkContainers();
     case "sandboxDebugProbe":
       return runtimeManager.sandboxDebugProbe();
     case "venomcoworkServerInfo":
@@ -2739,7 +2739,7 @@ async function handleDesktopInvoke(event, command, ...args) {
         String(args[1] ?? "").trim(),
         String(args[2] ?? ""),
       );
-    case "resetOpenworkState": {
+    case "resetVenomcoworkState": {
       await rm(workspaceStatePath(), { force: true });
       await rm(desktopBootstrapPath(), { force: true });
       return undefined;
@@ -2844,7 +2844,7 @@ function jsonForJavaScript(value) {
   return JSON.stringify(JSON.stringify(value ?? {}));
 }
 
-async function evaluateOpenworkControl(expression, options = {}) {
+async function evaluateVenomcoworkControl(expression, options = {}) {
   const win = await createMainWindow();
   if (options.focus === true) {
     win.show();
@@ -2854,10 +2854,10 @@ async function evaluateOpenworkControl(expression, options = {}) {
   return win.webContents.executeJavaScript(expression, true);
 }
 
-async function runOpenworkControlCommand(command, args = {}) {
+async function runVenomcoworkControlCommand(command, args = {}) {
   const argsJsonLiteral = jsonForJavaScript(args);
   if (command === "snapshot") {
-    return evaluateOpenworkControl(`(async () => {
+    return evaluateVenomcoworkControl(`(async () => {
       const control = window.__venomcoworkControl;
       if (!control) return { ok: false, error: "VenomCowork control surface is not available yet." };
       control.setEnabled?.(true);
@@ -2865,7 +2865,7 @@ async function runOpenworkControlCommand(command, args = {}) {
     })()`);
   }
   if (command === "actions") {
-    return evaluateOpenworkControl(`(async () => {
+    return evaluateVenomcoworkControl(`(async () => {
       const control = window.__venomcoworkControl;
       if (!control) return { ok: false, error: "VenomCowork control surface is not available yet." };
       control.setEnabled?.(true);
@@ -2873,7 +2873,7 @@ async function runOpenworkControlCommand(command, args = {}) {
     })()`);
   }
   if (command === "execute") {
-    return evaluateOpenworkControl(`(async () => {
+    return evaluateVenomcoworkControl(`(async () => {
       const control = window.__venomcoworkControl;
       const input = JSON.parse(${argsJsonLiteral});
       if (!control) return { ok: false, error: "VenomCowork control surface is not available yet." };
@@ -2901,15 +2901,15 @@ async function startUiControlServer() {
         return;
       }
       if (request.method === "GET" && url.pathname === "/snapshot") {
-        sendJsonResponse(response, 200, await runOpenworkControlCommand("snapshot"));
+        sendJsonResponse(response, 200, await runVenomcoworkControlCommand("snapshot"));
         return;
       }
       if (request.method === "GET" && url.pathname === "/actions") {
-        sendJsonResponse(response, 200, await runOpenworkControlCommand("actions"));
+        sendJsonResponse(response, 200, await runVenomcoworkControlCommand("actions"));
         return;
       }
       if (request.method === "POST" && url.pathname === "/execute") {
-        sendJsonResponse(response, 200, await runOpenworkControlCommand("execute", await readJsonRequestBody(request)));
+        sendJsonResponse(response, 200, await runVenomcoworkControlCommand("execute", await readJsonRequestBody(request)));
         return;
       }
       sendJsonResponse(response, 404, { ok: false, error: "Not found" });

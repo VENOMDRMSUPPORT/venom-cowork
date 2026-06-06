@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import { ChevronDown, ChevronRight, Settings2, Sparkles } from "lucide-react";
@@ -28,7 +28,7 @@ import {
   VENOMCOWORK_MODEL_PREVIEWS,
   VENOMCOWORK_MODELS_PROVIDER_ID,
   VENOMCOWORK_MODELS_PROVIDER_NAME,
-  openWorkModelsPromoChangedEvent,
+  venomCoworkModelsPromoChangedEvent,
 } from "@/react-app/domains/cloud/venomcowork-models-promo";
 import { getConnectedProviderItems, useProviderListQuery } from "@/react-app/domains/connections/provider-list-query";
 import {
@@ -174,7 +174,7 @@ function groupByProvider(modelOptions: ModelOption[]): ModelSelectGroup[] {
     .sort((a, b) => a.value.localeCompare(b.value));
 }
 
-function openWorkModelsGroup(): ModelSelectGroup {
+function venomCoworkModelsGroup(): ModelSelectGroup {
   return {
     value: VENOMCOWORK_MODELS_PROVIDER_NAME,
     promo: true,
@@ -216,8 +216,8 @@ export function ModelSelect({
 
   React.useEffect(() => {
     const handlePromoChanged = () => setPromoHidden(isVenomCoworkModelsPromoHidden());
-    window.addEventListener(openWorkModelsPromoChangedEvent, handlePromoChanged);
-    return () => window.removeEventListener(openWorkModelsPromoChangedEvent, handlePromoChanged);
+    window.addEventListener(venomCoworkModelsPromoChangedEvent, handlePromoChanged);
+    return () => window.removeEventListener(venomCoworkModelsPromoChangedEvent, handlePromoChanged);
   }, []);
 
   const focusSearchInput = React.useCallback(() => {
@@ -256,7 +256,7 @@ export function ModelSelect({
   const groups = React.useMemo(() => {
     const providerGroups = groupByProvider(modelOptions);
     return showVenomCoworkModelsPromo
-      ? [openWorkModelsGroup(), ...providerGroups]
+      ? [venomCoworkModelsGroup(), ...providerGroups]
       : providerGroups;
   }, [modelOptions, showVenomCoworkModelsPromo]);
 

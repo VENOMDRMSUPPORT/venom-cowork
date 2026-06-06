@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import {
   useCallback,
   useEffect,
@@ -734,7 +734,7 @@ export function SkillsView(props: SkillsViewProps) {
     closeCustomRepoModal();
   }, [closeCustomRepoModal, customRepoName, customRepoOwner, customRepoRef, extensions]);
 
-  const isOpenworkInjectedSkill = (skill: SkillCard) => {
+  const isVenomcoworkInjectedSkill = (skill: SkillCard) => {
     const normalizedName = skill.name.trim().toLowerCase();
     const normalizedPath = skill.path.replace(/\\/g, "/").toLowerCase();
     return normalizedPath.includes("/.opencode/skills/") &&
@@ -874,7 +874,7 @@ export function SkillsView(props: SkillsViewProps) {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <h4 className="truncate text-[14px] font-semibold text-dls-text">{skill.name}</h4>
-                          {isOpenworkInjectedSkill(skill) ? <span className={tagClass}>VenomCowork</span> : null}
+                          {isVenomcoworkInjectedSkill(skill) ? <span className={tagClass}>VenomCowork</span> : null}
                         </div>
                         <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-dls-secondary">
                           {skill.description || t("skills.no_description")}
@@ -1065,7 +1065,7 @@ export function SkillsView(props: SkillsViewProps) {
               <button
                 type="button"
                 onClick={() => {
-                  void Promise.resolve(extensions.addHubRepo({ owner: "different-ai", repo: "venomcowork-hub", ref: "main" })).then(() => {
+                  void Promise.resolve(extensions.addHubRepo({ owner: "venom-cowork", repo: "venomcowork-hub", ref: "main" })).then(() => {
                     void extensions.refreshHubSkills({ force: true });
                   });
                 }}
@@ -1353,7 +1353,7 @@ export function SkillsView(props: SkillsViewProps) {
                     type="text"
                     value={customRepoOwner}
                     onChange={(event) => setCustomRepoOwner(event.currentTarget.value)}
-                    placeholder="different-ai"
+                    placeholder="venom-cowork"
                     className="w-full rounded-lg border border-dls-border bg-dls-hover px-3 py-2 text-xs font-mono text-dls-text focus:outline-none"
                     spellCheck={false}
                   />

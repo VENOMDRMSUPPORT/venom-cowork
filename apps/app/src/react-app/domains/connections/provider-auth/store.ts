@@ -1,4 +1,4 @@
-﻿import { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 import { applyEdits, modify, parse } from "jsonc-parser";
 import type {
@@ -18,8 +18,8 @@ import { unwrap, waitForHealthy } from "../../../../app/lib/opencode";
 import {
   readOpencodeConfig,
   writeOpencodeConfig,
-  workspaceOpenworkRead,
-  workspaceOpenworkWrite,
+  workspaceVenomcoworkRead,
+  workspaceVenomcoworkWrite,
 } from "../../../../app/lib/desktop";
 import type {
   Client,
@@ -33,7 +33,7 @@ import {
 } from "../../../../app/utils/providers";
 import { getReactQueryClient } from "../../../infra/query-client";
 import { ensureProviderListQuery } from "../provider-list-query";
-import type { OpenworkServerStore } from "../venomcowork-server-store";
+import type { VenomcoworkServerStore } from "../venomcowork-server-store";
 import {
   denSessionUpdatedEvent,
   type DenSessionUpdatedDetail,
@@ -97,7 +97,7 @@ type CreateProviderAuthStoreOptions = {
   selectedWorkspaceRoot: () => string;
   runtimeWorkspaceId: () => string | null;
   ensureRuntimeWorkspaceId?: () => Promise<string | null | undefined>;
-  venomcoworkServer: OpenworkServerStore;
+  venomcoworkServer: VenomcoworkServerStore;
   setProviders: (value: ProviderListItem[]) => void;
   setProviderDefaults: (value: Record<string, string>) => void;
   setProviderConnectedIds: (value: string[]) => void;
@@ -199,24 +199,24 @@ export function createProviderAuthStore(options: CreateProviderAuthStoreOptions)
     return Array.from(merged.values()).toSorted(compareProviders);
   };
 
-  const resolveOpenworkConfigTarget = async (mode: "read" | "write") => {
+  const resolveVenomcoworkConfigTarget = async (mode: "read" | "write") => {
     const venomcoworkSnapshot = options.venomcoworkServer.getSnapshot();
     const venomcoworkClient = venomcoworkSnapshot.venomcoworkServerClient;
     let venomcoworkWorkspaceId = options.runtimeWorkspaceId()?.trim() || null;
     if (!venomcoworkWorkspaceId && venomcoworkSnapshot.venomcoworkServerStatus === "connected" && venomcoworkClient) {
       venomcoworkWorkspaceId = (await options.ensureRuntimeWorkspaceId?.())?.trim() || null;
     }
-    const hasOpenworkTarget =
+    const hasVenomcoworkTarget =
       venomcoworkSnapshot.venomcoworkServerStatus === "connected" &&
       Boolean(venomcoworkClient && venomcoworkWorkspaceId);
-    const canUseOpenworkServer =
-      hasOpenworkTarget &&
+    const canUseVenomcoworkServer =
+      hasVenomcoworkTarget &&
       venomcoworkSnapshot.venomcoworkServerCapabilities?.config?.[mode] !== false;
     return {
       venomcoworkClient,
       venomcoworkWorkspaceId,
-      hasOpenworkTarget,
-      canUseOpenworkServer,
+      hasVenomcoworkTarget,
+      canUseVenomcoworkServer,
     };
   };
 
@@ -339,26 +339,26 @@ export function createProviderAuthStore(options: CreateProviderAuthStoreOptions)
     return next;
   };
 
-  const readWorkspaceOpenworkConfigRecord = async (): Promise<
+  const readWorkspaceVenomcoworkConfigRecord = async (): Promise<
     Record<string, unknown>
   > => {
     const root = options.selectedWorkspaceRoot().trim();
     const isLocalWorkspace =
       options.selectedWorkspaceDisplay().workspaceType === "local";
-    const { venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget, canUseOpenworkServer } =
-      await resolveOpenworkConfigTarget("read");
+    const { venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget, canUseVenomcoworkServer } =
+      await resolveVenomcoworkConfigTarget("read");
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       const config = await venomcoworkClient.getConfig(venomcoworkWorkspaceId);
       return config.venomcowork ?? {};
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       return {};
     }
 
     if (isLocalWorkspace && isDesktopRuntime() && root) {
-      return (await workspaceOpenworkRead({
+      return (await workspaceVenomcoworkRead({
         workspacePath: root,
       })) as unknown as Record<string, unknown>;
     }
@@ -366,26 +366,26 @@ export function createProviderAuthStore(options: CreateProviderAuthStoreOptions)
     return {};
   };
 
-  const writeWorkspaceOpenworkConfigRecord = async (
+  const writeWorkspaceVenomcoworkConfigRecord = async (
     config: Record<string, unknown>,
   ) => {
     const root = options.selectedWorkspaceRoot().trim();
     const isLocalWorkspace =
       options.selectedWorkspaceDisplay().workspaceType === "local";
-    const { venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget, canUseOpenworkServer } =
-      await resolveOpenworkConfigTarget("write");
+    const { venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget, canUseVenomcoworkServer } =
+      await resolveVenomcoworkConfigTarget("write");
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       await venomcoworkClient.patchConfig(venomcoworkWorkspaceId, { venomcowork: config });
       return true;
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       return false;
     }
 
     if (isLocalWorkspace && isDesktopRuntime() && root) {
-      const result = await workspaceOpenworkWrite({
+      const result = await workspaceVenomcoworkWrite({
         workspacePath: root,
         config: config as never,
       });
@@ -403,7 +403,7 @@ export function createProviderAuthStore(options: CreateProviderAuthStoreOptions)
 
   const refreshImportedCloudProviders = async () => {
     try {
-      const config = await readWorkspaceOpenworkConfigRecord();
+      const config = await readWorkspaceVenomcoworkConfigRecord();
       const cloudImports = readWorkspaceCloudImports(config);
       setStateField("importedCloudProviders", cloudImports.providers);
       return cloudImports.providers;
@@ -416,7 +416,7 @@ export function createProviderAuthStore(options: CreateProviderAuthStoreOptions)
   const persistImportedCloudProviders = async (
     nextProviders: Record<string, CloudImportedProvider>,
   ) => {
-    const config = await readWorkspaceOpenworkConfigRecord();
+    const config = await readWorkspaceVenomcoworkConfigRecord();
     const cloudImports = readWorkspaceCloudImports(config);
     const nextCloudImports = {
       ...cloudImports,
@@ -425,14 +425,14 @@ export function createProviderAuthStore(options: CreateProviderAuthStoreOptions)
     const nextConfig = withWorkspaceCloudImports(config, {
       ...nextCloudImports,
     });
-    const persisted = await writeWorkspaceOpenworkConfigRecord(nextConfig);
+    const persisted = await writeWorkspaceVenomcoworkConfigRecord(nextConfig);
     if (!persisted) {
       throw new Error(
         "VenomCowork server unavailable. Connect to manage imported cloud providers.",
       );
     }
     setStateField("importedCloudProviders", nextProviders);
-    const target = await resolveOpenworkConfigTarget("write");
+    const target = await resolveVenomcoworkConfigTarget("write");
     void refreshDesktopCloudSync({
       venomcoworkClient: target.venomcoworkClient,
       workspaceId: target.venomcoworkWorkspaceId,
@@ -443,14 +443,14 @@ export function createProviderAuthStore(options: CreateProviderAuthStoreOptions)
     const root = options.selectedWorkspaceRoot().trim();
     const isLocalWorkspace =
       options.selectedWorkspaceDisplay().workspaceType === "local";
-    const { venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget, canUseOpenworkServer } =
-      await resolveOpenworkConfigTarget("read");
+    const { venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget, canUseVenomcoworkServer } =
+      await resolveVenomcoworkConfigTarget("read");
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       return await venomcoworkClient.readOpencodeConfigFile(venomcoworkWorkspaceId, "project");
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       throw new Error("VenomCowork server config API is unavailable for this workspace.");
     }
 
@@ -465,10 +465,10 @@ export function createProviderAuthStore(options: CreateProviderAuthStoreOptions)
     const root = options.selectedWorkspaceRoot().trim();
     const isLocalWorkspace =
       options.selectedWorkspaceDisplay().workspaceType === "local";
-    const { venomcoworkClient, venomcoworkWorkspaceId, hasOpenworkTarget, canUseOpenworkServer } =
-      await resolveOpenworkConfigTarget("write");
+    const { venomcoworkClient, venomcoworkWorkspaceId, hasVenomcoworkTarget, canUseVenomcoworkServer } =
+      await resolveVenomcoworkConfigTarget("write");
 
-    if (canUseOpenworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
+    if (canUseVenomcoworkServer && venomcoworkClient && venomcoworkWorkspaceId) {
       const result = await venomcoworkClient.writeOpencodeConfigFile(
         venomcoworkWorkspaceId,
         "project",
@@ -480,7 +480,7 @@ export function createProviderAuthStore(options: CreateProviderAuthStoreOptions)
       return true;
     }
 
-    if (hasOpenworkTarget) {
+    if (hasVenomcoworkTarget) {
       throw new Error("VenomCowork server config API is unavailable for this workspace.");
     }
 

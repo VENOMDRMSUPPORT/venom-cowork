@@ -1,11 +1,11 @@
-﻿import type { Message, Part, Session, Todo } from "@opencode-ai/sdk/v2/client";
+import type { Message, Part, Session, Todo } from "@opencode-ai/sdk/v2/client";
 import { desktopFetch } from "./desktop";
 import { isDesktopRuntime } from "../utils";
 import type { ExecResult, OpencodeConfigFile, WorkspaceInfo, WorkspaceList } from "./desktop";
 import type { DenOrgMarketplace, DenOrgPluginResolved, DenResourceSnapshot } from "./den";
 import type { CloudImportedMarketplace, CloudImportedPlugin } from "../cloud/import-state";
 
-export type OpenworkServerCapabilities = {
+export type VenomcoworkServerCapabilities = {
   skills: { read: boolean; write: boolean; source: "venomcowork" | "opencode" };
   hub?: {
     skills?: {
@@ -36,9 +36,9 @@ export type OpenworkServerCapabilities = {
   };
 };
 
-export type OpenworkServerStatus = "connected" | "disconnected" | "limited";
+export type VenomcoworkServerStatus = "connected" | "disconnected" | "limited";
 
-export type OpenworkServerDiagnostics = {
+export type VenomcoworkServerDiagnostics = {
   ok: boolean;
   version: string;
   uptimeMs: number;
@@ -48,16 +48,16 @@ export type OpenworkServerDiagnostics = {
   workspaceCount: number;
   activeWorkspaceId?: string | null;
   selectedWorkspaceId?: string | null;
-  workspace: OpenworkWorkspaceInfo | null;
+  workspace: VenomcoworkWorkspaceInfo | null;
   authorizedRoots: string[];
   server: { host: string; port: number; configPath?: string | null };
   tokenSource: { client: string; host: string };
 };
 
-export type OpenworkRuntimeServiceName = "venomcowork-server" | "opencode";
+export type VenomcoworkRuntimeServiceName = "venomcowork-server" | "opencode";
 
-export type OpenworkRuntimeServiceSnapshot = {
-  name: OpenworkRuntimeServiceName;
+export type VenomcoworkRuntimeServiceSnapshot = {
+  name: VenomcoworkRuntimeServiceName;
   enabled: boolean;
   running: boolean;
   targetVersion: string | null;
@@ -65,7 +65,7 @@ export type OpenworkRuntimeServiceSnapshot = {
   upgradeAvailable: boolean;
 };
 
-export type OpenworkRuntimeSnapshot = {
+export type VenomcoworkRuntimeSnapshot = {
   ok: boolean;
   orchestrator?: {
     version: string;
@@ -81,12 +81,12 @@ export type OpenworkRuntimeSnapshot = {
     finishedAt: number | null;
     error: string | null;
     operationId: string | null;
-    services: OpenworkRuntimeServiceName[];
+    services: VenomcoworkRuntimeServiceName[];
   };
-  services: OpenworkRuntimeServiceSnapshot[];
+  services: VenomcoworkRuntimeServiceSnapshot[];
 };
 
-export type OpenworkServerSettings = {
+export type VenomcoworkServerSettings = {
   urlOverride?: string;
   portOverride?: number;
   token?: string;
@@ -94,7 +94,7 @@ export type OpenworkServerSettings = {
   remoteAccessEnabled?: boolean;
 };
 
-export type OpenworkWorkspaceInfo = WorkspaceInfo & {
+export type VenomcoworkWorkspaceInfo = WorkspaceInfo & {
   opencode?: {
     baseUrl?: string;
     directory?: string;
@@ -103,20 +103,20 @@ export type OpenworkWorkspaceInfo = WorkspaceInfo & {
   };
 };
 
-export type OpenworkWorkspaceList = {
-  items: OpenworkWorkspaceInfo[];
+export type VenomcoworkWorkspaceList = {
+  items: VenomcoworkWorkspaceInfo[];
   workspaces?: WorkspaceInfo[];
   activeId?: string | null;
 };
 
-export type OpenworkSessionMessage = {
+export type VenomcoworkSessionMessage = {
   info: Message;
   parts: Part[];
 };
 
-export type OpenworkSessionSnapshot = {
+export type VenomcoworkSessionSnapshot = {
   session: Session;
-  messages: OpenworkSessionMessage[];
+  messages: VenomcoworkSessionMessage[];
   todos: Todo[];
   status:
     | { type: "idle" }
@@ -124,14 +124,14 @@ export type OpenworkSessionSnapshot = {
     | { type: "retry"; attempt: number; message: string; next: number };
 };
 
-export type OpenworkPluginItem = {
+export type VenomcoworkPluginItem = {
   spec: string;
   source: "config" | "dir.project" | "dir.global";
   scope: "project" | "global";
   path?: string;
 };
 
-export type OpenworkSkillItem = {
+export type VenomcoworkSkillItem = {
   name: string;
   path: string;
   description: string;
@@ -139,12 +139,12 @@ export type OpenworkSkillItem = {
   trigger?: string;
 };
 
-export type OpenworkSkillContent = {
-  item: OpenworkSkillItem;
+export type VenomcoworkSkillContent = {
+  item: VenomcoworkSkillItem;
   content: string;
 };
 
-export type OpenworkHubSkillItem = {
+export type VenomcoworkHubSkillItem = {
   name: string;
   description: string;
   trigger?: string;
@@ -156,20 +156,20 @@ export type OpenworkHubSkillItem = {
   };
 };
 
-export type OpenworkHubRepo = {
+export type VenomcoworkHubRepo = {
   owner?: string;
   repo?: string;
   ref?: string;
 };
 
-export type OpenworkWorkspaceFileContent = {
+export type VenomcoworkWorkspaceFileContent = {
   path: string;
   content: string;
   bytes: number;
   updatedAt: number;
 };
 
-export type OpenworkWorkspaceFileWriteResult = {
+export type VenomcoworkWorkspaceFileWriteResult = {
   ok: boolean;
   path: string;
   bytes: number;
@@ -177,19 +177,19 @@ export type OpenworkWorkspaceFileWriteResult = {
   revision?: string;
 };
 
-export type OpenworkAuthorizedFoldersResponse = {
+export type VenomcoworkAuthorizedFoldersResponse = {
   folders: string[];
   hiddenCount: number;
   workspaceRoot: string;
 };
 
-export type OpenworkAuthorizedFoldersUpdateResponse = {
+export type VenomcoworkAuthorizedFoldersUpdateResponse = {
   folders: string[];
   hiddenCount: number;
   updatedAt: number;
 };
 
-export type OpenworkRuntimeConfigMigrationResult = {
+export type VenomcoworkRuntimeConfigMigrationResult = {
   migrated: boolean;
   keys: string[];
   legacyKeys: string[];
@@ -198,7 +198,7 @@ export type OpenworkRuntimeConfigMigrationResult = {
   legacyError?: string | null;
 };
 
-export type OpenworkRuntimeConfigStatus = {
+export type VenomcoworkRuntimeConfigStatus = {
   runtime: Record<string, unknown>;
   runtimeKeys: string[];
   effectiveRuntime: Record<string, unknown>;
@@ -208,7 +208,7 @@ export type OpenworkRuntimeConfigStatus = {
     runtimeDatabase: { keys: string[]; config: Record<string, unknown> };
     injected: { keys: string[]; config: Record<string, unknown> };
   };
-  legacyOpenwork: {
+  legacyVenomcowork: {
     path: string;
     keys: string[];
     error: string | null;
@@ -221,7 +221,7 @@ export type OpenworkRuntimeConfigStatus = {
   };
 };
 
-export type OpenworkDesktopCloudSyncChange = {
+export type VenomcoworkDesktopCloudSyncChange = {
   id: string;
   kind: "new" | "modified" | "removed";
   resourceKind: "llmProvider" | "marketplace" | "plugin" | "configItem";
@@ -232,22 +232,22 @@ export type OpenworkDesktopCloudSyncChange = {
   queuedAt: number;
 };
 
-export type OpenworkDesktopCloudSyncState = {
+export type VenomcoworkDesktopCloudSyncState = {
   entries: Record<string, unknown>;
   updatedAt: number;
   version: 1;
 };
 
-export type OpenworkDesktopCloudSyncResult = {
-  changes: OpenworkDesktopCloudSyncChange[];
-  state: OpenworkDesktopCloudSyncState;
+export type VenomcoworkDesktopCloudSyncResult = {
+  changes: VenomcoworkDesktopCloudSyncChange[];
+  state: VenomcoworkDesktopCloudSyncState;
 };
 
-export type OpenworkCloudPluginInstallResult = {
+export type VenomcoworkCloudPluginInstallResult = {
   item: CloudImportedPlugin;
 };
 
-export type OpenworkCloudPluginsResult = {
+export type VenomcoworkCloudPluginsResult = {
   marketplaces: Record<string, CloudImportedMarketplace>;
   plugins: Record<string, CloudImportedPlugin>;
 };
@@ -262,7 +262,7 @@ function arrayBufferToBase64(data: ArrayBuffer): string {
   return btoa(binary);
 }
 
-export type OpenworkCommandItem = {
+export type VenomcoworkCommandItem = {
   name: string;
   description?: string;
   template: string;
@@ -272,14 +272,14 @@ export type OpenworkCommandItem = {
   scope: "workspace" | "global";
 };
 
-export type OpenworkMcpItem = {
+export type VenomcoworkMcpItem = {
   name: string;
   config: Record<string, unknown>;
   source: "config.project" | "config.global" | "config.remote";
   disabledByTools?: boolean;
 };
 
-export type OpenworkWorkspaceExport = {
+export type VenomcoworkWorkspaceExport = {
   workspaceId: string;
   exportedAt: number;
   opencode?: Record<string, unknown>;
@@ -289,14 +289,14 @@ export type OpenworkWorkspaceExport = {
   files?: Array<{ path: string; content: string }>;
 };
 
-export type OpenworkWorkspaceImportChange = {
+export type VenomcoworkWorkspaceImportChange = {
   kind: "opencode" | "venomcowork" | "skill" | "command" | "file";
   action: "create" | "update" | "replace" | "delete" | "unchanged";
   label: string;
   path: string;
 };
 
-export type OpenworkWorkspaceImportPreview = {
+export type VenomcoworkWorkspaceImportPreview = {
   fingerprint: string;
   summary: {
     total: number;
@@ -306,25 +306,25 @@ export type OpenworkWorkspaceImportPreview = {
     delete: number;
     unchanged: number;
   };
-  changes: OpenworkWorkspaceImportChange[];
+  changes: VenomcoworkWorkspaceImportChange[];
 };
 
-export type OpenworkWorkspaceExportSensitiveMode = "auto" | "include" | "exclude";
+export type VenomcoworkWorkspaceExportSensitiveMode = "auto" | "include" | "exclude";
 
-export type OpenworkWorkspaceExportWarning = {
+export type VenomcoworkWorkspaceExportWarning = {
   id: string;
   label: string;
   detail: string;
 };
 
-export type OpenworkBlueprintSessionsMaterializeResult = {
+export type VenomcoworkBlueprintSessionsMaterializeResult = {
   ok: boolean;
   created: Array<{ templateId: string; sessionId: string; title: string }>;
   existing: Array<{ templateId: string; sessionId: string }>;
   openSessionId: string | null;
 };
 
-export type OpenworkArtifactItem = {
+export type VenomcoworkArtifactItem = {
   id: string;
   name?: string;
   path?: string;
@@ -334,8 +334,8 @@ export type OpenworkArtifactItem = {
   mime?: string;
 };
 
-export type OpenworkArtifactList = {
-  items: OpenworkArtifactItem[];
+export type VenomcoworkArtifactList = {
+  items: VenomcoworkArtifactItem[];
 };
 
 export type GoogleWorkspaceAccount = {
@@ -381,14 +381,14 @@ export type GoogleWorkspaceConnectStatus = {
   googleWorkspace: GoogleWorkspaceAuthStatus | null;
 };
 
-export type OpenworkExtensionActionCall = {
+export type VenomcoworkExtensionActionCall = {
   extensionId: string;
   action: string;
   args?: Record<string, unknown>;
   context?: Record<string, unknown>;
 };
 
-export type OpenworkExtensionActionResult = {
+export type VenomcoworkExtensionActionResult = {
   ok: boolean;
   extensionId: string;
   action: string;
@@ -396,7 +396,7 @@ export type OpenworkExtensionActionResult = {
   context?: Record<string, unknown>;
 };
 
-export type OpenworkResolvedArtifactTarget = {
+export type VenomcoworkResolvedArtifactTarget = {
   id: string;
   kind: "file" | "url";
   value: string;
@@ -410,7 +410,7 @@ export type OpenworkResolvedArtifactTarget = {
   contentType?: string;
 };
 
-export type OpenworkWorkspaceFileStat = {
+export type VenomcoworkWorkspaceFileStat = {
   ok: boolean;
   path: string;
   exists: boolean;
@@ -419,7 +419,7 @@ export type OpenworkWorkspaceFileStat = {
   updatedAt?: number;
 };
 
-export type OpenworkInboxItem = {
+export type VenomcoworkInboxItem = {
   id: string;
   name?: string;
   path?: string;
@@ -427,52 +427,52 @@ export type OpenworkInboxItem = {
   updatedAt?: number;
 };
 
-export type OpenworkInboxList = {
-  items: OpenworkInboxItem[];
+export type VenomcoworkInboxList = {
+  items: VenomcoworkInboxItem[];
 };
 
-export type OpenworkInboxUploadResult = {
+export type VenomcoworkInboxUploadResult = {
   ok: boolean;
   path: string;
   bytes: number;
 };
 
-export type OpenworkUserEnvItem = {
+export type VenomcoworkUserEnvItem = {
   key: string;
   updatedAt: number;
   hasValue: boolean;
   value?: string;
 };
 
-export type OpenworkActor = {
+export type VenomcoworkActor = {
   type: "remote" | "host";
   clientId?: string;
   tokenHash?: string;
 };
 
-export type OpenworkAuditEntry = {
+export type VenomcoworkAuditEntry = {
   id: string;
   workspaceId: string;
-  actor: OpenworkActor;
+  actor: VenomcoworkActor;
   action: string;
   target: string;
   summary: string;
   timestamp: number;
 };
 
-export type OpenworkReloadTrigger = {
+export type VenomcoworkReloadTrigger = {
   type: "skill" | "plugin" | "config" | "mcp" | "agent" | "command";
   name?: string;
   action?: "added" | "removed" | "updated";
   path?: string;
 };
 
-export type OpenworkReloadEvent = {
+export type VenomcoworkReloadEvent = {
   id: string;
   seq: number;
   workspaceId: string;
   reason: "plugins" | "skills" | "mcp" | "config" | "agents" | "commands";
-  trigger?: OpenworkReloadTrigger;
+  trigger?: VenomcoworkReloadTrigger;
   timestamp: number;
 };
 
@@ -486,15 +486,15 @@ const STORAGE_TOKEN = "venomcowork.server.token";
 const STORAGE_HOST_AUTH_KEY = "venomcowork.server.hostToken";
 const STORAGE_REMOTE_ACCESS = "venomcowork.server.remoteAccessEnabled";
 
-export function normalizeOpenworkServerUrl(input: string) {
+export function normalizeVenomcoworkServerUrl(input: string) {
   const trimmed = input.trim();
   if (!trimmed) return null;
   const withProtocol = /^https?:\/\//.test(trimmed) ? trimmed : `http://${trimmed}`;
   return withProtocol.replace(/\/+$/, "");
 }
 
-export function isLoopbackOpenworkServerUrl(input: string) {
-  const normalized = normalizeOpenworkServerUrl(input) ?? "";
+export function isLoopbackVenomcoworkServerUrl(input: string) {
+  const normalized = normalizeVenomcoworkServerUrl(input) ?? "";
   if (!normalized) return false;
   try {
     const hostname = new URL(normalized).hostname.toLowerCase();
@@ -504,8 +504,8 @@ export function isLoopbackOpenworkServerUrl(input: string) {
   }
 }
 
-export function parseOpenworkWorkspaceIdFromUrl(input: string) {
-  const normalized = normalizeOpenworkServerUrl(input) ?? "";
+export function parseVenomcoworkWorkspaceIdFromUrl(input: string) {
+  const normalized = normalizeVenomcoworkServerUrl(input) ?? "";
   if (!normalized) return null;
 
   try {
@@ -531,8 +531,8 @@ export function parseOpenworkWorkspaceIdFromUrl(input: string) {
   }
 }
 
-export function buildOpenworkWorkspaceBaseUrl(hostUrl: string, workspaceId?: string | null) {
-  const normalized = normalizeOpenworkServerUrl(hostUrl) ?? "";
+export function buildVenomcoworkWorkspaceBaseUrl(hostUrl: string, workspaceId?: string | null) {
+  const normalized = normalizeVenomcoworkServerUrl(hostUrl) ?? "";
   if (!normalized) return null;
 
   try {
@@ -567,7 +567,7 @@ const VENOMCOWORK_INVITE_PARAM_TOKEN = "ow_token";
 const VENOMCOWORK_INVITE_PARAM_STARTUP = "ow_startup";
 const VENOMCOWORK_INVITE_PARAM_AUTO_CONNECT = "ow_auto_connect";
 
-export type OpenworkOpenCodeRouterHealthSnapshot = {
+export type VenomcoworkOpenCodeRouterHealthSnapshot = {
   ok: boolean;
   opencode: Record<string, unknown>;
   channels: Record<string, unknown>;
@@ -586,7 +586,7 @@ export type OpenworkOpenCodeRouterHealthSnapshot = {
   [key: string]: unknown;
 };
 
-export type OpenworkOpenCodeRouterIdentityItem = {
+export type VenomcoworkOpenCodeRouterIdentityItem = {
   id: string;
   channel?: string;
   enabled?: boolean;
@@ -594,7 +594,7 @@ export type OpenworkOpenCodeRouterIdentityItem = {
   [key: string]: unknown;
 };
 
-export type OpenworkOpenCodeRouterSendResult = {
+export type VenomcoworkOpenCodeRouterSendResult = {
   ok: boolean;
   sent: number;
   attempted: number;
@@ -603,21 +603,21 @@ export type OpenworkOpenCodeRouterSendResult = {
   [key: string]: unknown;
 };
 
-export type OpenworkConnectInvite = {
+export type VenomcoworkConnectInvite = {
   url: string;
   token?: string;
   startup?: "server";
   autoConnect?: boolean;
 };
 
-export function readOpenworkConnectInviteFromSearch(input: string | URLSearchParams) {
+export function readVenomcoworkConnectInviteFromSearch(input: string | URLSearchParams) {
   const search =
     typeof input === "string"
       ? new URLSearchParams(input.startsWith("?") ? input.slice(1) : input)
       : input;
 
   const rawUrl = search.get(VENOMCOWORK_INVITE_PARAM_URL)?.trim() ?? "";
-  const url = normalizeOpenworkServerUrl(rawUrl);
+  const url = normalizeVenomcoworkServerUrl(rawUrl);
   if (!url) return null;
 
   const token = search.get(VENOMCOWORK_INVITE_PARAM_TOKEN)?.trim() ?? "";
@@ -630,10 +630,10 @@ export function readOpenworkConnectInviteFromSearch(input: string | URLSearchPar
     token: token || undefined,
     startup,
     autoConnect: autoConnect || undefined,
-  } satisfies OpenworkConnectInvite;
+  } satisfies VenomcoworkConnectInvite;
 }
 
-export function stripOpenworkConnectInviteFromUrl(input: string) {
+export function stripVenomcoworkConnectInviteFromUrl(input: string) {
   try {
     const url = new URL(input);
     url.searchParams.delete(VENOMCOWORK_INVITE_PARAM_URL);
@@ -646,10 +646,10 @@ export function stripOpenworkConnectInviteFromUrl(input: string) {
   }
 }
 
-export function readOpenworkServerSettings(): OpenworkServerSettings {
+export function readVenomcoworkServerSettings(): VenomcoworkServerSettings {
   if (typeof window === "undefined") return {};
   try {
-    const urlOverride = normalizeOpenworkServerUrl(
+    const urlOverride = normalizeVenomcoworkServerUrl(
       window.localStorage.getItem(STORAGE_URL_OVERRIDE) ?? "",
     );
     const portRaw = window.localStorage.getItem(STORAGE_PORT_OVERRIDE) ?? "";
@@ -669,10 +669,10 @@ export function readOpenworkServerSettings(): OpenworkServerSettings {
   }
 }
 
-export function writeOpenworkServerSettings(next: OpenworkServerSettings): OpenworkServerSettings {
+export function writeVenomcoworkServerSettings(next: VenomcoworkServerSettings): VenomcoworkServerSettings {
   if (typeof window === "undefined") return next;
   try {
-    const urlOverride = normalizeOpenworkServerUrl(next.urlOverride ?? "");
+    const urlOverride = normalizeVenomcoworkServerUrl(next.urlOverride ?? "");
     const portOverride = typeof next.portOverride === "number" ? next.portOverride : undefined;
     const token = next.token?.trim() || undefined;
     const hostToken = next.hostToken?.trim() || undefined;
@@ -708,13 +708,13 @@ export function writeOpenworkServerSettings(next: OpenworkServerSettings): Openw
       window.localStorage.removeItem(STORAGE_REMOTE_ACCESS);
     }
 
-    return readOpenworkServerSettings();
+    return readVenomcoworkServerSettings();
   } catch {
     return next;
   }
 }
 
-export function hydrateOpenworkServerSettingsFromEnv() {
+export function hydrateVenomcoworkServerSettingsFromEnv() {
   if (typeof window === "undefined") return;
 
   const envUrl = typeof import.meta.env?.VITE_VENOMCOWORK_URL === "string"
@@ -733,12 +733,12 @@ export function hydrateOpenworkServerSettingsFromEnv() {
   if (!envUrl && !envPort && !envToken && !envHostToken) return;
 
   try {
-    const current = readOpenworkServerSettings();
-    const next: OpenworkServerSettings = { ...current };
+    const current = readVenomcoworkServerSettings();
+    const next: VenomcoworkServerSettings = { ...current };
     let changed = false;
 
     if (!current.urlOverride && envUrl) {
-      next.urlOverride = normalizeOpenworkServerUrl(envUrl) ?? undefined;
+      next.urlOverride = normalizeVenomcoworkServerUrl(envUrl) ?? undefined;
       changed = true;
     }
 
@@ -761,14 +761,14 @@ export function hydrateOpenworkServerSettingsFromEnv() {
     }
 
     if (changed) {
-      writeOpenworkServerSettings(next);
+      writeVenomcoworkServerSettings(next);
     }
   } catch {
     // ignore
   }
 }
 
-export function clearOpenworkServerSettings() {
+export function clearVenomcoworkServerSettings() {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.removeItem(STORAGE_URL_OVERRIDE);
@@ -781,7 +781,7 @@ export function clearOpenworkServerSettings() {
   }
 }
 
-export class OpenworkServerError extends Error {
+export class VenomcoworkServerError extends Error {
   status: number;
   code: string;
   details?: unknown;
@@ -910,7 +910,7 @@ async function requestJson<T>(
   if (!response.ok) {
     const code = typeof json?.code === "string" ? json.code : "request_failed";
     const message = typeof json?.message === "string" ? json.message : response.statusText;
-    throw new OpenworkServerError(response.status, code, message, json?.details);
+    throw new VenomcoworkServerError(response.status, code, message, json?.details);
   }
 
   return json as T;
@@ -964,7 +964,7 @@ async function requestBinary(
     }
     const code = typeof json?.code === "string" ? json.code : "request_failed";
     const message = typeof json?.message === "string" ? json.message : response.statusText;
-    throw new OpenworkServerError(response.status, code, message, json?.details);
+    throw new VenomcoworkServerError(response.status, code, message, json?.details);
   }
 
   const contentType = response.headers.get("content-type");
@@ -976,7 +976,7 @@ async function requestBinary(
   return { data, contentType, filename };
 }
 
-export function createOpenworkServerClient(options: { baseUrl: string; token?: string; hostToken?: string }) {
+export function createVenomcoworkServerClient(options: { baseUrl: string; token?: string; hostToken?: string }) {
   const baseUrl = options.baseUrl.replace(/\/+$/, "");
   const token = options.token;
   const hostToken = options.hostToken;
@@ -1002,9 +1002,9 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
     health: () =>
       requestJson<{ ok: boolean; version: string; uptimeMs: number }>(baseUrl, "/health", { token, hostToken, timeoutMs: timeouts.health }),
     runtimeVersions: () =>
-      requestJson<OpenworkRuntimeSnapshot>(baseUrl, "/runtime/versions", { token, hostToken, timeoutMs: timeouts.status }),
-    status: () => requestJson<OpenworkServerDiagnostics>(baseUrl, "/status", { token, hostToken, timeoutMs: timeouts.status }),
-    capabilities: () => requestJson<OpenworkServerCapabilities>(baseUrl, "/capabilities", { token, hostToken, timeoutMs: timeouts.capabilities }),
+      requestJson<VenomcoworkRuntimeSnapshot>(baseUrl, "/runtime/versions", { token, hostToken, timeoutMs: timeouts.status }),
+    status: () => requestJson<VenomcoworkServerDiagnostics>(baseUrl, "/status", { token, hostToken, timeoutMs: timeouts.status }),
+    capabilities: () => requestJson<VenomcoworkServerCapabilities>(baseUrl, "/capabilities", { token, hostToken, timeoutMs: timeouts.capabilities }),
     googleWorkspaceStatus: () => requestJson<GoogleWorkspaceAuthStatus>(baseUrl, "/experimental/google-workspace/status", { token, hostToken, timeoutMs: timeouts.status }),
     googleWorkspaceConnectStart: () => requestJson<GoogleWorkspaceConnectStart>(baseUrl, "/experimental/google-workspace/connect/start", { token, hostToken, method: "POST", timeoutMs: timeouts.status }),
     googleWorkspaceConnectStatus: (flowId: string) => requestJson<GoogleWorkspaceConnectStatus>(baseUrl, `/experimental/google-workspace/connect/status/${encodeURIComponent(flowId)}`, { token, hostToken, timeoutMs: timeouts.status }),
@@ -1012,15 +1012,15 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
     googleWorkspaceSetActiveAccount: (accountId: string) => requestJson<GoogleWorkspaceAuthStatus>(baseUrl, "/experimental/google-workspace/active-account", { token, hostToken, method: "POST", body: { accountId }, timeoutMs: timeouts.status }),
     googleWorkspaceTestConnection: () => requestJson<GoogleWorkspaceAuthStatus>(baseUrl, "/experimental/google-workspace/test", { token, hostToken, method: "POST", timeoutMs: 60_000 }),
     googleWorkspaceRunScopeSmokeTest: () => requestJson<GoogleWorkspaceAuthStatus>(baseUrl, "/experimental/google-workspace/smoke-test", { token, hostToken, method: "POST", timeoutMs: 120_000 }),
-    callExtensionAction: (payload: OpenworkExtensionActionCall) =>
-      requestJson<OpenworkExtensionActionResult>(baseUrl, "/experimental/extensions/call", {
+    callExtensionAction: (payload: VenomcoworkExtensionActionCall) =>
+      requestJson<VenomcoworkExtensionActionResult>(baseUrl, "/experimental/extensions/call", {
         token,
         hostToken,
         method: "POST",
         body: payload,
         timeoutMs: timeouts.binary,
       }),
-    listWorkspaces: () => requestJson<OpenworkWorkspaceList>(baseUrl, "/workspaces", { token, hostToken, timeoutMs: timeouts.listWorkspaces }),
+    listWorkspaces: () => requestJson<VenomcoworkWorkspaceList>(baseUrl, "/workspaces", { token, hostToken, timeoutMs: timeouts.listWorkspaces }),
     createLocalWorkspace: (payload: { folderPath: string; name: string; preset: string }) =>
       requestJson<WorkspaceList>(baseUrl, "/workspaces/local", {
         token,
@@ -1059,14 +1059,14 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       }),
     activateWorkspace: (workspaceId: string, options?: { persist?: boolean }) => {
       const query = options?.persist ? "?persist=true" : "";
-      return requestJson<{ activeId: string; workspace: OpenworkWorkspaceInfo; persisted: boolean }>(
+      return requestJson<{ activeId: string; workspace: VenomcoworkWorkspaceInfo; persisted: boolean }>(
         baseUrl,
         `/workspaces/${encodeURIComponent(workspaceId)}/activate${query}`,
         { token, hostToken, method: "POST", timeoutMs: timeouts.activateWorkspace },
       );
     },
     deleteWorkspace: (workspaceId: string) =>
-      requestJson<{ ok: boolean; deleted: boolean; persisted: boolean; activeId: string | null; items: OpenworkWorkspaceInfo[]; workspaces?: WorkspaceInfo[] }>(
+      requestJson<{ ok: boolean; deleted: boolean; persisted: boolean; activeId: string | null; items: VenomcoworkWorkspaceInfo[]; workspaces?: WorkspaceInfo[] }>(
         baseUrl,
         `/workspaces/${encodeURIComponent(workspaceId)}`,
         { token, hostToken, method: "DELETE", timeoutMs: timeouts.deleteWorkspace },
@@ -1103,7 +1103,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       const query = new URLSearchParams();
       if (typeof options?.limit === "number") query.set("limit", String(options.limit));
       const suffix = query.size ? `?${query.toString()}` : "";
-      return requestJson<{ items: OpenworkSessionMessage[] }>(
+      return requestJson<{ items: VenomcoworkSessionMessage[] }>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/sessions/${encodeURIComponent(sessionId)}/messages${suffix}`,
         { token, hostToken, timeoutMs: timeouts.sessionRead },
@@ -1113,7 +1113,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       const query = new URLSearchParams();
       if (typeof options?.limit === "number") query.set("limit", String(options.limit));
       const suffix = query.size ? `?${query.toString()}` : "";
-      return requestJson<{ item: OpenworkSessionSnapshot }>(
+      return requestJson<{ item: VenomcoworkSessionSnapshot }>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/sessions/${encodeURIComponent(sessionId)}/snapshot${suffix}`,
         { token, hostToken, timeoutMs: timeouts.sessionRead },
@@ -1121,21 +1121,21 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
     },
     exportWorkspace: (
       workspaceId: string,
-      options?: { sensitiveMode?: OpenworkWorkspaceExportSensitiveMode },
+      options?: { sensitiveMode?: VenomcoworkWorkspaceExportSensitiveMode },
     ) => {
       const query = new URLSearchParams();
       if (options?.sensitiveMode) {
         query.set("sensitive", options.sensitiveMode);
       }
       const suffix = query.size ? `?${query.toString()}` : "";
-      return requestJson<OpenworkWorkspaceExport>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/export${suffix}`, {
+      return requestJson<VenomcoworkWorkspaceExport>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/export${suffix}`, {
         token,
         hostToken,
         timeoutMs: timeouts.workspaceExport,
       });
     },
     importWorkspace: (workspaceId: string, payload: Record<string, unknown>) =>
-      requestJson<{ ok: boolean; preview?: OpenworkWorkspaceImportPreview }>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/import`, {
+      requestJson<{ ok: boolean; preview?: VenomcoworkWorkspaceImportPreview }>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/import`, {
         token,
         hostToken,
         method: "POST",
@@ -1143,7 +1143,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         timeoutMs: timeouts.workspaceImport,
       }),
     previewWorkspaceImport: (workspaceId: string, payload: Record<string, unknown>) =>
-      requestJson<OpenworkWorkspaceImportPreview>(
+      requestJson<VenomcoworkWorkspaceImportPreview>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/import/preview`,
         {
@@ -1155,7 +1155,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         },
       ),
     materializeBlueprintSessions: (workspaceId: string) =>
-      requestJson<OpenworkBlueprintSessionsMaterializeResult>(
+      requestJson<VenomcoworkBlueprintSessionsMaterializeResult>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/blueprint/sessions/materialize`,
         {
@@ -1172,13 +1172,13 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         { token, hostToken, timeoutMs: timeouts.config },
       ),
     listAuthorizedFolders: (workspaceId: string) =>
-      requestJson<OpenworkAuthorizedFoldersResponse>(
+      requestJson<VenomcoworkAuthorizedFoldersResponse>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/authorized-folders`,
         { token, hostToken, timeoutMs: timeouts.config },
       ),
     setAuthorizedFolders: (workspaceId: string, folders: string[]) =>
-      requestJson<OpenworkAuthorizedFoldersUpdateResponse>(
+      requestJson<VenomcoworkAuthorizedFoldersUpdateResponse>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/authorized-folders`,
         {
@@ -1190,7 +1190,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         },
       ),
     migrateRuntimeConfig: (workspaceId: string) =>
-      requestJson<OpenworkRuntimeConfigMigrationResult>(
+      requestJson<VenomcoworkRuntimeConfigMigrationResult>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/runtime-config/migrate`,
         {
@@ -1201,7 +1201,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         },
       ),
     getRuntimeConfigStatus: (workspaceId: string) =>
-      requestJson<OpenworkRuntimeConfigStatus>(
+      requestJson<VenomcoworkRuntimeConfigStatus>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/runtime-config`,
         { token, hostToken, timeoutMs: timeouts.config },
@@ -1214,13 +1214,13 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         body: payload,
       }),
     getDesktopCloudSync: (workspaceId: string) =>
-      requestJson<OpenworkDesktopCloudSyncState>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/desktop-cloud-sync`, {
+      requestJson<VenomcoworkDesktopCloudSyncState>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/desktop-cloud-sync`, {
         token,
         hostToken,
         timeoutMs: timeouts.config,
       }),
     syncDesktopCloud: (workspaceId: string, snapshot: DenResourceSnapshot) =>
-      requestJson<OpenworkDesktopCloudSyncResult>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/desktop-cloud-sync`, {
+      requestJson<VenomcoworkDesktopCloudSyncResult>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/desktop-cloud-sync`, {
         token,
         hostToken,
         method: "POST",
@@ -1228,13 +1228,13 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         timeoutMs: timeouts.config,
       }),
     listCloudPlugins: (workspaceId: string) =>
-      requestJson<OpenworkCloudPluginsResult>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/cloud-plugins`, {
+      requestJson<VenomcoworkCloudPluginsResult>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/cloud-plugins`, {
         token,
         hostToken,
         timeoutMs: timeouts.config,
       }),
     installCloudPlugin: (workspaceId: string, payload: { marketplaceId: string | null; marketplace?: DenOrgMarketplace | null; resolved: DenOrgPluginResolved }) =>
-      requestJson<OpenworkCloudPluginInstallResult>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/cloud-plugins`, {
+      requestJson<VenomcoworkCloudPluginInstallResult>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/cloud-plugins`, {
         token,
         hostToken,
         method: "POST",
@@ -1242,7 +1242,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         timeoutMs: timeouts.config,
       }),
     removeCloudPlugin: (workspaceId: string, pluginId: string) =>
-      requestJson<OpenworkCloudPluginInstallResult>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/cloud-plugins/${encodeURIComponent(pluginId)}`, {
+      requestJson<VenomcoworkCloudPluginInstallResult>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/cloud-plugins/${encodeURIComponent(pluginId)}`, {
         token,
         hostToken,
         method: "DELETE",
@@ -1264,7 +1264,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       }),
     listReloadEvents: (workspaceId: string, options?: { since?: number }) => {
       const query = typeof options?.since === "number" ? `?since=${options.since}` : "";
-      return requestJson<{ items: OpenworkReloadEvent[]; cursor?: number }>(
+      return requestJson<{ items: VenomcoworkReloadEvent[]; cursor?: number }>(
         baseUrl,
         `/workspace/${workspaceId}/events${query}`,
         { token, hostToken },
@@ -1278,33 +1278,33 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       }),
     listPlugins: (workspaceId: string, options?: { includeGlobal?: boolean }) => {
       const query = options?.includeGlobal ? "?includeGlobal=true" : "";
-      return requestJson<{ items: OpenworkPluginItem[]; loadOrder: string[] }>(
+      return requestJson<{ items: VenomcoworkPluginItem[]; loadOrder: string[] }>(
         baseUrl,
         `/workspace/${workspaceId}/plugins${query}`,
         { token, hostToken },
       );
     },
     addPlugin: (workspaceId: string, spec: string) =>
-      requestJson<{ items: OpenworkPluginItem[]; loadOrder: string[] }>(
+      requestJson<{ items: VenomcoworkPluginItem[]; loadOrder: string[] }>(
         baseUrl,
         `/workspace/${workspaceId}/plugins`,
         { token, hostToken, method: "POST", body: { spec } },
       ),
     removePlugin: (workspaceId: string, name: string) =>
-      requestJson<{ items: OpenworkPluginItem[]; loadOrder: string[] }>(
+      requestJson<{ items: VenomcoworkPluginItem[]; loadOrder: string[] }>(
         baseUrl,
         `/workspace/${workspaceId}/plugins/${encodeURIComponent(name)}`,
         { token, hostToken, method: "DELETE" },
       ),
     listSkills: (workspaceId: string, options?: { includeGlobal?: boolean }) => {
       const query = options?.includeGlobal ? "?includeGlobal=true" : "";
-      return requestJson<{ items: OpenworkSkillItem[] }>(
+      return requestJson<{ items: VenomcoworkSkillItem[] }>(
         baseUrl,
         `/workspace/${workspaceId}/skills${query}`,
         { token, hostToken },
       );
     },
-    listHubSkills: (options?: { repo?: OpenworkHubRepo }) => {
+    listHubSkills: (options?: { repo?: VenomcoworkHubRepo }) => {
       const params = new URLSearchParams();
       const owner = options?.repo?.owner?.trim();
       const repo = options?.repo?.repo?.trim();
@@ -1313,7 +1313,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       if (repo) params.set("repo", repo);
       if (ref) params.set("ref", ref);
       const query = params.size ? `?${params.toString()}` : "";
-      return requestJson<{ items: OpenworkHubSkillItem[] }>(baseUrl, `/hub/skills${query}`, {
+      return requestJson<{ items: VenomcoworkHubSkillItem[] }>(baseUrl, `/hub/skills${query}`, {
         token,
         hostToken,
       });
@@ -1338,14 +1338,14 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       ),
     getSkill: (workspaceId: string, name: string, options?: { includeGlobal?: boolean }) => {
       const query = options?.includeGlobal ? "?includeGlobal=true" : "";
-      return requestJson<OpenworkSkillContent>(
+      return requestJson<VenomcoworkSkillContent>(
         baseUrl,
         `/workspace/${workspaceId}/skills/${encodeURIComponent(name)}${query}`,
         { token, hostToken },
       );
     },
     upsertSkill: (workspaceId: string, payload: { name: string; content: string; description?: string }) =>
-      requestJson<OpenworkSkillItem>(baseUrl, `/workspace/${workspaceId}/skills`, {
+      requestJson<VenomcoworkSkillItem>(baseUrl, `/workspace/${workspaceId}/skills`, {
         token,
         hostToken,
         method: "POST",
@@ -1362,22 +1362,22 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         },
       ),
     listMcp: (workspaceId: string) =>
-      requestJson<{ items: OpenworkMcpItem[] }>(baseUrl, `/workspace/${workspaceId}/mcp`, { token, hostToken }),
+      requestJson<{ items: VenomcoworkMcpItem[] }>(baseUrl, `/workspace/${workspaceId}/mcp`, { token, hostToken }),
     addMcp: (workspaceId: string, payload: { name: string; config: Record<string, unknown> }) =>
-      requestJson<{ items: OpenworkMcpItem[] }>(baseUrl, `/workspace/${workspaceId}/mcp`, {
+      requestJson<{ items: VenomcoworkMcpItem[] }>(baseUrl, `/workspace/${workspaceId}/mcp`, {
         token,
         hostToken,
         method: "POST",
         body: payload,
       }),
     removeMcp: (workspaceId: string, name: string) =>
-      requestJson<{ items: OpenworkMcpItem[] }>(baseUrl, `/workspace/${workspaceId}/mcp/${encodeURIComponent(name)}`, {
+      requestJson<{ items: VenomcoworkMcpItem[] }>(baseUrl, `/workspace/${workspaceId}/mcp/${encodeURIComponent(name)}`, {
         token,
         hostToken,
         method: "DELETE",
       }),
     setMcpEnabled: (workspaceId: string, name: string, enabled: boolean) =>
-      requestJson<{ items: OpenworkMcpItem[] }>(
+      requestJson<{ items: VenomcoworkMcpItem[] }>(
         baseUrl,
         `/workspace/${workspaceId}/mcp/${encodeURIComponent(name)}/enabled`,
         {
@@ -1396,13 +1396,13 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       }),
 
     listCommands: (workspaceId: string, scope: "workspace" | "global" = "workspace") =>
-      requestJson<{ items: OpenworkCommandItem[] }>(
+      requestJson<{ items: VenomcoworkCommandItem[] }>(
         baseUrl,
         `/workspace/${workspaceId}/commands?scope=${scope}`,
         { token, hostToken },
       ),
     listAudit: (workspaceId: string, limit = 50) =>
-      requestJson<{ items: OpenworkAuditEntry[] }>(
+      requestJson<{ items: VenomcoworkAuditEntry[] }>(
         baseUrl,
         `/workspace/${workspaceId}/audit?limit=${limit}`,
         { token, hostToken },
@@ -1411,7 +1411,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       workspaceId: string,
       payload: { name: string; description?: string; template: string; agent?: string; model?: string | null; subtask?: boolean },
     ) =>
-      requestJson<{ items: OpenworkCommandItem[] }>(baseUrl, `/workspace/${workspaceId}/commands`, {
+      requestJson<{ items: VenomcoworkCommandItem[] }>(baseUrl, `/workspace/${workspaceId}/commands`, {
         token,
         hostToken,
         method: "POST",
@@ -1451,7 +1451,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         } catch {
           // ignore
         }
-        throw new OpenworkServerError(
+        throw new VenomcoworkServerError(
           result.status,
           "request_failed",
           message || "Shared folder upload failed",
@@ -1461,13 +1461,13 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       const body = result.text.trim();
       if (body) {
         try {
-          const parsed = JSON.parse(body) as Partial<OpenworkInboxUploadResult>;
+          const parsed = JSON.parse(body) as Partial<VenomcoworkInboxUploadResult>;
           if (typeof parsed.path === "string" && parsed.path.trim()) {
             return {
               ok: parsed.ok ?? true,
               path: parsed.path.trim(),
               bytes: typeof parsed.bytes === "number" ? parsed.bytes : file.size,
-            } satisfies OpenworkInboxUploadResult;
+            } satisfies VenomcoworkInboxUploadResult;
           }
         } catch {
           // ignore invalid JSON and fall back
@@ -1478,11 +1478,11 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         ok: true,
         path: options?.path?.trim() || file.name,
         bytes: file.size,
-      } satisfies OpenworkInboxUploadResult;
+      } satisfies VenomcoworkInboxUploadResult;
     },
 
     listInbox: (workspaceId: string) =>
-      requestJson<OpenworkInboxList>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/inbox`, {
+      requestJson<VenomcoworkInboxList>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/inbox`, {
         token,
         hostToken,
       }),
@@ -1495,14 +1495,14 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       ),
 
     readWorkspaceFile: (workspaceId: string, path: string) =>
-      requestJson<OpenworkWorkspaceFileContent>(
+      requestJson<VenomcoworkWorkspaceFileContent>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/files/content?path=${encodeURIComponent(path)}`,
         { token, hostToken },
       ),
 
     statWorkspaceFile: (workspaceId: string, path: string) =>
-      requestJson<OpenworkWorkspaceFileStat>(
+      requestJson<VenomcoworkWorkspaceFileStat>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/files/stat?path=${encodeURIComponent(path)}`,
         { token, hostToken },
@@ -1512,7 +1512,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       workspaceId: string,
       payload: { path: string; content: string; baseUpdatedAt?: number | null; force?: boolean },
     ) =>
-      requestJson<OpenworkWorkspaceFileWriteResult>(
+      requestJson<VenomcoworkWorkspaceFileWriteResult>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/files/content`,
         {
@@ -1527,7 +1527,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       workspaceId: string,
       payload: { path: string; data: ArrayBuffer; baseUpdatedAt?: number | null; force?: boolean },
     ) =>
-      requestJson<OpenworkWorkspaceFileWriteResult>(
+      requestJson<VenomcoworkWorkspaceFileWriteResult>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/files/raw`,
         {
@@ -1551,7 +1551,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       ),
 
     listArtifacts: (workspaceId: string) =>
-      requestJson<OpenworkArtifactList>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/artifacts`, {
+      requestJson<VenomcoworkArtifactList>(baseUrl, `/workspace/${encodeURIComponent(workspaceId)}/artifacts`, {
         token,
         hostToken,
       }),
@@ -1567,7 +1567,7 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
         reason?: string;
       }>,
     ) =>
-      requestJson<{ items: OpenworkResolvedArtifactTarget[] }>(
+      requestJson<{ items: VenomcoworkResolvedArtifactTarget[] }>(
         baseUrl,
         `/workspace/${encodeURIComponent(workspaceId)}/artifacts/resolve`,
         { token, hostToken, method: "POST", body: { targets } },
@@ -1610,14 +1610,14 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
       }),
 
     listUserEnv: () =>
-      requestJson<{ items: OpenworkUserEnvItem[] }>(
+      requestJson<{ items: VenomcoworkUserEnvItem[] }>(
         baseUrl,
         "/env?includeValues=false",
         { token, hostToken, timeoutMs: timeouts.config },
       ),
 
     getUserEnv: (key: string) =>
-      requestJson<{ item: OpenworkUserEnvItem & { value: string } }>(
+      requestJson<{ item: VenomcoworkUserEnvItem & { value: string } }>(
         baseUrl,
         `/env/${encodeURIComponent(key)}`,
         { token, hostToken, timeoutMs: timeouts.config },
@@ -1658,4 +1658,4 @@ export function createOpenworkServerClient(options: { baseUrl: string; token?: s
   };
 }
 
-export type OpenworkServerClient = ReturnType<typeof createOpenworkServerClient>;
+export type VenomcoworkServerClient = ReturnType<typeof createVenomcoworkServerClient>;

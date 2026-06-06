@@ -1,4 +1,4 @@
-﻿import { spawnSync } from "child_process";
+import { spawnSync } from "child_process";
 import { createHash } from "crypto";
 import {
   chmodSync,
@@ -276,7 +276,7 @@ const parseChecksum = (content, assetName) => {
 
 // venomcowork-server is no longer compiled as a sidecar binary â€” it runs
 // in-process inside Electron via a direct import of the server library.
-const didBuildOpenworkServer = false;
+const didBuildVenomcoworkServer = false;
 
 // Server binary copy/sign skipped â€” runs in-process.
 

@@ -1,9 +1,9 @@
-﻿import { describe, it } from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import {
   prioritizeWorkspacePaths,
-  resolveOpenworkServerConfigPath,
+  resolveVenomcoworkServerConfigPath,
   seedWorkspacePathsForEmbeddedServer,
 } from "./runtime.mjs";
 
@@ -39,10 +39,10 @@ describe("seedWorkspacePathsForEmbeddedServer", () => {
   });
 });
 
-describe("resolveOpenworkServerConfigPath", () => {
+describe("resolveVenomcoworkServerConfigPath", () => {
   it("respects explicit server config path", () => {
     assert.equal(
-      resolveOpenworkServerConfigPath({ VENOMCOWORK_SERVER_CONFIG: "/tmp/venomcowork/server.json" }),
+      resolveVenomcoworkServerConfigPath({ VENOMCOWORK_SERVER_CONFIG: "/tmp/venomcowork/server.json" }),
       "/tmp/venomcowork/server.json",
     );
   });
@@ -50,7 +50,7 @@ describe("resolveOpenworkServerConfigPath", () => {
   it("uses XDG config home on Unix", () => {
     if (process.platform === "win32") return;
     assert.equal(
-      resolveOpenworkServerConfigPath({ XDG_CONFIG_HOME: "/tmp/xdg" }),
+      resolveVenomcoworkServerConfigPath({ XDG_CONFIG_HOME: "/tmp/xdg" }),
       "/tmp/xdg/venomcowork/server.json",
     );
   });

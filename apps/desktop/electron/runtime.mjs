@@ -1,4 +1,4 @@
-﻿import { randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
@@ -47,7 +47,7 @@ export function prioritizeWorkspacePaths(preferredPath, workspacePaths = []) {
   return paths;
 }
 
-export function resolveOpenworkServerConfigPath(env = process.env) {
+export function resolveVenomcoworkServerConfigPath(env = process.env) {
   const override = String(env.VENOMCOWORK_SERVER_CONFIG ?? "").trim();
   if (override) return path.resolve(override);
   if (process.platform === "win32") {
@@ -107,7 +107,7 @@ function snapshotEngineState(state) {
   };
 }
 
-function createOpenworkServerState() {
+function createVenomcoworkServerState() {
   return {
     child: null,
     childExited: true,
@@ -130,7 +130,7 @@ function createOpenworkServerState() {
   };
 }
 
-function snapshotOpenworkServerState(state) {
+function snapshotVenomcoworkServerState(state) {
   const child = state.childExited ? null : state.child;
   const running = state.inProcess || Boolean(child && child.exitCode === null && !child.killed);
   return {
@@ -172,7 +172,7 @@ function redactedExecutionSnapshot(command, args, cwd, injectedEnv) {
   };
 }
 
-function assertOpenworkServerReady(snapshot) {
+function assertVenomcoworkServerReady(snapshot) {
   if (!snapshot?.running) {
     throw new Error("VenomCowork server did not stay running after startup.");
   }
@@ -427,7 +427,7 @@ async function fetchJson(url, options = {}, timeoutMs = 3000) {
 }
 
 // Resolves ~/.config/venomcowork/env.json (or %APPDATA%\venomcowork\env.json on
-// Windows) â€” must agree byte-for-byte with apps/server/src/env-file.ts and
+// Windows) Ã¢â‚¬â€ must agree byte-for-byte with apps/server/src/env-file.ts and
 // apps/desktop/src-tauri/src/env_file.rs. Honor VENOMCOWORK_ENV_STORE override.
 function resolveUserEnvFilePath() {
   const override = String(process.env.VENOMCOWORK_ENV_STORE ?? "").trim();
@@ -467,7 +467,7 @@ function loadUserEnvFile() {
 
 export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths }) {
   const engineState = createEngineState();
-  const venomcoworkServerState = createOpenworkServerState();
+  const venomcoworkServerState = createVenomcoworkServerState();
   const orchestratorState = createOrchestratorState();
 
   // Serialize engine lifecycle operations. Without this, concurrent renderer
@@ -599,7 +599,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     await saveTokenStore(store);
   }
 
-  async function readPreferredOpenworkPort(workspaceKey) {
+  async function readPreferredVenomcoworkPort(workspaceKey) {
     const state = await loadPortState();
     const normalized = normalizeWorkspaceKey(workspaceKey);
     if (normalized && state.workspacePorts?.[normalized]) {
@@ -608,7 +608,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     return state.preferredPort ?? null;
   }
 
-  async function persistPreferredOpenworkPort(workspaceKey, port) {
+  async function persistPreferredVenomcoworkPort(workspaceKey, port) {
     const state = await loadPortState();
     const normalized = normalizeWorkspaceKey(workspaceKey);
     state.version = 3;
@@ -622,8 +622,8 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     await savePortState(state);
   }
 
-  async function resolveOpenworkPort(host, workspaceKey) {
-    const preferredPort = await readPreferredOpenworkPort(workspaceKey);
+  async function resolveVenomcoworkPort(host, workspaceKey) {
+    const preferredPort = await readPreferredVenomcoworkPort(workspaceKey);
     if (preferredPort && (await portAvailable(host, preferredPort))) {
       return preferredPort;
     }
@@ -651,7 +651,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
   async function buildChildEnv(extra = {}) {
     /** @type {NodeJS.ProcessEnv} */
     // User env is layered first so process.env + any caller overrides always
-    // win. See apps/server/src/env-file.ts and src-tauri/src/env_file.rs â€”
+    // win. See apps/server/src/env-file.ts and src-tauri/src/env_file.rs Ã¢â‚¬â€
     // all three loaders must agree on path + reserved-keys policy.
     const env = {
       ...loadUserEnvFile(),
@@ -734,7 +734,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     const candidates = [];
     const seen = new Set();
 
-    for (const key of ["VENOMCOWORK_DOCKER_BIN", "OPENWRK_DOCKER_BIN", "DOCKER_BIN"]) {
+    for (const key of ["VENOMCOWORK_DOCKER_BIN", "VENOMCOWORK_DOCKER_BIN", "DOCKER_BIN"]) {
       const value = process.env[key]?.trim();
       if (value && !seen.has(value)) {
         seen.add(value);
@@ -813,7 +813,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     return `venomcowork-orchestrator-${sanitized}`;
   }
 
-  async function listOpenworkManagedContainers() {
+  async function listVenomcoworkManagedContainers() {
     const result = runDockerCommandDetailed(["ps", "-a", "--format", "{{.Names}}"], 8000);
     if (result.status !== 0) {
       const combined = `${result.stdout.trim()}\n${result.stderr.trim()}`.trim();
@@ -1033,7 +1033,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
   // In-process server handle. Kept alive across restarts so we can stop it.
   let inProcessServer = null;
 
-  async function startOpenworkServer(options) {
+  async function startVenomcoworkServer(options) {
     // Stop any previously running in-process server
     if (inProcessServer) {
       try { await inProcessServer.stop(); } catch { /* ignore */ }
@@ -1059,13 +1059,13 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     // truth. Do not pass Electron's legacy workspace list as CLI workspaces or
     // the server config loader will ignore server.json and lose server-created
     // workspaces after restart.
-    const serverConfigPath = resolveOpenworkServerConfigPath(process.env);
+    const serverConfigPath = resolveVenomcoworkServerConfigPath(process.env);
     const workspacePaths = seedWorkspacePathsForEmbeddedServer(
       options.workspacePaths.filter((value) => value.trim().length > 0),
       existsSync(serverConfigPath),
     );
     const activeWorkspace = workspacePaths[0] ?? "";
-    const port = await resolveOpenworkPort(host, activeWorkspace);
+    const port = await resolveVenomcoworkPort(host, activeWorkspace);
     const tokens = await loadOrCreateWorkspaceTokens(activeWorkspace);
 
     // One call: resolve config, spawn managed OpenCode, start HTTP server.
@@ -1161,8 +1161,8 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
         appendOutput(venomcoworkServerState, "lastStderr", `VenomCowork server workspace probe: ${error instanceof Error ? error.message : String(error)}\n`);
       }
     }
-    await persistPreferredOpenworkPort(activeWorkspace, boundPort);
-    return snapshotOpenworkServerState(venomcoworkServerState);
+    await persistPreferredVenomcoworkPort(activeWorkspace, boundPort);
+    return snapshotVenomcoworkServerState(venomcoworkServerState);
   }
 
   async function resolveOrchestratorBaseUrl() {
@@ -1310,7 +1310,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     await stopChild(engineState);
 
     Object.assign(engineState, createEngineState());
-    Object.assign(venomcoworkServerState, createOpenworkServerState());
+    Object.assign(venomcoworkServerState, createVenomcoworkServerState());
     Object.assign(orchestratorState, createOrchestratorState());
   }
 
@@ -1321,10 +1321,10 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     lifecycleState = "idle";
   }
 
-  async function ensureOpenwork(options) {
+  async function ensureVenomcowork(options) {
     let venomcoworkServer;
     try {
-      venomcoworkServer = await startOpenworkServer({
+      venomcoworkServer = await startVenomcoworkServer({
         workspacePaths: options.workspacePaths,
         opencodeBaseUrl: engineState.baseUrl,
         opencodeUsername: engineState.opencodeUsername,
@@ -1338,7 +1338,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
       throw error;
     }
 
-    assertOpenworkServerReady(venomcoworkServer);
+    assertVenomcoworkServerReady(venomcoworkServer);
   }
 
   async function engineStart(projectDir, options = {}) {
@@ -1349,7 +1349,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
 
     // Reuse a healthy server instead of tearing it down. During boot the
     // main process kicks off bootRuntimeForSelectedWorkspace while renderer
-    // routes independently call ensureDesktopLocalOpenworkConnection. Both go
+    // routes independently call ensureDesktopLocalVenomcoworkConnection. Both go
     // through this serialized path; without this guard the second call runs
     // prepareFreshRuntime (killing the freshly bound server) and then rebinds
     // the sticky preferred port, racing the not-yet-released socket into
@@ -1361,7 +1361,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
       normalizeWorkspaceKey(engineState.projectDir) === normalizeWorkspaceKey(safeProjectDir) &&
       venomcoworkServerState.remoteAccessEnabled === requestedRemoteAccess
     ) {
-      const existing = snapshotOpenworkServerState(venomcoworkServerState);
+      const existing = snapshotVenomcoworkServerState(venomcoworkServerState);
       if (existing.running && existing.baseUrl && (existing.ownerToken || existing.clientToken)) {
         return snapshotEngineState(engineState);
       }
@@ -1383,7 +1383,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
       engineState.child = null;
       engineState.childExited = true;
 
-      await ensureOpenwork({
+      await ensureVenomcowork({
         projectDir: safeProjectDir,
         workspacePaths,
         remoteAccessEnabled: options.venomcoworkRemoteAccess === true,
@@ -1427,12 +1427,12 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     return {
       lifecycleState,
       engine: await engineInfo(),
-      venomcoworkServer: snapshotOpenworkServerState(venomcoworkServerState),
+      venomcoworkServer: snapshotVenomcoworkServerState(venomcoworkServerState),
     };
   }
 
   async function venomcoworkServerInfo() {
-    return snapshotOpenworkServerState(venomcoworkServerState);
+    return snapshotVenomcoworkServerState(venomcoworkServerState);
   }
 
   async function venomcoworkServerRestart(options = {}) {
@@ -1440,7 +1440,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     const shouldManageOpencode = Boolean(
       venomcoworkServerState.managedOpencodeBinPath || engineState.opencodeBinPath || !engineState.baseUrl,
     );
-    return startOpenworkServer({
+    return startVenomcoworkServer({
       workspacePaths,
       opencodeBaseUrl: shouldManageOpencode ? null : engineState.baseUrl,
       opencodeUsername: shouldManageOpencode ? null : engineState.opencodeUsername,
@@ -1453,7 +1453,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
 
   async function orchestratorStatus() {
     const engine = snapshotEngineState(engineState);
-    const venomcoworkServer = snapshotOpenworkServerState(venomcoworkServerState);
+    const venomcoworkServer = snapshotVenomcoworkServerState(venomcoworkServerState);
     const workspaces = engine.projectDir
       ? [{ id: normalizeWorkspaceKey(engine.projectDir), path: engine.projectDir, name: path.basename(engine.projectDir) || "Workspace" }]
       : [];
@@ -1672,8 +1672,8 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     };
   }
 
-  async function sandboxCleanupOpenworkContainers() {
-    const candidates = await listOpenworkManagedContainers().catch((error) => {
+  async function sandboxCleanupVenomcoworkContainers() {
+    const candidates = await listVenomcoworkManagedContainers().catch((error) => {
       throw error;
     });
     const removed = [];
@@ -1866,7 +1866,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     opencodeMcpAuth,
     sandboxDoctor,
     sandboxStop,
-    sandboxCleanupOpenworkContainers,
+    sandboxCleanupVenomcoworkContainers,
     sandboxDebugProbe,
   };
 }

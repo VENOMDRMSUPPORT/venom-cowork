@@ -1,5 +1,5 @@
-﻿import { DEFAULT_DEN_BASE_URL, normalizeDenBaseUrl } from "./den";
-import { normalizeOpenworkServerUrl } from "./venomcowork-server";
+import { DEFAULT_DEN_BASE_URL, normalizeDenBaseUrl } from "./den";
+import { normalizeVenomcoworkServerUrl } from "./venomcowork-server";
 
 export type RemoteWorkspaceDefaults = {
   venomcoworkHostUrl?: string | null;
@@ -42,7 +42,7 @@ export function parseRemoteConnectDeepLink(rawUrl: string): RemoteWorkspaceDefau
 
   const hostUrlRaw = url.searchParams.get("venomcoworkHostUrl") ?? url.searchParams.get("venomcoworkUrl") ?? "";
   const tokenRaw = url.searchParams.get("venomcoworkToken") ?? url.searchParams.get("accessToken") ?? "";
-  const normalizedHostUrl = normalizeOpenworkServerUrl(hostUrlRaw);
+  const normalizedHostUrl = normalizeVenomcoworkServerUrl(hostUrlRaw);
   const token = tokenRaw.trim();
   if (!normalizedHostUrl || !token) {
     return null;

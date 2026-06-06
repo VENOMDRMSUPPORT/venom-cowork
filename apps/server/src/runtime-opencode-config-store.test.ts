@@ -1,10 +1,10 @@
-﻿import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { addMcp, listMcp, setMcpEnabled } from "./mcp.js";
-import { buildOpenworkRuntimeConfig } from "./venomcowork-runtime-config.js";
-import { readOpenworkWorkspaceConfig } from "./venomcowork-workspace-config-store.js";
+import { buildVenomcoworkRuntimeConfig } from "./venomcowork-runtime-config.js";
+import { readVenomcoworkWorkspaceConfig } from "./venomcowork-workspace-config-store.js";
 import { addPlugin, listPlugins, removePlugin } from "./plugins.js";
 import { readRuntimeOpencodeConfig } from "./runtime-opencode-config-store.js";
 import { startServer } from "./server.js";
@@ -93,7 +93,7 @@ describe("runtime OpenCode config store", () => {
       expect(result.items.map((item) => item.spec)).toEqual(["project-plugin", "runtime-plugin"]);
 
       await addMcp(config, WORKSPACE_ID, "runtime", { type: "remote", url: "https://runtime.example/mcp", enabled: true });
-      const runtimeConfig = JSON.parse(await buildOpenworkRuntimeConfig(config, WORKSPACE_ID)) as {
+      const runtimeConfig = JSON.parse(await buildVenomcoworkRuntimeConfig(config, WORKSPACE_ID)) as {
         plugin?: string[];
         mcp?: Record<string, Record<string, unknown>>;
       };
@@ -135,11 +135,11 @@ describe("runtime OpenCode config store", () => {
         });
         expect(response.status).toBe(200);
 
-        const legacyOpenworkPath = join(root, ".opencode", "venomcowork.json");
-        const legacyOpenwork = await readFile(legacyOpenworkPath, "utf8").catch(() => "");
-        expect(legacyOpenwork).not.toContain("productivity");
-        expect(legacyOpenwork).not.toContain("cloudImports");
-        expect((await readOpenworkWorkspaceConfig(config, WORKSPACE_ID)).cloudImports).toEqual({
+        const legacyVenomcoworkPath = join(root, ".opencode", "venomcowork.json");
+        const legacyVenomcowork = await readFile(legacyVenomcoworkPath, "utf8").catch(() => "");
+        expect(legacyVenomcowork).not.toContain("productivity");
+        expect(legacyVenomcowork).not.toContain("cloudImports");
+        expect((await readVenomcoworkWorkspaceConfig(config, WORKSPACE_ID)).cloudImports).toEqual({
           plugins: {
             plugin_1: { pluginId: "plugin_1", name: "productivity", files: [] },
           },
@@ -217,7 +217,7 @@ describe("runtime OpenCode config store", () => {
             projectOpencode: { exists: false, keys: [] },
             runtimeDatabase: { keys: ["plugin", "mcp", "permission", "provider"] },
           },
-          legacyOpenwork: { keys: [] },
+          legacyVenomcowork: { keys: [] },
           userOpencode: { exists: false, keys: [] },
         });
         expect(status.effectiveRuntime.default_agent).toBe("venomcowork");
@@ -246,7 +246,7 @@ describe("runtime OpenCode config store", () => {
         expect(response.status).toBe(200);
         expect(await response.json()).toMatchObject({
           runtimeKeys: ["mcp"],
-          legacyOpenwork: { keys: [], error: "Failed to parse venomcowork.json" },
+          legacyVenomcowork: { keys: [], error: "Failed to parse venomcowork.json" },
         });
       } finally {
         await server.stop(true);

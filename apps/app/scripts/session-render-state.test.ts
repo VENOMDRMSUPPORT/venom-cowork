@@ -1,7 +1,7 @@
-﻿import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import type { UIMessage } from "ai";
 
-import type { OpenworkSessionSnapshot } from "../src/app/lib/venomcowork-server";
+import type { VenomcoworkSessionSnapshot } from "../src/app/lib/venomcowork-server";
 import {
   deriveRenderedSessionMessages,
   resolveRenderedSessionSnapshot,
@@ -12,7 +12,7 @@ import { describeOpencodeSessionError } from "../src/react-app/domains/session/s
 function snapshotWithMessages(
   messages: Array<{ id: string; role: "user" | "assistant"; text: string; created?: number }>,
   sessionId = "ses_test",
-): OpenworkSessionSnapshot {
+): VenomcoworkSessionSnapshot {
   return {
     session: {
       id: sessionId,
@@ -41,7 +41,7 @@ function snapshotWithMessages(
     })),
     todos: [],
     status: { type: "idle" },
-  } as unknown as OpenworkSessionSnapshot;
+  } as unknown as VenomcoworkSessionSnapshot;
 }
 
 function uiMessage(id: string, role: "user" | "assistant", text: string, created?: number): UIMessage {
@@ -53,7 +53,7 @@ function uiMessage(id: string, role: "user" | "assistant", text: string, created
   };
 }
 
-function snapshotWithText(text: string, sessionId = "ses_test"): OpenworkSessionSnapshot {
+function snapshotWithText(text: string, sessionId = "ses_test"): VenomcoworkSessionSnapshot {
   return snapshotWithMessages([{ id: "msg_user", role: "user", text }], sessionId);
 }
 

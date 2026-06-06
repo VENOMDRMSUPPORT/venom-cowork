@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import {
   useCallback,
   useEffect,
@@ -21,18 +21,18 @@ import { createClient, unwrap } from "@/app/lib/opencode";
 import { forkSession, listCommands, revertSession, setSessionArchived, shellInSession } from "@/app/lib/opencode-session";
 import { useSessionManagementStore as sessionManagementStore } from "@/react-app/domains/session/sidebar/session-management-store";
 import {
-  buildOpenworkWorkspaceBaseUrl,
-  createOpenworkServerClient,
-  readOpenworkServerSettings,
-  type OpenworkServerClient,
-  type OpenworkWorkspaceInfo,
+  buildVenomcoworkWorkspaceBaseUrl,
+  createVenomcoworkServerClient,
+  readVenomcoworkServerSettings,
+  type VenomcoworkServerClient,
+  type VenomcoworkWorkspaceInfo,
 } from "@/app/lib/venomcowork-server";
 import {
   resolveWorkspaceEndpoint,
   workspaceServerId,
   type ResolvedWorkspaceEndpoint,
 } from "@/app/lib/workspace-endpoint";
-import { buildOpenworkEnvRuntimeKey } from "@/app/lib/venomcowork-env-runtime";
+import { buildVenomcoworkEnvRuntimeKey } from "@/app/lib/venomcowork-env-runtime";
 import {
   engineInfo,
   revealDesktopItemInDir,
@@ -43,7 +43,7 @@ import {
   workspaceSetRuntimeActive,
   workspaceSetSelected,
   type EngineInfo,
-  type OpenworkServerInfo,
+  type VenomcoworkServerInfo,
   type WorkspaceInfo,
   type WorkspaceList,
 } from "@/app/lib/desktop";
@@ -83,7 +83,7 @@ import { useCheckDesktopRestriction } from "@/react-app/domains/cloud/desktop-co
 import { useRestrictionNotice } from "@/react-app/domains/cloud/restriction-notice-provider";
 import { ReactSessionRuntime } from "@/react-app/domains/session/sync/runtime-sync";
 import { useSessionActivityStore } from "@/react-app/domains/session/status/session-activity-store";
-import { buildOpenworkEnvSystemContext } from "@/react-app/domains/session/sync/env-context";
+import { buildVenomcoworkEnvSystemContext } from "@/react-app/domains/session/sync/env-context";
 import {
   permissionKey as reactPermissionKey,
   questionKey as reactQuestionKey,
@@ -108,7 +108,7 @@ import {
   isVenomCoworkModelsPromoHidden,
   markVenomCoworkModelsStartupPromoShown,
   VENOMCOWORK_MODEL_PREVIEWS,
-  openWorkModelsPromoChangedEvent,
+  venomCoworkModelsPromoChangedEvent,
   wasVenomCoworkModelsStartupPromoShown,
 } from "@/react-app/domains/cloud/venomcowork-models-promo";
 import {
@@ -135,7 +135,7 @@ import {
   recordInspectorEvent,
 } from "./app-inspector";
 import { saveSessionDraft } from "@/react-app/domains/session/sync/draft-store";
-import { useControlAction, type OpenworkControlAction } from "./control/control-provider";
+import { useControlAction, type VenomcoworkControlAction } from "./control/control-provider";
 import { useReactRenderWatchdog } from "./react-render-watchdog";
 
 import { readDenSettings } from "@/app/lib/den";
@@ -144,8 +144,8 @@ import { denSessionUpdatedEvent } from "@/app/lib/den-session-events";
 import { openModelPickerEvent, pendingModelPickerProviderIdsKey } from "./new-providers-toast";
 import { getModelBehaviorSummary } from "@/app/lib/model-behavior";
 import { filterProviderList } from "@/app/utils/providers";
-import { ensureDesktopLocalOpenworkConnection } from "./desktop-local-venomcowork";
-import { resolveOpenworkConnection } from "./venomcowork-connection";
+import { ensureDesktopLocalVenomcoworkConnection } from "./desktop-local-venomcowork";
+import { resolveVenomcoworkConnection } from "./venomcowork-connection";
 import { useReloadCoordinator } from "./reload-coordinator";
 import { useShellConfig } from "./shell-config";
 import { getReactQueryClient } from "@/react-app/infra/query-client";
@@ -162,7 +162,7 @@ import {
   useProviderListQuery,
 } from "@/react-app/domains/connections/provider-list-query";
 
-type RouteWorkspace = OpenworkWorkspaceInfo & {
+type RouteWorkspace = VenomcoworkWorkspaceInfo & {
   displayNameResolved: string;
 };
 
@@ -213,7 +213,7 @@ function isTransientStartupError(message: string | null | undefined) {
   );
 }
 
-function workspaceLabel(workspace: OpenworkWorkspaceInfo) {
+function workspaceLabel(workspace: VenomcoworkWorkspaceInfo) {
   return (
     workspace.displayName?.trim() ||
     workspace.venomcoworkWorkspaceName?.trim() ||
@@ -223,7 +223,7 @@ function workspaceLabel(workspace: OpenworkWorkspaceInfo) {
   );
 }
 
-function workspaceExportFilename(workspace: OpenworkWorkspaceInfo) {
+function workspaceExportFilename(workspace: VenomcoworkWorkspaceInfo) {
   const slug = workspaceLabel(workspace).replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
   return `${slug || "workspace"}-venomcowork-export.json`;
 }
@@ -310,7 +310,7 @@ function useQueryCacheState<T>(queryKey: readonly unknown[] | null, fallback: T)
 }
 
 function mergeRouteWorkspaces(
-  serverWorkspaces: OpenworkWorkspaceInfo[],
+  serverWorkspaces: VenomcoworkWorkspaceInfo[],
   desktopWorkspaces: RouteWorkspace[],
 ): RouteWorkspace[] {
   const desktopById = new Map(desktopWorkspaces.map((workspace) => [workspace.id, workspace]));
@@ -532,7 +532,7 @@ export function SessionRoute() {
 
   const { markRouteReady: markBootRouteReady } = useBootState();
   const [loading, setLoading] = useState(true);
-  const [client, setClient] = useState<OpenworkServerClient | null>(null);
+  const [client, setClient] = useState<VenomcoworkServerClient | null>(null);
   const [baseUrl, setBaseUrl] = useState("");
   const [token, setToken] = useState("");
   const [workspaces, setWorkspaces] = useState<RouteWorkspace[]>([]);
@@ -594,7 +594,7 @@ export function SessionRoute() {
   // session "Pick a model" button navigated to /settings/general, which is a
   // dead-end). Loads providers lazily when the modal opens.
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
-  // initialTab removed â€” model picker no longer has tabs
+  // initialTab removed Ã¢â‚¬â€ model picker no longer has tabs
   const [compactModelPickerOpen, setCompactModelPickerOpen] = useState(false);
   const [modelPickerQuery, setModelPickerQuery] = useState("");
   const [modelOptions, setModelOptions] = useState<ModelOption[]>([]);
@@ -608,9 +608,9 @@ export function SessionRoute() {
     [providerConnectedIds],
   );
   const [disabledProviderIds, setDisabledProviderIds] = useState<string[]>([]);
-  const [openWorkModelsStartupOpen, setVenomCoworkModelsStartupOpen] = useState(false);
-  const [openWorkModelsPromoHidden, setVenomCoworkModelsPromoHidden] = useState(isVenomCoworkModelsPromoHidden);
-  const openWorkModelsStartupScheduledRef = useRef(false);
+  const [venomCoworkModelsStartupOpen, setVenomCoworkModelsStartupOpen] = useState(false);
+  const [venomCoworkModelsPromoHidden, setVenomCoworkModelsPromoHidden] = useState(isVenomCoworkModelsPromoHidden);
+  const venomCoworkModelsStartupScheduledRef = useRef(false);
   const onboardingProviderAuthPendingRef = useRef(false);
   // Bump to re-filter provider list when den session changes (sign-in/out)
   const [denSessionVersion, setDenSessionVersion] = useState(0);
@@ -622,8 +622,8 @@ export function SessionRoute() {
 
   useEffect(() => {
     const handlePromoChanged = () => setVenomCoworkModelsPromoHidden(isVenomCoworkModelsPromoHidden());
-    window.addEventListener(openWorkModelsPromoChangedEvent, handlePromoChanged);
-    return () => window.removeEventListener(openWorkModelsPromoChangedEvent, handlePromoChanged);
+    window.addEventListener(venomCoworkModelsPromoChangedEvent, handlePromoChanged);
+    return () => window.removeEventListener(venomCoworkModelsPromoChangedEvent, handlePromoChanged);
   }, []);
 
   const hasVenomCoworkModels = useMemo(
@@ -648,7 +648,7 @@ export function SessionRoute() {
     hideVenomCoworkModelsPromo();
     setVenomCoworkModelsPromoHidden(true);
   }, []);
-  // Provider IDs that were just added â€” used to highlight them as
+  // Provider IDs that were just added Ã¢â‚¬â€ used to highlight them as
   // "Recently added" in the model picker even after they've been
   // marked as seen in localStorage.
   const [recentProviderIds, setRecentProviderIds] = useState<Set<string>>(new Set());
@@ -696,7 +696,7 @@ export function SessionRoute() {
   // options for whichever model is currently selected so the composer's
   // behavior pill actually shows its options (bug: was empty before).
   const [providerCatalog, setProviderCatalog] = useState<Record<string, Record<string, any>>>({});
-  const [venomcoworkServerHostInfoState, setOpenworkServerHostInfoState] = useState<OpenworkServerInfo | null>(null);
+  const [venomcoworkServerHostInfoState, setVenomcoworkServerHostInfoState] = useState<VenomcoworkServerInfo | null>(null);
   useReactRenderWatchdog("SessionRoute", {
     selectedSessionId,
     selectedWorkspaceId,
@@ -706,13 +706,13 @@ export function SessionRoute() {
     commandPaletteOpen,
     modelPickerOpen,
   });
-  const [venomcoworkServerSettingsVersion, setOpenworkServerSettingsVersion] = useState(0);
+  const [venomcoworkServerSettingsVersion, setVenomcoworkServerSettingsVersion] = useState(0);
   const [engineReloadVersion, setEngineReloadVersion] = useState(0);
   const [routeEngineInfo, setRouteEngineInfo] = useState<EngineInfo | null>(null);
   const reconnectAttemptedWorkspaceIdRef = useRef("");
 
   const venomcoworkServerSettings = useMemo(
-    () => readOpenworkServerSettings(),
+    () => readVenomcoworkServerSettings(),
     [venomcoworkServerSettingsVersion],
   );
 
@@ -799,7 +799,7 @@ export function SessionRoute() {
       const backoffMs = (attempt: number) => Math.min(500 * Math.pow(2, attempt), 4_000);
 
       const fetchOnce = async (workspace: RouteWorkspace, attempt: number): Promise<void> => {
-        const isRemoteOpenworkWorkspace = workspace.workspaceType === "remote" && workspace.remoteType !== "opencode";
+        const isRemoteVenomcoworkWorkspace = workspace.workspaceType === "remote" && workspace.remoteType !== "opencode";
         const endpoint = endpointForWorkspace(workspace);
         if (!endpoint) {
           if (workspace.workspaceType === "remote") {
@@ -823,7 +823,7 @@ export function SessionRoute() {
         if (startedAt && Date.now() - startedAt < 5_000) return;
         const requestStartedAt = Date.now();
         backgroundSessionLoadInFlight.current.set(workspace.id, requestStartedAt);
-        if (isRemoteOpenworkWorkspace) {
+        if (isRemoteVenomcoworkWorkspace) {
           setWorkspaceConnectionOverrides((current) => ({
             ...current,
             [workspace.id]: {
@@ -837,7 +837,7 @@ export function SessionRoute() {
           const response = await endpoint.client.listSessions(endpoint.workspaceId, { limit: 200 });
           const fetchedItems = response.items ?? [];
           const workspaceRoot = normalizeDirectoryPath(workspace.path ?? "");
-          const items = workspaceRoot && !isRemoteOpenworkWorkspace
+          const items = workspaceRoot && !isRemoteVenomcoworkWorkspace
             ? fetchedItems.filter((session: any) =>
                 normalizeDirectoryPath(session?.directory ?? "") === workspaceRoot,
               )
@@ -850,7 +850,7 @@ export function SessionRoute() {
           });
           setErrorsByWorkspaceId((current) => ({ ...current, [workspace.id]: null }));
           setWorkspaceConnectionOverrides((current) => {
-            if (isRemoteOpenworkWorkspace) {
+            if (isRemoteVenomcoworkWorkspace) {
               return {
                 ...current,
                 [workspace.id]: {
@@ -886,7 +886,7 @@ export function SessionRoute() {
           // The first cold call to OpenCode's /session endpoint often hits
           // the 12s server timeout while the daemon finishes warming up
           // its index. Retry silently with backoff until we get a response
-          // or run out of attempts â€” the sidebar keeps its "loading" state
+          // or run out of attempts Ã¢â‚¬â€ the sidebar keeps its "loading" state
           // in the meantime instead of flashing "error" next to the
           // workspace name.
           if (attempt + 1 < MAX_ATTEMPTS && isTransientStartupError(message)) {
@@ -956,8 +956,8 @@ export function SessionRoute() {
         }
       }
 
-      const { normalizedBaseUrl, resolvedToken, resolvedHostToken, hostInfo } = await resolveOpenworkConnection();
-      setOpenworkServerHostInfoState(hostInfo);
+      const { normalizedBaseUrl, resolvedToken, resolvedHostToken, hostInfo } = await resolveVenomcoworkConnection();
+      setVenomcoworkServerHostInfoState(hostInfo);
       if (!normalizedBaseUrl || !resolvedToken) {
         // Keep `localServerRef` in lockstep with the disconnected state.
         // Otherwise a previously-cached baseUrl/token would still resolve a
@@ -985,7 +985,7 @@ export function SessionRoute() {
       // local workspaces => sidebar gets stuck in "loading" forever.
       localServerRef.current = { baseUrl: normalizedBaseUrl, token: resolvedToken };
 
-      const venomcoworkClient = createOpenworkServerClient({
+      const venomcoworkClient = createVenomcoworkServerClient({
         baseUrl: normalizedBaseUrl,
         token: resolvedToken,
         hostToken: resolvedHostToken || undefined,
@@ -1111,8 +1111,8 @@ export function SessionRoute() {
 
   const remoteAccessRestart = useRemoteAccessRestart({
     isEnabled: () => venomcoworkServerSettings.remoteAccessEnabled === true,
-    onHostInfo: setOpenworkServerHostInfoState,
-    onSettingsChanged: () => setOpenworkServerSettingsVersion((value) => value + 1),
+    onHostInfo: setVenomcoworkServerHostInfoState,
+    onSettingsChanged: () => setVenomcoworkServerSettingsVersion((value) => value + 1),
   });
 
   const reloadWorkspaceEngineFromUi = useCallback(async () => {
@@ -1283,7 +1283,7 @@ export function SessionRoute() {
     })();
 
     const handleSettingsChange = () => {
-      setOpenworkServerSettingsVersion((value) => value + 1);
+      setVenomcoworkServerSettingsVersion((value) => value + 1);
       // Self-heal: if the previous refresh got stuck mid-flight (e.g. macOS
       // backgrounded the webview and never let a fetch resolve), clear the
       // guard so a re-entry after resume actually goes through.
@@ -1292,7 +1292,7 @@ export function SessionRoute() {
     };
     window.addEventListener("venomcowork-server-settings-changed", handleSettingsChange);
 
-    // Also retry on visibility flip independently â€” even when nobody else
+    // Also retry on visibility flip independently Ã¢â‚¬â€ even when nobody else
     // dispatches the settings event.
     const handleVisibility = () => {
       if (typeof document === "undefined") return;
@@ -1506,7 +1506,7 @@ export function SessionRoute() {
     if (!workspaceId || reconnectAttemptedWorkspaceIdRef.current === workspaceId) return;
     reconnectAttemptedWorkspaceIdRef.current = workspaceId;
 
-    void ensureDesktopLocalOpenworkConnection({
+    void ensureDesktopLocalVenomcoworkConnection({
       route: "session",
       workspace: selectedWorkspace,
       allWorkspaces: workspaces,
@@ -1586,17 +1586,17 @@ export function SessionRoute() {
   );
 
   useEffect(() => {
-    if (!shellConfig.cloudSignin || openWorkModelsPromoHidden || hasVenomCoworkModels) return;
+    if (!shellConfig.cloudSignin || venomCoworkModelsPromoHidden || hasVenomCoworkModels) return;
     if (denAuth.status === "checking" || !opencodeClient || !selectedWorkspaceId) return;
-    if (wasVenomCoworkModelsStartupPromoShown() || openWorkModelsStartupScheduledRef.current) return;
+    if (wasVenomCoworkModelsStartupPromoShown() || venomCoworkModelsStartupScheduledRef.current) return;
 
-    openWorkModelsStartupScheduledRef.current = true;
+    venomCoworkModelsStartupScheduledRef.current = true;
     const timeout = window.setTimeout(() => {
       markVenomCoworkModelsStartupPromoShown();
       setVenomCoworkModelsStartupOpen(true);
     }, 900);
     return () => window.clearTimeout(timeout);
-  }, [denAuth.status, hasVenomCoworkModels, opencodeClient, openWorkModelsPromoHidden, selectedWorkspaceId, shellConfig.cloudSignin]);
+  }, [denAuth.status, hasVenomCoworkModels, opencodeClient, venomCoworkModelsPromoHidden, selectedWorkspaceId, shellConfig.cloudSignin]);
 
   const sessionProviderAuthStateRef = useRef({
     opencodeClient: opencodeClient as Client | null,
@@ -1927,8 +1927,8 @@ export function SessionRoute() {
 
   // Prefetch the full provider catalog once so `getModelBehaviorSummary` has
   // everything it needs to expose the reasoning/thinking variants the active
-  // model supports â€” without waiting for the model picker to open. Cached
-  // as providerID â†’ modelID â†’ ProviderModel.
+  // model supports Ã¢â‚¬â€ without waiting for the model picker to open. Cached
+  // as providerID Ã¢â€ â€™ modelID Ã¢â€ â€™ ProviderModel.
   useEffect(() => {
     const data = providerListQuery.data;
     if (!data?.all) return;
@@ -2146,12 +2146,12 @@ export function SessionRoute() {
         }
 
         const parts = await draftToParts(draft, selectedWorkspaceRoot);
-        const envRuntimeKey = buildOpenworkEnvRuntimeKey({
+        const envRuntimeKey = buildVenomcoworkEnvRuntimeKey({
           baseUrl: client?.baseUrl ?? null,
           pid: venomcoworkServerHostInfoState?.pid ?? null,
           port: venomcoworkServerHostInfoState?.port ?? null,
         });
-        const envSystemContext = await buildOpenworkEnvSystemContext(client, {
+        const envSystemContext = await buildVenomcoworkEnvSystemContext(client, {
           cacheKey: targetSessionId,
           runtimeKey: envRuntimeKey,
         });
@@ -2589,7 +2589,7 @@ export function SessionRoute() {
     refreshRouteState,
   });
 
-  const commandPaletteControlAction = useMemo<OpenworkControlAction>(() => ({
+  const commandPaletteControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "command_palette.open",
     label: "Open the command palette",
     description: "Open the in-app command palette so the next choice is visible.",
@@ -2598,7 +2598,7 @@ export function SessionRoute() {
   }), []);
   useControlAction(commandPaletteControlAction);
 
-  const addProviderControlAction = useMemo<OpenworkControlAction>(() => ({
+  const addProviderControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "settings.provider.add",
     label: "Add a model provider",
     description: "Open the provider connection modal, optionally pre-filtered to a specific provider.",
@@ -2758,7 +2758,7 @@ export function SessionRoute() {
         const workspacePath = targetWorkspace?.path?.trim() || folder;
         const session = createdOnServer && baseUrl && token
           ? unwrap(await createClient(
-              `${(buildOpenworkWorkspaceBaseUrl(baseUrl, targetWorkspaceId) ?? baseUrl).replace(/\/+$/, "")}/opencode`,
+              `${(buildVenomcoworkWorkspaceBaseUrl(baseUrl, targetWorkspaceId) ?? baseUrl).replace(/\/+$/, "")}/opencode`,
               workspacePath || undefined,
               { token, mode: "venomcowork" },
             ).session.create({ directory: workspacePath || undefined }))
@@ -2958,7 +2958,7 @@ export function SessionRoute() {
             setRetryingWorkspaceIds((current) => Array.from(new Set([...current, workspaceId])));
             void loadWorkspaceSessionsInBackground([workspace]);
           }
-          // Fire Tauri updates but don't await them â€” they're bookkeeping and
+          // Fire Tauri updates but don't await them Ã¢â‚¬â€ they're bookkeeping and
           // awaiting 2 IPC roundtrips on every click used to stall rapid
           // workspace switches behind a queue.
           if (isDesktopRuntime()) {
@@ -3124,7 +3124,7 @@ export function SessionRoute() {
       onAccessibleTargetsChange={setPaletteAccessibleTargets}
     />
     <VenomCoworkModelsStartupDialog
-      open={openWorkModelsStartupOpen}
+      open={venomCoworkModelsStartupOpen}
       isSignedIn={denAuth.isSignedIn}
       models={VENOMCOWORK_MODEL_PREVIEWS}
       onSubscribe={subscribeToVenomCoworkModels}

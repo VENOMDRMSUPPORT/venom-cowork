@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { UIMessage } from "ai";
 import { useQuery } from "@tanstack/react-query";
@@ -11,8 +11,8 @@ import { abortSessionSafe } from "@/app/lib/opencode-session";
 import { t } from "@/i18n";
 import { readWorkspaceCloudImports, type CloudImportedPlugin } from "@/app/cloud/import-state";
 import type {
-  OpenworkServerClient,
-  OpenworkSessionSnapshot,
+  VenomcoworkServerClient,
+  VenomcoworkSessionSnapshot,
 } from "@/app/lib/venomcowork-server";
 import type {
   ComposerAttachment,
@@ -30,7 +30,7 @@ import {
   publishInspectorSlice,
   recordInspectorEvent,
 } from "@/react-app/shell/app-inspector";
-import { useControlAction, type OpenworkControlAction } from "@/react-app/shell/control/control-provider";
+import { useControlAction, type VenomcoworkControlAction } from "@/react-app/shell/control/control-provider";
 import { ReactSessionComposer } from "./composer/composer";
 import { decodeComposerMentionValue, encodeComposerMentionValue } from "./composer/mention-encoding";
 import { parseSlashCommandInvocation } from "./composer/slash-command";
@@ -81,7 +81,7 @@ type SessionError = {
 };
 
 export type SessionSurfaceProps = {
-  client: OpenworkServerClient;
+  client: VenomcoworkServerClient;
   workspaceId: string;
   workspaceRoot: string;
   sessionId: string;
@@ -155,7 +155,7 @@ function transcriptToText(messages: UIMessage[]) {
     .join("\n\n---\n\n");
 }
 
-function statusLabel(snapshot: OpenworkSessionSnapshot | undefined, busy: boolean) {
+function statusLabel(snapshot: VenomcoworkSessionSnapshot | undefined, busy: boolean) {
   if (busy) return "Running...";
   if (snapshot?.status.type === "busy") return "Running...";
   if (snapshot?.status.type === "retry") return `Retrying: ${snapshot.status.message}`;
@@ -407,7 +407,7 @@ export function SessionSurface(props: SessionSurfaceProps) {
   const [queuedDrafts, setQueuedDrafts] = useState<ComposerDraft[]>([]);
   const [showDelayedLoading, setShowDelayedLoading] = useState(false);
   const [awaitingAssistantBaseline, setAwaitingAssistantBaseline] = useState<number | null>(null);
-  const [rendered, setRendered] = useState<{ sessionId: string; snapshot: OpenworkSessionSnapshot } | null>(null);
+  const [rendered, setRendered] = useState<{ sessionId: string; snapshot: VenomcoworkSessionSnapshot } | null>(null);
   const [toolSkills, setToolSkills] = useState<SkillCard[]>([]);
   const [toolMcpServers, setToolMcpServers] = useState<McpServerEntry[]>([]);
   const [toolMcpStatus, setToolMcpStatus] = useState<string | null>(null);
@@ -435,7 +435,7 @@ export function SessionSurface(props: SessionSurfaceProps) {
     () => reactStatusKey(props.workspaceId, props.sessionId),
     [props.workspaceId, props.sessionId],
   );
-  const snapshotQuery = useQuery<OpenworkSessionSnapshot>({
+  const snapshotQuery = useQuery<VenomcoworkSessionSnapshot>({
     queryKey: snapshotQueryKey,
     queryFn: async () => (await props.client.getSessionSnapshot(props.workspaceId, props.sessionId, { limit: 140 })).item,
     staleTime: 500,
@@ -918,7 +918,7 @@ export function SessionSurface(props: SessionSurfaceProps) {
     return () => window.removeEventListener("venomcowork:voice-transcript", handleVoiceTranscript);
   }, [attachments, buildDraft, props.onDraftChange, props.sessionId, props.workspaceId, typeComposerText]);
 
-  const composerSetTextControlAction = useMemo<OpenworkControlAction>(() => ({
+  const composerSetTextControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "composer.set_text",
     label: "Type into the composer",
     description: "Replace the current session draft and type the supplied text visibly.",
@@ -937,7 +937,7 @@ export function SessionSurface(props: SessionSurfaceProps) {
   }), [attachments, buildDraft, props.onDraftChange, typeComposerText]);
   useControlAction(composerSetTextControlAction);
 
-  const composerSendControlAction = useMemo<OpenworkControlAction>(() => ({
+  const composerSendControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "composer.send",
     label: "Send the composer prompt",
     description: "Send the currently visible composer draft to the active session.",
@@ -951,7 +951,7 @@ export function SessionSurface(props: SessionSurfaceProps) {
   }), [attachments.length, draft, handleSend, model.transitionState, props.modelUnavailable]);
   useControlAction(composerSendControlAction);
 
-  const composerStopControlAction = useMemo<OpenworkControlAction>(() => ({
+  const composerStopControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "composer.stop",
     label: "Stop the current run",
     description: "Stop the current streaming session run.",
@@ -1047,7 +1047,7 @@ export function SessionSurface(props: SessionSurfaceProps) {
     props.onForkAtMessage?.(messageId, props.sessionId);
   }, [props.onForkAtMessage, props.sessionId]);
 
-  const sessionScrollTopControlAction = useMemo<OpenworkControlAction>(() => ({
+  const sessionScrollTopControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.scroll_top",
     label: "Go to the top of the session",
     description: "Scroll the visible session transcript to the first messages.",
@@ -1061,7 +1061,7 @@ export function SessionSurface(props: SessionSurfaceProps) {
   }), []);
   useControlAction(sessionScrollTopControlAction);
 
-  const sessionScrollBottomControlAction = useMemo<OpenworkControlAction>(() => ({
+  const sessionScrollBottomControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.scroll_bottom",
     label: "Go to the bottom of the session",
     description: "Scroll the visible session transcript to the newest messages and composer area.",
@@ -1073,7 +1073,7 @@ export function SessionSurface(props: SessionSurfaceProps) {
   }), [sessionScroll.jumpToLatest]);
   useControlAction(sessionScrollBottomControlAction);
 
-  const sessionLatestMessageControlAction = useMemo<OpenworkControlAction>(() => ({
+  const sessionLatestMessageControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.latest_message",
     label: "Read the latest session message",
     description: "Return the latest visible message in the current session transcript.",
@@ -1092,7 +1092,7 @@ export function SessionSurface(props: SessionSurfaceProps) {
   }), [props.sessionId, renderedMessages]);
   useControlAction(sessionLatestMessageControlAction);
 
-  const sessionReadTranscriptControlAction = useMemo<OpenworkControlAction>(() => ({
+  const sessionReadTranscriptControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.read_transcript",
     label: "Read the current session transcript",
     description: "Return the last messages from the current session transcript as readable text, including the session ID, title, and message count.",

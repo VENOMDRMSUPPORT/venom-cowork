@@ -1,4 +1,4 @@
-﻿import { basename, join } from "node:path";
+import { basename, join } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 
 import { ensureDir, exists } from "./utils.js";
@@ -7,7 +7,7 @@ import { venomcoworkConfigPath, opencodeConfigPath } from "./workspace-files.js"
 import { readJsoncFile } from "./jsonc.js";
 import type { ReloadReason } from "./types.js";
 
-type WorkspaceOpenworkConfig = {
+type WorkspaceVenomcoworkConfig = {
   version: number;
   workspace?: {
     name?: string | null;
@@ -32,11 +32,11 @@ function normalizePreset(preset: string | null | undefined): string {
   return trimmed;
 }
 
-async function ensureWorkspaceOpenworkConfig(workspaceRoot: string, preset: string): Promise<boolean> {
+async function ensureWorkspaceVenomcoworkConfig(workspaceRoot: string, preset: string): Promise<boolean> {
   const path = venomcoworkConfigPath(workspaceRoot);
   if (await exists(path)) return false;
   const now = Date.now();
-  const config: WorkspaceOpenworkConfig = {
+  const config: WorkspaceVenomcoworkConfig = {
     version: 1,
     workspace: {
       name: basename(workspaceRoot) || "Workspace",
@@ -67,7 +67,7 @@ export async function ensureWorkspaceFiles(workspaceRoot: string, presetInput: s
   await ensureDir(workspaceRoot);
   const reloadReasons = new Set<ReloadReason>();
   if (await ensureOpencodeConfig(workspaceRoot)) reloadReasons.add("config");
-  const venomcoworkConfigChanged = await ensureWorkspaceOpenworkConfig(workspaceRoot, preset);
+  const venomcoworkConfigChanged = await ensureWorkspaceVenomcoworkConfig(workspaceRoot, preset);
   return {
     changed: venomcoworkConfigChanged || reloadReasons.size > 0,
     reloadReasons: Array.from(reloadReasons),

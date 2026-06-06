@@ -1,4 +1,4 @@
-﻿import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import zlib from "node:zlib";
 
@@ -224,7 +224,7 @@ function isSafeArchivePath(name) {
   return !normalized.split("/").some((part) => part === ".." || part === "");
 }
 
-function defaultOpenworkConfig(targetDir, preset = "starter") {
+function defaultVenomcoworkConfig(targetDir, preset = "starter") {
   return {
     version: 1,
     workspace: {
@@ -306,11 +306,11 @@ export async function importWorkspaceConfig({ archivePath, targetDir, name }) {
       }
       await writeFile(venomcoworkPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
     } catch {
-      const config = defaultOpenworkConfig(targetDir, preset);
+      const config = defaultVenomcoworkConfig(targetDir, preset);
       await writeFile(venomcoworkPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
     }
   } else {
-    const config = defaultOpenworkConfig(targetDir, preset);
+    const config = defaultVenomcoworkConfig(targetDir, preset);
     await writeFile(venomcoworkPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
   }
 

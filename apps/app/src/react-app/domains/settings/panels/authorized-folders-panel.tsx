@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useCallback, useEffect, useMemo, useReducer, useState, type SetStateAction } from "react";
 import { Folder, Info, Plus, X } from "lucide-react";
 
@@ -14,9 +14,9 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { t } from "@/i18n";
 import type {
-  OpenworkServerCapabilities,
-  OpenworkServerClient,
-  OpenworkServerStatus,
+  VenomcoworkServerCapabilities,
+  VenomcoworkServerClient,
+  VenomcoworkServerStatus,
 } from "../../../../app/lib/venomcowork-server";
 import { pickDirectory } from "../../../../app/lib/desktop";
 import {
@@ -41,9 +41,9 @@ import {
 } from "../settings-layout";
 
 export type AuthorizedFoldersPanelProps = {
-  venomcoworkServerClient: OpenworkServerClient | null;
-  venomcoworkServerStatus: OpenworkServerStatus;
-  venomcoworkServerCapabilities: OpenworkServerCapabilities | null;
+  venomcoworkServerClient: VenomcoworkServerClient | null;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
+  venomcoworkServerCapabilities: VenomcoworkServerCapabilities | null;
   runtimeWorkspaceId: string | null;
   selectedWorkspaceRoot: string;
   activeWorkspaceType: "local" | "remote";

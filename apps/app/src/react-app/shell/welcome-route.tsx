@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useCallback, useEffect, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -22,12 +22,12 @@ import {
   hideVenomCoworkModelsPromo,
   markVenomCoworkModelsStartupPromoShown,
 } from "../domains/cloud/venomcowork-models-promo";
-import { resolveOpenworkConnection } from "./venomcowork-connection";
-import { buildOpenworkWorkspaceBaseUrl, createOpenworkServerClient } from "../../app/lib/venomcowork-server";
+import { resolveVenomcoworkConnection } from "./venomcowork-connection";
+import { buildVenomcoworkWorkspaceBaseUrl, createVenomcoworkServerClient } from "../../app/lib/venomcowork-server";
 import { buildDenAuthUrl, readDenSettings } from "../../app/lib/den";
 import { writeActiveWorkspaceId, writeLastSessionFor } from "./session-memory";
 import { workspaceSessionRoute } from "./workspace-routes";
-import { ensureDesktopLocalOpenworkConnection } from "./desktop-local-venomcowork";
+import { ensureDesktopLocalVenomcoworkConnection } from "./desktop-local-venomcowork";
 
 function folderNameFromPath(path: string) {
   const normalized = path.replace(/\\/g, "/").replace(/\/+$/, "");
@@ -134,9 +134,9 @@ export function WelcomeRoute() {
         let serverToken = "";
         try {
           const { normalizedBaseUrl, resolvedToken, resolvedHostToken } =
-            await resolveOpenworkConnection();
+            await resolveVenomcoworkConnection();
           if (normalizedBaseUrl && (resolvedToken || resolvedHostToken)) {
-            const venomcoworkClient = createOpenworkServerClient({
+            const venomcoworkClient = createVenomcoworkServerClient({
               baseUrl: normalizedBaseUrl,
               token: resolvedToken || undefined,
               hostToken: resolvedHostToken || undefined,
@@ -168,7 +168,7 @@ export function WelcomeRoute() {
           writeActiveWorkspaceId(createdId);
         }
         if (targetWorkspace) {
-          await ensureDesktopLocalOpenworkConnection({
+          await ensureDesktopLocalVenomcoworkConnection({
             route: "session",
             workspace: targetWorkspace,
             allWorkspaces: list.workspaces,
@@ -178,7 +178,7 @@ export function WelcomeRoute() {
           try {
             const workspacePath = targetWorkspace?.path?.trim() || folder;
             const session = unwrap(await createClient(
-              `${(buildOpenworkWorkspaceBaseUrl(serverBaseUrl, targetWorkspaceId) ?? serverBaseUrl).replace(/\/+$/, "")}/opencode`,
+              `${(buildVenomcoworkWorkspaceBaseUrl(serverBaseUrl, targetWorkspaceId) ?? serverBaseUrl).replace(/\/+$/, "")}/opencode`,
               workspacePath || undefined,
               { token: serverToken, mode: "venomcowork" },
             ).session.create({ directory: workspacePath || undefined }));
@@ -231,9 +231,9 @@ export function WelcomeRoute() {
         let list: WorkspaceList | null = null;
         try {
           const { normalizedBaseUrl, resolvedToken, resolvedHostToken } =
-            await resolveOpenworkConnection();
+            await resolveVenomcoworkConnection();
           if (normalizedBaseUrl && (resolvedToken || resolvedHostToken)) {
-            list = await createOpenworkServerClient({
+            list = await createVenomcoworkServerClient({
               baseUrl: normalizedBaseUrl,
               token: resolvedToken || undefined,
               hostToken: resolvedHostToken || undefined,

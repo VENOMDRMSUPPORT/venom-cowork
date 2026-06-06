@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/components/ui/sonner";
@@ -7,15 +7,15 @@ import { SUGGESTED_PLUGINS } from "@/app/constants";
 import type { EnablementContext } from "@/app/enablement";
 import { createClient } from "@/app/lib/opencode";
 import {
-  createOpenworkServerClient,
-  isLoopbackOpenworkServerUrl,
-  readOpenworkServerSettings,
-  type OpenworkServerCapabilities,
-  type OpenworkServerClient,
-  type OpenworkWorkspaceInfo,
+  createVenomcoworkServerClient,
+  isLoopbackVenomcoworkServerUrl,
+  readVenomcoworkServerSettings,
+  type VenomcoworkServerCapabilities,
+  type VenomcoworkServerClient,
+  type VenomcoworkWorkspaceInfo,
 } from "@/app/lib/venomcowork-server";
 import { resolveWorkspaceEndpoint } from "@/app/lib/workspace-endpoint";
-import { buildOpenworkEnvRuntimeKey } from "@/app/lib/venomcowork-env-runtime";
+import { buildVenomcoworkEnvRuntimeKey } from "@/app/lib/venomcowork-env-runtime";
 import {
   getInitialThemeMode,
   setThemeMode as setAppThemeMode,
@@ -33,7 +33,7 @@ import type {
 import { getWorkspaceTaskLoadErrorDisplay } from "@/app/utils";
 import { currentLocale, t, setLocale, type Language } from "@/i18n";
 import { createConnectionsStore, useConnectionsStoreSnapshot } from "@/react-app/domains/connections/store";
-import { createOpenworkServerStore, useOpenworkServerStoreSnapshot } from "@/react-app/domains/connections/venomcowork-server-store";
+import { createVenomcoworkServerStore, useVenomcoworkServerStoreSnapshot } from "@/react-app/domains/connections/venomcowork-server-store";
 import { createProviderAuthStore, useProviderAuthStoreSnapshot } from "@/react-app/domains/connections/provider-auth/store";
 import ProviderAuthModal from "@/react-app/domains/connections/provider-auth/provider-auth-modal";
 import ConnectionsModals from "@/react-app/domains/connections/modals";
@@ -99,7 +99,7 @@ import { useCloudProviderAutoSync } from "@/react-app/domains/cloud/use-cloud-pr
 import {
   hideVenomCoworkModelsPromo,
   isVenomCoworkModelsPromoHidden,
-  openWorkModelsPromoChangedEvent,
+  venomCoworkModelsPromoChangedEvent,
 } from "@/react-app/domains/cloud/venomcowork-models-promo";
 import {
   isDesktopRuntime,
@@ -125,8 +125,8 @@ import { ModelPickerModal } from "@/react-app/domains/session/modals/model-picke
 import type { ModelOption, ModelRef } from "@/app/types";
 import { workspaceSwatchColor } from "@/react-app/domains/session/sidebar/utils";
 import { recordInspectorEvent } from "./app-inspector";
-import { ensureDesktopLocalOpenworkConnection } from "./desktop-local-venomcowork";
-import { resolveOpenworkConnection } from "./venomcowork-connection";
+import { ensureDesktopLocalVenomcoworkConnection } from "./desktop-local-venomcowork";
+import { resolveVenomcoworkConnection } from "./venomcowork-connection";
 import { abortSessionSafe } from "@/app/lib/opencode-session";
 import { useReloadCoordinator } from "./reload-coordinator";
 import { buildFeedbackUrl } from "@/app/lib/feedback";
@@ -142,11 +142,11 @@ import {
 } from "@/react-app/domains/settings/openai-image-extension";
 import { OLLAMA_PROVIDER_CONFIG, type LocalProviderInstallInput } from "@/react-app/domains/settings/openai-image-extension";
 
-type RouteWorkspace = OpenworkWorkspaceInfo & {
+type RouteWorkspace = VenomcoworkWorkspaceInfo & {
   displayNameResolved: string;
 };
 
-const ROUTE_VENOMCOWORK_CAPABILITIES: OpenworkServerCapabilities = {
+const ROUTE_VENOMCOWORK_CAPABILITIES: VenomcoworkServerCapabilities = {
   skills: { read: true, write: true, source: "venomcowork" },
   plugins: { read: true, write: true },
   mcp: { read: true, write: true },
@@ -205,7 +205,7 @@ function normalizeComputerUsePermissions(value: unknown) {
 }
 
 function mergeRouteWorkspaces(
-  serverWorkspaces: OpenworkWorkspaceInfo[],
+  serverWorkspaces: VenomcoworkWorkspaceInfo[],
   desktopWorkspaces: RouteWorkspace[],
 ): RouteWorkspace[] {
   const desktopById = new Map(desktopWorkspaces.map((workspace) => [workspace.id, workspace]));
@@ -292,7 +292,7 @@ const SETTINGS_HIDE_TITLEBAR_KEY = "venomcowork.react.settings.hide-titlebar";
 const SETTINGS_UPDATE_AUTO_CHECK_KEY = "venomcowork.react.settings.update-auto-check";
 const SETTINGS_UPDATE_AUTO_DOWNLOAD_KEY = "venomcowork.react.settings.update-auto-download";
 
-function workspaceLabel(workspace: OpenworkWorkspaceInfo) {
+function workspaceLabel(workspace: VenomcoworkWorkspaceInfo) {
   return (
     workspace.displayName?.trim() ||
     workspace.venomcoworkWorkspaceName?.trim() ||
@@ -302,7 +302,7 @@ function workspaceLabel(workspace: OpenworkWorkspaceInfo) {
   );
 }
 
-function workspaceExportFilename(workspace: OpenworkWorkspaceInfo) {
+function workspaceExportFilename(workspace: VenomcoworkWorkspaceInfo) {
   const slug = workspaceLabel(workspace).replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
   return `${slug || "workspace"}-venomcowork-export.json`;
 }
@@ -478,7 +478,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
   }, [navigate, props.embedded, selectedWorkspaceId]);
   const [baseUrl, setBaseUrl] = useState("");
   const [token, setToken] = useState("");
-  const [venomcoworkClient, setOpenworkClient] = useState<OpenworkServerClient | null>(null);
+  const [venomcoworkClient, setVenomcoworkClient] = useState<VenomcoworkServerClient | null>(null);
   const [activeClient, setActiveClient] = useState<Client | null>(null);
   const [busy, setBusy] = useState(false);
   const [busyLabel, setBusyLabel] = useState<string | null>(null);
@@ -522,7 +522,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
   const [autoCompactContextBusy, setAutoCompactContextBusy] = useState(false);
   const [autoCompactContextLoaded, setAutoCompactContextLoaded] = useState(false);
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
-  // initialTab removed â€” model picker no longer has tabs
+  // initialTab removed Ã¢â‚¬â€ model picker no longer has tabs
   const [modelPickerQuery, setModelPickerQuery] = useState("");
   const [modelOptions, setModelOptions] = useState<ModelOption[]>([]);
   const [localProviderBusy, setLocalProviderBusy] = useState(false);
@@ -558,9 +558,9 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
     selectedWorkspaceRoot: "",
     selectedWorkspaceType: "local" as "local" | "remote",
     runtimeWorkspaceId: null as string | null,
-    venomcoworkServerClient: null as OpenworkServerClient | null,
+    venomcoworkServerClient: null as VenomcoworkServerClient | null,
     venomcoworkServerStatus: "disconnected" as "connected" | "disconnected",
-    venomcoworkServerCapabilities: null as OpenworkServerCapabilities | null,
+    venomcoworkServerCapabilities: null as VenomcoworkServerCapabilities | null,
     selectedWorkspaceDisplay: emptyWorkspaceDisplay as WorkspaceDisplay,
     providerItems: [] as ProviderListItem[],
     providerDefaults: {} as Record<string, string>,
@@ -655,7 +655,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
       // ignore browser event dispatch failures
     }
 
-    // OpenCode reconnects MCPs async after dispose â€” the store polls until
+    // OpenCode reconnects MCPs async after dispose Ã¢â‚¬â€ the store polls until
     // statuses settle so users don't have to collapse/expand the card.
     void pollMcpServersAfterReloadRef.current?.();
 
@@ -684,15 +684,15 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
 
   const venomcoworkServerStore = useMemo(
     () =>
-      createOpenworkServerStore({
+      createVenomcoworkServerStore({
         startupPreference: () => {
           // In desktop mode, loopback URLs are ephemeral local runtime details.
           // Only non-loopback stored URLs indicate an explicit remote/manual
           // server connection preference.
           if (!isDesktopRuntime()) return "server";
-          const stored = readOpenworkServerSettings();
+          const stored = readVenomcoworkServerSettings();
           const storedUrl = stored.urlOverride?.trim() ?? "";
-          return storedUrl && !isLoopbackOpenworkServerUrl(storedUrl) ? "server" : "local";
+          return storedUrl && !isLoopbackVenomcoworkServerUrl(storedUrl) ? "server" : "local";
         },
         documentVisible: () => typeof document === "undefined" || document.visibilityState === "visible",
         developerMode: () => routeStateRef.current.developerMode,
@@ -704,7 +704,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
           try {
             await venomcoworkServerRestart({
               remoteAccessEnabled:
-                readOpenworkServerSettings().remoteAccessEnabled === true,
+                readVenomcoworkServerSettings().remoteAccessEnabled === true,
             });
             return true;
           } catch {
@@ -801,7 +801,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
       }),
     [venomcoworkServerStore, reloadCoordinator.markReloadRequired],
   );
-  const venomcoworkServerSnapshot = useOpenworkServerStoreSnapshot(venomcoworkServerStore);
+  const venomcoworkServerSnapshot = useVenomcoworkServerStoreSnapshot(venomcoworkServerStore);
   const connectionsSnapshot = useConnectionsStoreSnapshot(connectionsStore);
   const providerAuthSnapshot = useProviderAuthStoreSnapshot(providerAuthStore);
   useExtensionsStoreSnapshot(extensionsStore);
@@ -818,13 +818,13 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
       Object.values(providerAuthSnapshot.importedCloudProviders ?? {}).some(isVenomCoworkCloudProvider),
     [providerAuthSnapshot.cloudOrgProviders, providerAuthSnapshot.importedCloudProviders],
   );
-  const [openWorkModelsPromoHidden, setVenomCoworkModelsPromoHidden] = useState(isVenomCoworkModelsPromoHidden);
-  const showVenomCoworkModelsSubscribe = (!cloudSession.isSignedIn || !hasVenomCoworkCloudProvider) && !openWorkModelsPromoHidden;
+  const [venomCoworkModelsPromoHidden, setVenomCoworkModelsPromoHidden] = useState(isVenomCoworkModelsPromoHidden);
+  const showVenomCoworkModelsSubscribe = (!cloudSession.isSignedIn || !hasVenomCoworkCloudProvider) && !venomCoworkModelsPromoHidden;
 
   useEffect(() => {
     const handlePromoChanged = () => setVenomCoworkModelsPromoHidden(isVenomCoworkModelsPromoHidden());
-    window.addEventListener(openWorkModelsPromoChangedEvent, handlePromoChanged);
-    return () => window.removeEventListener(openWorkModelsPromoChangedEvent, handlePromoChanged);
+    window.addEventListener(venomCoworkModelsPromoChangedEvent, handlePromoChanged);
+    return () => window.removeEventListener(venomCoworkModelsPromoChangedEvent, handlePromoChanged);
   }, []);
 
   const dismissVenomCoworkModelsPromo = useCallback(() => {
@@ -1286,10 +1286,10 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
           desktopWorkspaces = workspacesRef.current;
         }
       }
-      const { normalizedBaseUrl, resolvedToken, resolvedHostToken } = await resolveOpenworkConnection();
+      const { normalizedBaseUrl, resolvedToken, resolvedHostToken } = await resolveVenomcoworkConnection();
 
       if (!normalizedBaseUrl || !resolvedToken) {
-        setOpenworkClient(null);
+        setVenomcoworkClient(null);
         setBaseUrl("");
         setToken("");
         setWorkspaces(desktopWorkspaces);
@@ -1303,7 +1303,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
         return;
       }
 
-      const client = createOpenworkServerClient({
+      const client = createVenomcoworkServerClient({
         baseUrl: normalizedBaseUrl,
         token: resolvedToken,
         hostToken: resolvedHostToken || undefined,
@@ -1351,7 +1351,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
         }),
       );
 
-      setOpenworkClient(client);
+      setVenomcoworkClient(client);
       setBaseUrl(normalizedBaseUrl);
       setToken(resolvedToken);
       setWorkspaces(nextWorkspaces);
@@ -1511,7 +1511,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
     if (!workspaceId || reconnectAttemptedWorkspaceIdRef.current === workspaceId) return;
     reconnectAttemptedWorkspaceIdRef.current = workspaceId;
 
-    void ensureDesktopLocalOpenworkConnection({
+    void ensureDesktopLocalVenomcoworkConnection({
       route: "settings",
       workspace: selectedWorkspace,
       allWorkspaces: workspaces,
@@ -1685,7 +1685,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
     const configuredEnvKeys = new Set(userEnvKeys);
     const loadedPlugins = new Set<string>();
     // Browser plugin detection: check if any configured plugin matches the chrome-devtools name.
-    // For now, treat it as loaded if the plugin is in the MCP/plugin list â€” this will
+    // For now, treat it as loaded if the plugin is in the MCP/plugin list Ã¢â‚¬â€ this will
     // be refined when we add a real plugin-loaded signal from the engine.
     const browserPluginConfigured = connectionsSnapshot.mcpServers.some(
       (s) => s.name === "opencode-chrome-devtools" || s.config.command?.some((c: string) => c.includes("chrome-devtools")),
@@ -1713,9 +1713,9 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
     try {
       await venomcoworkServerRestart({
         remoteAccessEnabled:
-          readOpenworkServerSettings().remoteAccessEnabled === true,
+          readVenomcoworkServerSettings().remoteAccessEnabled === true,
       });
-      await venomcoworkServerStore.reconnectOpenworkServer();
+      await venomcoworkServerStore.reconnectVenomcoworkServer();
       await refreshRouteState();
       return true;
     } catch {
@@ -1724,7 +1724,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
   }, [venomcoworkServerStore, refreshRouteState]);
   const extensionController = useSettingsExtensionController({
     venomcoworkServerClient: selectedWorkspaceEndpoint?.client ?? venomcoworkClient,
-    hostOpenworkServerClient: venomcoworkClient,
+    hostVenomcoworkServerClient: venomcoworkClient,
     enablementContext,
     mcpServers: connectionsSnapshot.mcpServers,
     mcpConnectingName: connectionsSnapshot.mcpConnectingName,
@@ -1770,7 +1770,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
     }),
     [connectionsSnapshot.mcpServers, connectionsStore.quickConnect, enablementContext, extensionController, extensionsStore],
   );
-  const routeOpenworkStatus = venomcoworkClient ? "connected" : "disconnected";
+  const routeVenomcoworkStatus = venomcoworkClient ? "connected" : "disconnected";
   const notFoundRouteError = !loading && routeWorkspaceId && !selectedWorkspace
     ? "Workspace was not found. Select a new workspace from the sidebar."
     : null;
@@ -1779,10 +1779,10 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
       toast.error(notFoundRouteError);
     }
   }, [notFoundRouteError]);
-  const routeOpenworkCapabilities: OpenworkServerCapabilities | null = venomcoworkClient
+  const routeVenomcoworkCapabilities: VenomcoworkServerCapabilities | null = venomcoworkClient
     ? ROUTE_VENOMCOWORK_CAPABILITIES
     : null;
-  const environmentRuntimeKey = buildOpenworkEnvRuntimeKey({
+  const environmentRuntimeKey = buildVenomcoworkEnvRuntimeKey({
     baseUrl: venomcoworkServerSnapshot.venomcoworkServerBaseUrl || venomcoworkServerSnapshot.venomcoworkServerUrl,
     pid: venomcoworkServerSnapshot.venomcoworkServerHostInfo?.pid ?? null,
     port: venomcoworkServerSnapshot.venomcoworkServerHostInfo?.port ?? null,
@@ -1816,7 +1816,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
       workspacePaths,
       venomcoworkRemoteAccess: venomcoworkServerSnapshot.venomcoworkServerSettings.remoteAccessEnabled === true,
     });
-    const reconnected = await venomcoworkServerStore.reconnectOpenworkServer();
+    const reconnected = await venomcoworkServerStore.reconnectVenomcoworkServer();
     if (!reconnected) {
       await refreshRouteState().catch(() => {});
       return { statusMessage: t("settings.environment.apply_refresh_failed") };
@@ -2006,21 +2006,21 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
   };
 
   const handleReconnectMessagingServer = useCallback(async () => {
-    const ok = await venomcoworkServerStore.reconnectOpenworkServer();
+    const ok = await venomcoworkServerStore.reconnectVenomcoworkServer();
     if (ok) {
       await refreshRouteState();
     }
     return ok;
   }, [venomcoworkServerStore, refreshRouteState]);
 
-  const restartOpenworkServerAndRefresh = useCallback(async () => {
+  const restartVenomcoworkServerAndRefresh = useCallback(async () => {
     if (!isDesktopRuntime()) return false;
     try {
       await venomcoworkServerRestart({
         remoteAccessEnabled:
-          readOpenworkServerSettings().remoteAccessEnabled === true,
+          readVenomcoworkServerSettings().remoteAccessEnabled === true,
       });
-      await venomcoworkServerStore.reconnectOpenworkServer();
+      await venomcoworkServerStore.reconnectVenomcoworkServer();
       await refreshRouteState();
       return true;
     } catch {
@@ -2028,8 +2028,8 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
     }
   }, [venomcoworkServerStore, refreshRouteState]);
 
-  const handleRestartLocalServer = restartOpenworkServerAndRefresh;
-  const handleRestartMessagingWorker = restartOpenworkServerAndRefresh;
+  const handleRestartLocalServer = restartVenomcoworkServerAndRefresh;
+  const handleRestartMessagingWorker = restartVenomcoworkServerAndRefresh;
 
   const messagingViewProps = useMessagingViewProps({
     busy,
@@ -2038,7 +2038,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
     venomcoworkServerClient:
       venomcoworkClient ?? venomcoworkServerSnapshot.venomcoworkServerClient,
     venomcoworkReconnectBusy: venomcoworkServerSnapshot.venomcoworkReconnectBusy,
-    reconnectOpenworkServer: handleReconnectMessagingServer,
+    reconnectVenomcoworkServer: handleReconnectMessagingServer,
     restartMessagingWorker: handleRestartMessagingWorker,
     workspaceId: runtimeWorkspaceId,
     selectedWorkspaceRoot,
@@ -2076,8 +2076,8 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
           <SettingsStack>
             <AuthorizedFoldersPanel
               venomcoworkServerClient={venomcoworkClient}
-              venomcoworkServerStatus={routeOpenworkStatus}
-              venomcoworkServerCapabilities={routeOpenworkCapabilities}
+              venomcoworkServerStatus={routeVenomcoworkStatus}
+              venomcoworkServerCapabilities={routeVenomcoworkCapabilities}
               runtimeWorkspaceId={runtimeWorkspaceId}
               selectedWorkspaceRoot={selectedWorkspaceRoot}
               activeWorkspaceType={workspaceType}
@@ -2209,7 +2209,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
                   void connectionsStore.removeMcp(name);
                 }}
                 setMcpEnabled={
-                  routeOpenworkStatus === "connected" && routeOpenworkCapabilities?.mcp?.write
+                  routeVenomcoworkStatus === "connected" && routeVenomcoworkCapabilities?.mcp?.write
                     ? (name, enabled) => connectionsStore.setMcpEnabled(name, enabled)
                     : undefined
                 }
@@ -2364,7 +2364,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
             onRepairOpencodeCache={() => {}}
             dockerCleanupBusy={false}
             dockerCleanupResult={null}
-            onCleanupOpenworkDockerContainers={() => {}}
+            onCleanupVenomcoworkDockerContainers={() => {}}
           />
         );
       case "environment":
@@ -2400,7 +2400,7 @@ function SettingsRouteContent(props: SettingsSurfaceProps = {}) {
         selectedWorkspaceColor={selectedWorkspaceColor}
         workspaces={workspaceOptions}
         onSelectWorkspace={handleSelectSettingsWorkspace}
-        headerStatus={routeOpenworkStatus}
+        headerStatus={routeVenomcoworkStatus}
         busyHint={loading ? t("session.loading_detail") : busyLabel}
         onClose={props.onClose ?? (() => navigate(selectedWorkspaceId ? workspaceSessionRoute(selectedWorkspaceId) : "/session"))}
         compact={props.embedded}

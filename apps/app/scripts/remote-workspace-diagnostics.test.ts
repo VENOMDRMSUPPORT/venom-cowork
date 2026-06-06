@@ -1,6 +1,6 @@
-﻿import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 
-import type { OpenworkServerClient } from "../src/app/lib/venomcowork-server";
+import type { VenomcoworkServerClient } from "../src/app/lib/venomcowork-server";
 import type { WorkspaceInfo } from "../src/app/lib/desktop";
 import { getWorkspaceTaskLoadErrorDisplay } from "../src/app/utils";
 import {
@@ -25,7 +25,7 @@ function workspace(overrides: Partial<WorkspaceInfo> = {}): WorkspaceInfo {
   };
 }
 
-function client(overrides: Partial<OpenworkServerClient> = {}): OpenworkServerClient {
+function client(overrides: Partial<VenomcoworkServerClient> = {}): VenomcoworkServerClient {
   return {
     baseUrl: "https://worker.example.com/w/ws_remote",
     token: "ow-token",
@@ -71,7 +71,7 @@ function client(overrides: Partial<OpenworkServerClient> = {}): OpenworkServerCl
       activeId: "ws_remote",
     }),
     ...overrides,
-  } as OpenworkServerClient;
+  } as VenomcoworkServerClient;
 }
 
 function serverError(status: number, code: string, message: string) {

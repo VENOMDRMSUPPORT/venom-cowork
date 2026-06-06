@@ -1,4 +1,4 @@
-﻿import { homedir } from "node:os";
+import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { eq } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
@@ -11,7 +11,7 @@ const venomcoworkWorkspaceConfigs = sqliteTable("venomcowork_workspace_configs",
   updatedAt: integer("updated_at").notNull(),
 });
 
-type OpenworkWorkspaceConfigDb = {
+type VenomcoworkWorkspaceConfigDb = {
   get: (workspaceId: string) => { configJson: string } | undefined;
   upsert: (value: { workspaceId: string; configJson: string; updatedAt: number }) => void;
 };
@@ -20,7 +20,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function normalizeOpenworkWorkspaceConfig(value: unknown): Record<string, unknown> {
+function normalizeVenomcoworkWorkspaceConfig(value: unknown): Record<string, unknown> {
   return isRecord(value) ? value : {};
 }
 
@@ -32,7 +32,7 @@ function runtimeDbPath(config: ServerConfig): string {
   return join(configDir, "runtime.sqlite");
 }
 
-async function openDb(path: string): Promise<OpenworkWorkspaceConfigDb> {
+async function openDb(path: string): Promise<VenomcoworkWorkspaceConfigDb> {
   await ensureDir(dirname(path));
   if (typeof process.versions.bun === "string") {
     const { Database } = await import("bun:sqlite");
@@ -75,9 +75,9 @@ async function openDb(path: string): Promise<OpenworkWorkspaceConfigDb> {
   };
 }
 
-const dbByPath = new Map<string, Promise<OpenworkWorkspaceConfigDb>>();
+const dbByPath = new Map<string, Promise<VenomcoworkWorkspaceConfigDb>>();
 
-async function workspaceConfigDb(config: ServerConfig): Promise<OpenworkWorkspaceConfigDb> {
+async function workspaceConfigDb(config: ServerConfig): Promise<VenomcoworkWorkspaceConfigDb> {
   const path = runtimeDbPath(config);
   const existing = dbByPath.get(path);
   if (existing) return existing;
@@ -86,29 +86,29 @@ async function workspaceConfigDb(config: ServerConfig): Promise<OpenworkWorkspac
   return db;
 }
 
-export async function readOpenworkWorkspaceConfig(config: ServerConfig, workspaceId: string): Promise<Record<string, unknown>> {
+export async function readVenomcoworkWorkspaceConfig(config: ServerConfig, workspaceId: string): Promise<Record<string, unknown>> {
   const db = await workspaceConfigDb(config);
   const row = db.get(workspaceId);
   if (!row) return {};
   try {
-    return normalizeOpenworkWorkspaceConfig(JSON.parse(row.configJson));
+    return normalizeVenomcoworkWorkspaceConfig(JSON.parse(row.configJson));
   } catch {
     return {};
   }
 }
 
-export async function writeOpenworkWorkspaceConfig(
+export async function writeVenomcoworkWorkspaceConfig(
   config: ServerConfig,
   workspaceId: string,
   updater: (current: Record<string, unknown>) => Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
   const db = await workspaceConfigDb(config);
-  const next = normalizeOpenworkWorkspaceConfig(updater(await readOpenworkWorkspaceConfig(config, workspaceId)));
+  const next = normalizeVenomcoworkWorkspaceConfig(updater(await readVenomcoworkWorkspaceConfig(config, workspaceId)));
   db.upsert({ workspaceId, configJson: JSON.stringify(next), updatedAt: Date.now() });
   return next;
 }
 
-export function mergeOpenworkWorkspaceConfigs(
+export function mergeVenomcoworkWorkspaceConfigs(
   legacy: Record<string, unknown>,
   stored: Record<string, unknown>,
 ): Record<string, unknown> {

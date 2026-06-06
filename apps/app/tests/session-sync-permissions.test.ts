@@ -1,8 +1,8 @@
-﻿import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import type { UIMessage } from "ai";
 import type { PermissionRequest, QuestionRequest } from "@opencode-ai/sdk/v2/client";
 
-import type { OpenworkSessionSnapshot } from "../src/app/lib/venomcowork-server";
+import type { VenomcoworkSessionSnapshot } from "../src/app/lib/venomcowork-server";
 import { getReactQueryClient } from "../src/react-app/infra/query-client";
 import {
   __applySessionSyncEventForTest,
@@ -59,7 +59,7 @@ function uiMessage(id: string, role: "user" | "assistant", text: string): UIMess
 function snapshotWithMessages(
   messages: Array<{ id: string; role: "user" | "assistant"; text: string }>,
   sessionId = "session-a",
-): OpenworkSessionSnapshot {
+): VenomcoworkSessionSnapshot {
   return {
     session: {
       id: sessionId,
@@ -88,7 +88,7 @@ function snapshotWithMessages(
     })),
     todos: [],
     status: { type: "idle" },
-  } as unknown as OpenworkSessionSnapshot;
+  } as unknown as VenomcoworkSessionSnapshot;
 }
 
 afterEach(() => {

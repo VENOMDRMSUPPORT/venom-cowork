@@ -1,16 +1,16 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import type { ReactNode } from "react";
 import type { McpDirectoryInfo } from "../../../app/constants";
 import { extensionContribution } from "../../../app/extensions";
-import type { OpenworkServerClient } from "../../../app/lib/venomcowork-server";
+import type { VenomcoworkServerClient } from "../../../app/lib/venomcowork-server";
 
 /**
  * Context bag that the settings route passes to extension config factories.
  * Each extension picks what it needs; unused fields are ignored.
  */
 export type ExtensionConfigContext = {
-  venomcoworkServerClient?: OpenworkServerClient | null;
-  hostOpenworkServerClient?: OpenworkServerClient | null;
+  venomcoworkServerClient?: VenomcoworkServerClient | null;
+  hostVenomcoworkServerClient?: VenomcoworkServerClient | null;
   extensionConnections?: Record<string, boolean>;
   onExtensionConnectionChange?: (extensionId: string, connected: boolean) => void;
   restartLocalServer?: () => Promise<boolean>;

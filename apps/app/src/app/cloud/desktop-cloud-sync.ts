@@ -1,18 +1,18 @@
-﻿import {
+import {
   createDenClient,
   readDenSettings,
 } from "../lib/den";
 import type {
-  OpenworkDesktopCloudSyncResult,
-  OpenworkServerClient,
+  VenomcoworkDesktopCloudSyncResult,
+  VenomcoworkServerClient,
 } from "../lib/venomcowork-server";
 
 let desktopCloudSyncQueue: Promise<void> = Promise.resolve();
 
 async function runDesktopCloudSync(input: {
-  venomcoworkClient: OpenworkServerClient;
+  venomcoworkClient: VenomcoworkServerClient;
   workspaceId: string;
-}): Promise<OpenworkDesktopCloudSyncResult | null> {
+}): Promise<VenomcoworkDesktopCloudSyncResult | null> {
   const settings = readDenSettings();
   const token = settings.authToken?.trim() ?? "";
   const activeOrgId = settings.activeOrgId?.trim() ?? "";
@@ -28,9 +28,9 @@ async function runDesktopCloudSync(input: {
 }
 
 export function refreshDesktopCloudSync(input: {
-  venomcoworkClient: OpenworkServerClient | null | undefined;
+  venomcoworkClient: VenomcoworkServerClient | null | undefined;
   workspaceId: string | null | undefined;
-}): Promise<OpenworkDesktopCloudSyncResult | null> {
+}): Promise<VenomcoworkDesktopCloudSyncResult | null> {
   const venomcoworkClient = input.venomcoworkClient ?? null;
   const workspaceId = input.workspaceId?.trim() ?? "";
   if (!venomcoworkClient || !workspaceId) return Promise.resolve(null);

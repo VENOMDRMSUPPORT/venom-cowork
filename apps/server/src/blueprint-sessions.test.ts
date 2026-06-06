@@ -1,10 +1,10 @@
-﻿import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 
 import {
   applyMaterializedBlueprintSessions,
   normalizeBlueprintSessionTemplates,
   readMaterializedBlueprintSessions,
-  sanitizeOpenworkTemplateConfig,
+  sanitizeVenomcoworkTemplateConfig,
 } from "./blueprint-sessions.js";
 
 describe("blueprint sessions", () => {
@@ -39,7 +39,7 @@ describe("blueprint sessions", () => {
   });
 
   test("sanitizes materialized session state from exported template config", () => {
-    const sanitized = sanitizeOpenworkTemplateConfig({
+    const sanitized = sanitizeVenomcoworkTemplateConfig({
       blueprint: {
         sessions: [{ id: "welcome", title: "Welcome", messages: [{ role: "assistant", text: "Hello" }] }],
         materialized: {

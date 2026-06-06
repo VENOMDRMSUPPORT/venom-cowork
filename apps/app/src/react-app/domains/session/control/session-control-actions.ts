@@ -1,11 +1,11 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useCallback, useMemo } from "react";
 
 import type { createClient } from "../../../../app/lib/opencode";
-import type { OpenworkServerClient, OpenworkWorkspaceInfo } from "../../../../app/lib/venomcowork-server";
+import type { VenomcoworkServerClient, VenomcoworkWorkspaceInfo } from "../../../../app/lib/venomcowork-server";
 import { setSessionArchived } from "../../../../app/lib/opencode-session";
 import { getDisplaySessionTitle } from "../../../../app/lib/session-title";
-import { useControlAction, type OpenworkControlAction } from "../../../shell/control/control-provider";
+import { useControlAction, type VenomcoworkControlAction } from "../../../shell/control/control-provider";
 import { useSessionManagementStore } from "../sidebar/session-management-store";
 
 type SessionLike = {
@@ -17,7 +17,7 @@ type SessionLike = {
   };
 };
 
-type SessionControlWorkspace = OpenworkWorkspaceInfo & {
+type SessionControlWorkspace = VenomcoworkWorkspaceInfo & {
   displayNameResolved?: string;
 };
 
@@ -28,7 +28,7 @@ type UseSessionControlActionsInput = {
   selectedWorkspaceRoot: string;
   selectedSessionId: string | null;
   canCreateTask: boolean;
-  venomcoworkClient: OpenworkServerClient | null;
+  venomcoworkClient: VenomcoworkServerClient | null;
   opencodeClient: ReturnType<typeof createClient> | null;
   navigateToSession: (sessionId: string) => void;
   navigateToSessionRoot: () => void;
@@ -81,7 +81,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
     workspaces,
   } = input;
 
-  const createTaskControlAction = useMemo<OpenworkControlAction>(() => ({
+  const createTaskControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.create_task",
     label: "Create a new task",
     description: "Create a new session in the selected workspace.",
@@ -95,7 +95,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
   }), [canCreateTask, createTaskInWorkspace, selectedWorkspaceId]);
   useControlAction(createTaskControlAction);
 
-  const listSessionsControlAction = useMemo<OpenworkControlAction>(() => ({
+  const listSessionsControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.list_sessions",
     label: "List available sessions",
     description: "Return the list of sessions across workspaces so the user can ask to open one by name.",
@@ -118,7 +118,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
   }), [sessionsByWorkspaceId, workspaces]);
   useControlAction(listSessionsControlAction);
 
-  const openSessionControlAction = useMemo<OpenworkControlAction>(() => ({
+  const openSessionControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.open",
     label: "Open a session by ID",
     description: "Navigate to a specific session. Use list_sessions first to get the session ID.",
@@ -134,7 +134,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
   }), [navigateToSession]);
   useControlAction(openSessionControlAction);
 
-  const renameSessionControlAction = useMemo<OpenworkControlAction>(() => ({
+  const renameSessionControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.rename",
     label: "Rename a session",
     description: "Rename a session by ID. Use list_sessions first to match the title the user said.",
@@ -164,7 +164,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
   }), [opencodeClient, refreshRouteState, selectedWorkspaceRoot, sessionsByWorkspaceId, workspaces]);
   useControlAction(renameSessionControlAction);
 
-  const deleteSessionControlAction = useMemo<OpenworkControlAction>(() => ({
+  const deleteSessionControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.delete",
     label: "Delete a session",
     description: "Delete a session by ID. Destructive: only run after explicit user confirmation.",
@@ -195,7 +195,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
   }), [navigateToSessionRoot, venomcoworkClient, refreshRouteState, selectedSessionId, sessionsByWorkspaceId, workspaces]);
   useControlAction(deleteSessionControlAction);
 
-  const modelPickerControlAction = useMemo<OpenworkControlAction>(() => ({
+  const modelPickerControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.model_picker.open",
     label: "Open the model picker",
     description: "Open the current session model picker.",
@@ -228,7 +228,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
     return selectedWorkspaceId || undefined;
   }, [selectedWorkspaceId, workspaces]);
 
-  const pinControlAction = useMemo<OpenworkControlAction>(() => ({
+  const pinControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.pin",
     label: "Pin or unpin a session",
     description: "Toggle pin on a session. Pinned sessions float to the top of the sidebar.",
@@ -245,7 +245,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
   }), []);
   useControlAction(pinControlAction);
 
-  const archiveControlAction = useMemo<OpenworkControlAction>(() => ({
+  const archiveControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.archive",
     label: "Archive or unarchive a session",
     description: "Archive a session (non-destructive, preserves context). Archived sessions move to the Archived section. Pass archived=false to unarchive.",
@@ -269,7 +269,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
   }), [opencodeClient, refreshRouteState, selectedWorkspaceRoot, sessionsByWorkspaceId, workspaces]);
   useControlAction(archiveControlAction);
 
-  const groupCreateControlAction = useMemo<OpenworkControlAction>(() => ({
+  const groupCreateControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.group.create",
     label: "Create a session group",
     description: "Create a new group (folder/separator) in the current workspace sidebar. Sessions can then be moved into it.",
@@ -293,7 +293,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
   }), [resolveWorkspaceId]);
   useControlAction(groupCreateControlAction);
 
-  const groupMoveControlAction = useMemo<OpenworkControlAction>(() => ({
+  const groupMoveControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.group.move",
     label: "Move a session to a group",
     description: "Assign a session to a group (folder). Pass groupId=null or omit to remove from current group. Use session.group.list to see available groups.",
@@ -317,7 +317,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
   }), [resolveWorkspaceId, sessionsByWorkspaceId, workspaces]);
   useControlAction(groupMoveControlAction);
 
-  const groupRemoveControlAction = useMemo<OpenworkControlAction>(() => ({
+  const groupRemoveControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.group.remove",
     label: "Remove a session group",
     description: "Remove a group from the workspace. Sessions in the group become ungrouped (not deleted).",
@@ -343,7 +343,7 @@ export function useSessionControlActions(input: UseSessionControlActionsInput) {
   }), [resolveWorkspaceId]);
   useControlAction(groupRemoveControlAction);
 
-  const groupListControlAction = useMemo<OpenworkControlAction>(() => ({
+  const groupListControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "session.group.list",
     label: "List session groups",
     description: "List all groups in a workspace with their IDs and labels.",

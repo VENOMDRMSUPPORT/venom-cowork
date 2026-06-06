@@ -1,4 +1,4 @@
-﻿import { DEN_WORKER_POLL_INTERVAL_MS } from "./CONSTS.js"
+import { DEN_WORKER_POLL_INTERVAL_MS } from "./CONSTS.js"
 import { z } from "zod"
 
 const EnvSchema = z.object({
@@ -248,7 +248,7 @@ export const env = {
       parsed.RENDER_WORKER_ROOT_DIR ?? "ee/apps/den-worker-runtime",
     workerPlan: parsed.RENDER_WORKER_PLAN ?? "standard",
     workerRegion: parsed.RENDER_WORKER_REGION ?? "oregon",
-    workerOpenworkVersion: parsed.RENDER_WORKER_VENOMCOWORK_VERSION,
+    workerVenomcoworkVersion: parsed.RENDER_WORKER_VENOMCOWORK_VERSION,
     workerNamePrefix: parsed.RENDER_WORKER_NAME_PREFIX ?? "den-worker",
     workerPublicDomainSuffix: parsed.RENDER_WORKER_PUBLIC_DOMAIN_SUFFIX,
     customDomainReadyTimeoutMs: Number(

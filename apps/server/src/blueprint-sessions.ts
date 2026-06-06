@@ -1,4 +1,4 @@
-﻿type BlueprintSessionMessage = {
+type BlueprintSessionMessage = {
   role: "assistant" | "user";
   text: string;
 };
@@ -74,7 +74,7 @@ export function readMaterializedBlueprintSessions(venomcowork: Record<string, un
     .filter((item): item is MaterializedBlueprintSession => Boolean(item));
 }
 
-export function sanitizeOpenworkTemplateConfig(venomcowork: Record<string, unknown> | null | undefined): Record<string, unknown> {
+export function sanitizeVenomcoworkTemplateConfig(venomcowork: Record<string, unknown> | null | undefined): Record<string, unknown> {
   const next = cloneRecord(venomcowork ?? {});
   const blueprint = readRecord(next.blueprint);
   if (!blueprint) return next;
@@ -98,7 +98,7 @@ export function applyMaterializedBlueprintSessions(
   items: MaterializedBlueprintSession[],
   hydratedAt: number,
 ): Record<string, unknown> {
-  const next = sanitizeOpenworkTemplateConfig(venomcowork);
+  const next = sanitizeVenomcoworkTemplateConfig(venomcowork);
   const blueprint = readRecord(next.blueprint) ?? {};
   const materialized = readRecord(blueprint.materialized) ?? {};
   materialized.sessions = {

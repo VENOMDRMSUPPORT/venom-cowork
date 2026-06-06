@@ -1,4 +1,4 @@
-﻿import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -87,7 +87,7 @@ function startMockOpencode() {
   return { server, requests };
 }
 
-function startMockRemoteOpenwork() {
+function startMockRemoteVenomcowork() {
   const requests: Array<{ pathname: string; authorization: string | null }> = [];
   const server = Bun.serve({
     hostname: "127.0.0.1",
@@ -113,7 +113,7 @@ function startMockRemoteOpenwork() {
   return { server, requests };
 }
 
-async function startOpenworkServer(input: { workspaceRoot: string; opencodeBaseUrl: string }) {
+async function startVenomcoworkServer(input: { workspaceRoot: string; opencodeBaseUrl: string }) {
   const config: ServerConfig = {
     host: "127.0.0.1",
     port: 0,
@@ -144,7 +144,7 @@ async function startOpenworkServer(input: { workspaceRoot: string; opencodeBaseU
   return { server, hostToken: config.hostToken };
 }
 
-async function startOpenworkServerWithWorkspaces(input: {
+async function startVenomcoworkServerWithWorkspaces(input: {
   configPath: string;
   workspaces: ServerConfig["workspaces"];
   authorizedRoots: string[];
@@ -181,7 +181,7 @@ describe("workspace activation", () => {
   test("reloads the bound OpenCode engine on activate", async () => {
     const workspaceRoot = await createWorkspaceRoot();
     const mock = startMockOpencode();
-    const venomcowork = await startOpenworkServer({
+    const venomcowork = await startVenomcoworkServer({
       workspaceRoot,
       opencodeBaseUrl: `http://127.0.0.1:${mock.server.port}`,
     });
@@ -230,7 +230,7 @@ describe("workspace activation", () => {
       `${JSON.stringify({ workspaces, authorizedRoots: [firstRoot, secondRoot] }, null, 2)}\n`,
       "utf8",
     );
-    const venomcowork = await startOpenworkServerWithWorkspaces({
+    const venomcowork = await startVenomcoworkServerWithWorkspaces({
       configPath,
       workspaces,
       authorizedRoots: [firstRoot, secondRoot],
@@ -275,7 +275,7 @@ describe("workspace lifecycle registry", () => {
     const configRoot = await createWorkspaceRoot();
     const workspaceRoot = await createWorkspaceRoot();
     const configPath = join(configRoot, "server.json");
-    const venomcowork = await startOpenworkServerWithWorkspaces({
+    const venomcowork = await startVenomcoworkServerWithWorkspaces({
       configPath,
       workspaces: [],
       authorizedRoots: [],
@@ -303,7 +303,7 @@ describe("workspace lifecycle registry", () => {
     const configRoot = await createWorkspaceRoot();
     const workspaceRoot = await createWorkspaceRoot();
     const configPath = join(configRoot, "server.json");
-    const venomcowork = await startOpenworkServerWithWorkspaces({
+    const venomcowork = await startVenomcoworkServerWithWorkspaces({
       configPath,
       workspaces: [],
       authorizedRoots: [],
@@ -333,8 +333,8 @@ describe("workspace lifecycle registry", () => {
     const workspaceRoot = await createWorkspaceRoot();
     const configPath = join(workspaceRoot, "server.json");
     await writeFile(configPath, `${JSON.stringify({ workspaces: [], authorizedRoots: [] }, null, 2)}\n`, "utf8");
-    const remote = startMockRemoteOpenwork();
-    const venomcowork = await startOpenworkServerWithWorkspaces({
+    const remote = startMockRemoteVenomcowork();
+    const venomcowork = await startVenomcoworkServerWithWorkspaces({
       configPath,
       workspaces: [],
       authorizedRoots: [],
@@ -396,7 +396,7 @@ describe("workspace lifecycle registry", () => {
       },
     ];
     await writeFile(configPath, `${JSON.stringify({ workspaces, authorizedRoots: [] }, null, 2)}\n`, "utf8");
-    const venomcowork = await startOpenworkServerWithWorkspaces({
+    const venomcowork = await startVenomcoworkServerWithWorkspaces({
       configPath,
       workspaces,
       authorizedRoots: [],

@@ -1,4 +1,4 @@
-﻿import { WorkerTable } from "@venom-cowork-ee/den-db/schema"
+import { WorkerTable } from "@venom-cowork-ee/den-db/schema"
 import { env } from "../env.js"
 import {
   deprovisionWorkerOnDaytona,
@@ -253,8 +253,8 @@ async function provisionWorkerOnRender(
   const serviceName = slug(
     `${env.render.workerNamePrefix}-${input.name}-${input.workerId.slice(0, 8)}`,
   ).slice(0, 62)
-  const orchestratorPackage = env.render.workerOpenworkVersion?.trim()
-    ? `venomcowork-orchestrator@${env.render.workerOpenworkVersion.trim()}`
+  const orchestratorPackage = env.render.workerVenomcoworkVersion?.trim()
+    ? `venomcowork-orchestrator@${env.render.workerVenomcoworkVersion.trim()}`
     : "venomcowork-orchestrator"
   const buildCommand = [
     `npm install -g ${orchestratorPackage}`,

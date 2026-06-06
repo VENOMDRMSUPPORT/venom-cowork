@@ -1,4 +1,4 @@
-﻿// Type definitions for the desktop bridge.
+// Type definitions for the desktop bridge.
 // These types were previously colocated with the Tauri bridge implementation.
 // They are runtime-agnostic and shared by the Electron bridge.
 
@@ -32,7 +32,7 @@ export type OpencodeExecutionSnapshot = {
   env: OpencodeExecutionEnvEntry[];
 };
 
-export type OpenworkServerInfo = {
+export type VenomcoworkServerInfo = {
   running: boolean;
   remoteAccessEnabled: boolean;
   host: string | null;
@@ -108,7 +108,7 @@ export type OpencodeCommandDraft = {
   subtask?: boolean;
 };
 
-export type WorkspaceOpenworkConfig = {
+export type WorkspaceVenomcoworkConfig = {
   version: number;
   workspace?: {
     name?: string | null;
@@ -172,7 +172,7 @@ export type SandboxDoctorResult = {
   } | null;
 };
 
-export type OpenworkDockerCleanupResult = {
+export type VenomcoworkDockerCleanupResult = {
   candidates: string[];
   removed: string[];
   errors: string[];

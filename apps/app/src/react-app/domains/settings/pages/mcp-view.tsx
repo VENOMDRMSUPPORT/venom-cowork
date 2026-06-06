@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useEffect, useReducer, useRef, useState, type SetStateAction } from "react";
 import {
   BookOpen,
@@ -229,8 +229,8 @@ export function McpView(props: McpViewProps) {
   const [detailSkill, setDetailSkill] = useState<SkillItem | null>(null);
   const [detailSkillContent, setDetailSkillContent] = useState<string | null>(null);
   const [detailPlugin, setDetailPlugin] = useState<CloudImportedPlugin | null>(null);
-  const [venomcoworkUiMcpCommand, setOpenworkUiMcpCommand] = useState<string[] | null>(null);
-  const [venomcoworkUiMcpEnvironment, setOpenworkUiMcpEnvironment] = useState<Record<string, string> | null>(null);
+  const [venomcoworkUiMcpCommand, setVenomcoworkUiMcpCommand] = useState<string[] | null>(null);
+  const [venomcoworkUiMcpEnvironment, setVenomcoworkUiMcpEnvironment] = useState<Record<string, string> | null>(null);
   const [computerUseMcpCommand, setComputerUseMcpCommand] = useState<string[] | null>(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<ExtensionFilter>("all");
@@ -289,13 +289,13 @@ export function McpView(props: McpViewProps) {
     if (!isDesktopRuntime()) return;
     void (async () => {
       try {
-        const command = await window.__VENOMCOWORK_ELECTRON__?.invokeDesktop?.("getOpenworkUiMcpCommand");
+        const command = await window.__VENOMCOWORK_ELECTRON__?.invokeDesktop?.("getVenomcoworkUiMcpCommand");
         if (Array.isArray(command) && command.every((part) => typeof part === "string")) {
-          setOpenworkUiMcpCommand(command);
+          setVenomcoworkUiMcpCommand(command);
         }
-        const environment = await window.__VENOMCOWORK_ELECTRON__?.invokeDesktop?.("getOpenworkUiMcpEnvironment");
+        const environment = await window.__VENOMCOWORK_ELECTRON__?.invokeDesktop?.("getVenomcoworkUiMcpEnvironment");
         if (environment && typeof environment === "object" && !Array.isArray(environment)) {
-          setOpenworkUiMcpEnvironment(Object.fromEntries(
+          setVenomcoworkUiMcpEnvironment(Object.fromEntries(
             Object.entries(environment).filter((entry): entry is [string, string] =>
               typeof entry[0] === "string" && typeof entry[1] === "string"
             ),
@@ -306,8 +306,8 @@ export function McpView(props: McpViewProps) {
           setComputerUseMcpCommand(computerUseCommand);
         }
       } catch {
-        setOpenworkUiMcpCommand(null);
-        setOpenworkUiMcpEnvironment(null);
+        setVenomcoworkUiMcpCommand(null);
+        setVenomcoworkUiMcpEnvironment(null);
         setComputerUseMcpCommand(null);
       }
     })();

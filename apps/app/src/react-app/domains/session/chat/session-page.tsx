@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePanelRef } from "react-resizable-panels";
@@ -6,7 +6,7 @@ import { Columns2, FileText, Globe, Mic2, Settings2, X, Zap } from "lucide-react
 
 import { t } from "../../../../i18n";
 import { VENOMCOWORK_EXTENSION_CATALOG } from "../../../../app/constants";
-import { type OpenworkServerClient, type OpenworkServerStatus } from "../../../../app/lib/venomcowork-server";
+import { type VenomcoworkServerClient, type VenomcoworkServerStatus } from "../../../../app/lib/venomcowork-server";
 import { getDisplaySessionTitle } from "../../../../app/lib/session-title";
 import type { BootPhase } from "../../../../app/lib/startup-boot";
 import type { WorkspaceInfo } from "../../../../app/lib/desktop";
@@ -59,7 +59,7 @@ import { SidePanel } from "../panel/side-panel";
 import { TerminalDock } from "../terminal/terminal-dock";
 import { useActivePanelTab, usePanelTabStore, useSessionPanelState } from "../panel/panel-tab-store";
 import { useWorkspaceShellLayout } from "../../../shell/workspace-shell-layout";
-import { useControlAction, type OpenworkControlAction } from "../../../shell/control/control-provider";
+import { useControlAction, type VenomcoworkControlAction } from "../../../shell/control/control-provider";
 import { getExtensionId, isVenomCoworkExtensionEnabled, VENOMCOWORK_EXTENSION_STATE_CHANGED } from "../../settings/extension-state";
 import { cn } from "@/lib/utils";
 
@@ -143,8 +143,8 @@ export type SessionPageProps = {
   opencodeBaseUrl?: string | null;
   workspaces: WorkspaceInfo[];
   clientConnected: boolean;
-  venomcoworkServerStatus: OpenworkServerStatus;
-  venomcoworkServerClient: OpenworkServerClient | null;
+  venomcoworkServerStatus: VenomcoworkServerStatus;
+  venomcoworkServerClient: VenomcoworkServerClient | null;
   venomcoworkServerToken?: string | null;
   developerMode: boolean;
   headerStatus: string;
@@ -423,7 +423,7 @@ export function SessionPage(props: SessionPageProps) {
     }
     toggleCurrentSidePanel("panel");
   }, [panelRailActive, sessionPanelState.tabs, toggleCurrentSidePanel]);
-  const openBrowserUrlControlAction = useMemo<OpenworkControlAction>(() => ({
+  const openBrowserUrlControlAction = useMemo<VenomcoworkControlAction>(() => ({
     id: "browser.open_url",
     label: "Open URL in built-in browser",
     description: "Create or select an VenomCowork built-in browser tab, navigate it to a URL, and return the CDP handle for browser automation.",
@@ -531,7 +531,7 @@ export function SessionPage(props: SessionPageProps) {
     }
   }, [activeSidePanel, setCurrentSidePanel, voiceExtensionEnabled]);
 
-  const openVoicePanelControlAction = useMemo<OpenworkControlAction | null>(() => (
+  const openVoicePanelControlAction = useMemo<VenomcoworkControlAction | null>(() => (
     voiceExtensionEnabled ? {
       id: "voice.panel.open",
       label: "Open Voice Mode",
@@ -545,7 +545,7 @@ export function SessionPage(props: SessionPageProps) {
   ), [setCurrentSidePanel, voiceExtensionEnabled]);
   useControlAction(openVoicePanelControlAction);
 
-  const closeVoicePanelControlAction = useMemo<OpenworkControlAction | null>(() => (
+  const closeVoicePanelControlAction = useMemo<VenomcoworkControlAction | null>(() => (
     voiceExtensionEnabled && activeSidePanel === "voice" ? {
       id: "voice.panel.close",
       label: "Close Voice Mode",

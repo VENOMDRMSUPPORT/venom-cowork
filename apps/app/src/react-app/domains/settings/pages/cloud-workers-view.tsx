@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import * as React from "react";
 import { toast } from "@/components/ui/sonner";
 
@@ -69,7 +69,7 @@ export function CloudWorkersView({
     void refreshWorkers(true);
   }, [activeOrgId, refreshWorkers, user]);
 
-  const openWorker = React.useCallback(
+  const venomCoworker = React.useCallback(
     async (workerId: string, workerName: string) => {
       if (!activeOrgId) {
         setWorkersError(t("den.error_choose_org"));
@@ -135,7 +135,7 @@ export function CloudWorkersView({
         workers={workers}
         workersBusy={workersBusy}
         workersError={workersError}
-        onVenomCoworker={openWorker}
+        onVenomCoworker={venomCoworker}
         onRefreshWorkers={refreshWorkers}
       />
     </SettingsStack>

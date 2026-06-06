@@ -1,4 +1,4 @@
-﻿import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -28,7 +28,7 @@ async function createWorkspaceRoot() {
   return root;
 }
 
-async function startOpenworkServer(workspaceRoot: string) {
+async function startVenomcoworkServer(workspaceRoot: string) {
   const config: ServerConfig = {
     host: "127.0.0.1",
     port: 0,
@@ -57,7 +57,7 @@ function auth(token: string) {
 describe("artifact file routes", () => {
   test("resolve, read, write, and download markdown/csv/xlsx/pptx/html artifacts", async () => {
     const root = await createWorkspaceRoot();
-    const { base, token } = await startOpenworkServer(root);
+    const { base, token } = await startVenomcoworkServer(root);
 
     const resolveResponse = await fetch(`${base}/workspace/ws_1/artifacts/resolve`, {
       method: "POST",

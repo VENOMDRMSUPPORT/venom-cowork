@@ -1,13 +1,13 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { MonitorSmartphone } from "lucide-react";
 
 import { surfaceCardClass } from "../workspace/modal-styles";
 import { registerExtensionConfig } from "./extension-registry";
 
-const openWorkBrowserConfigFactory = () => <VenomCoworkBrowserConfig />;
+const venomCoworkBrowserConfigFactory = () => <VenomCoworkBrowserConfig />;
 
-registerExtensionConfig("venomcowork.browser.settings", openWorkBrowserConfigFactory);
-registerExtensionConfig("venomcowork-browser", openWorkBrowserConfigFactory);
+registerExtensionConfig("venomcowork.browser.settings", venomCoworkBrowserConfigFactory);
+registerExtensionConfig("venomcowork-browser", venomCoworkBrowserConfigFactory);
 
 function VenomCoworkBrowserConfig() {
   return (

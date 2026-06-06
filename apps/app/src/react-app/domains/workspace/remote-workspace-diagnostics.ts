@@ -1,10 +1,10 @@
-﻿import type { WorkspaceConnectionState } from "../../../app/types";
+import type { WorkspaceConnectionState } from "../../../app/types";
 import type { WorkspaceInfo } from "../../../app/lib/desktop";
 import {
-  createOpenworkServerClient,
-  normalizeOpenworkServerUrl,
-  parseOpenworkWorkspaceIdFromUrl,
-  type OpenworkServerClient,
+  createVenomcoworkServerClient,
+  normalizeVenomcoworkServerUrl,
+  parseVenomcoworkWorkspaceIdFromUrl,
+  type VenomcoworkServerClient,
 } from "../../../app/lib/venomcowork-server";
 import { redactTokenLikeText } from "../../../app/utils";
 
@@ -29,9 +29,9 @@ export type RemoteWorkspaceConnectionResult = {
 type TestOptions = {
   now?: () => number;
   createClient?: (target: RemoteWorkspaceConnectionTarget) => Pick<
-    OpenworkServerClient,
+    VenomcoworkServerClient,
     "health" | "capabilities" | "status" | "listWorkspaces"
-  > | Promise<Pick<OpenworkServerClient, "health" | "capabilities" | "status" | "listWorkspaces">>;
+  > | Promise<Pick<VenomcoworkServerClient, "health" | "capabilities" | "status" | "listWorkspaces">>;
 };
 
 function trim(value: string | null | undefined) {
@@ -59,7 +59,7 @@ function endpointLabel(baseUrl: string) {
   }
 }
 
-function stripOpenworkWorkspaceMount(baseUrl: string) {
+function stripVenomcoworkWorkspaceMount(baseUrl: string) {
   try {
     const url = new URL(baseUrl);
     const segments = url.pathname.split("/").filter(Boolean);
@@ -142,7 +142,7 @@ function displayWorkspaceName(workspace: unknown) {
 }
 
 function defaultCreateClient(target: RemoteWorkspaceConnectionTarget) {
-  return createOpenworkServerClient({
+  return createVenomcoworkServerClient({
     baseUrl: target.baseUrl,
     token: target.token || undefined,
   });
@@ -183,7 +183,7 @@ export function resolveRemoteWorkspaceConnectionTarget(workspace: WorkspaceInfo)
     };
   }
 
-  const normalizedHostUrl = normalizeOpenworkServerUrl(rawHostUrl);
+  const normalizedHostUrl = normalizeVenomcoworkServerUrl(rawHostUrl);
   if (!normalizedHostUrl || !isValidHttpEndpoint(normalizedHostUrl)) {
     return {
       ok: false,
@@ -197,10 +197,10 @@ export function resolveRemoteWorkspaceConnectionTarget(workspace: WorkspaceInfo)
 
   const workspaceId =
     trim(workspace.venomcoworkWorkspaceId) ||
-    parseOpenworkWorkspaceIdFromUrl(normalizedHostUrl) ||
-    parseOpenworkWorkspaceIdFromUrl(trim(workspace.baseUrl)) ||
+    parseVenomcoworkWorkspaceIdFromUrl(normalizedHostUrl) ||
+    parseVenomcoworkWorkspaceIdFromUrl(trim(workspace.baseUrl)) ||
     null;
-  const hostBaseUrl = stripOpenworkWorkspaceMount(normalizedHostUrl);
+  const hostBaseUrl = stripVenomcoworkWorkspaceMount(normalizedHostUrl);
   const token =
     trim(workspace.venomcoworkToken) ||
     trim(workspace.venomcoworkClientToken) ||

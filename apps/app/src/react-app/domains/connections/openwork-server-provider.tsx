@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import {
   createContext,
   use,
@@ -6,25 +6,25 @@ import {
   type ReactNode,
 } from "react";
 
-import type { OpenworkServerStore } from "./venomcowork-server-store";
+import type { VenomcoworkServerStore } from "./venomcowork-server-store";
 
-const OpenworkServerContext = createContext<OpenworkServerStore | null>(null);
+const VenomcoworkServerContext = createContext<VenomcoworkServerStore | null>(null);
 
-export function OpenworkServerProvider(props: {
-  store: OpenworkServerStore;
+export function VenomcoworkServerProvider(props: {
+  store: VenomcoworkServerStore;
   children: ReactNode;
 }) {
   return (
-    <OpenworkServerContext.Provider value={props.store}>
+    <VenomcoworkServerContext.Provider value={props.store}>
       {props.children}
-    </OpenworkServerContext.Provider>
+    </VenomcoworkServerContext.Provider>
   );
 }
 
-export function useOpenworkServer() {
-  const store = use(OpenworkServerContext);
+export function useVenomcoworkServer() {
+  const store = use(VenomcoworkServerContext);
   if (!store) {
-    throw new Error("useOpenworkServer must be used within an OpenworkServerProvider");
+    throw new Error("useVenomcoworkServer must be used within an VenomcoworkServerProvider");
   }
 
   useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);

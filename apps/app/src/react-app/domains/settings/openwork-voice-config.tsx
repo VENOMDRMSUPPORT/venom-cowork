@@ -1,4 +1,4 @@
-﻿/** @jsxImportSource react */
+/** @jsxImportSource react */
 import { useState } from "react";
 import { CheckCircle2, Loader2, Mic2, XCircle } from "lucide-react";
 
@@ -30,7 +30,7 @@ export type VenomCoworkVoiceConfigProps = {
   onTestSession: () => void | Promise<void>;
 };
 
-const openWorkVoiceConfigFactory = (ctx: ExtensionConfigContext) => (
+const venomCoworkVoiceConfigFactory = (ctx: ExtensionConfigContext) => (
   <VenomCoworkVoiceConfig
     busy={ctx.voiceExtension.busy}
     status={ctx.voiceExtension.status}
@@ -41,8 +41,8 @@ const openWorkVoiceConfigFactory = (ctx: ExtensionConfigContext) => (
   />
 );
 
-registerExtensionConfig("venomcowork.voice.settings", openWorkVoiceConfigFactory);
-registerExtensionConfig("venomcowork-voice", openWorkVoiceConfigFactory);
+registerExtensionConfig("venomcowork.voice.settings", venomCoworkVoiceConfigFactory);
+registerExtensionConfig("venomcowork-voice", venomCoworkVoiceConfigFactory);
 
 export function VenomCoworkVoiceConfig(props: VenomCoworkVoiceConfigProps) {
   const [apiKey, setApiKey] = useState("");

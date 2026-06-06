@@ -1,4 +1,4 @@
-﻿function trim(value) {
+function trim(value) {
   return String(value ?? "").trim();
 }
 
@@ -18,7 +18,7 @@ function workspaceDirectoryCandidates(workspace) {
     .filter(Boolean);
 }
 
-export function selectOpenworkWorkspaceForConnection(list, directory) {
+export function selectVenomcoworkWorkspaceForConnection(list, directory) {
   const items = Array.isArray(list?.items)
     ? list.items
     : Array.isArray(list?.workspaces)

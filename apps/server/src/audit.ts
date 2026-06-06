@@ -1,4 +1,4 @@
-﻿import { dirname, join } from "node:path";
+import { dirname, join } from "node:path";
 import { appendFile, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import type { AuditEntry } from "./types.js";
@@ -11,14 +11,14 @@ function expandHome(value: string): string {
   return value;
 }
 
-function resolveOpenworkDataDir(): string {
+function resolveVenomcoworkDataDir(): string {
   const override = process.env.VENOMCOWORK_DATA_DIR?.trim();
   if (override) return expandHome(override);
   return join(homedir(), ".venomcowork", "venomcowork-server");
 }
 
 export function auditLogPath(workspaceId: string): string {
-  return join(resolveOpenworkDataDir(), "audit", `${workspaceId}.jsonl`);
+  return join(resolveVenomcoworkDataDir(), "audit", `${workspaceId}.jsonl`);
 }
 
 export function legacyAuditLogPath(workspaceRoot: string): string {
