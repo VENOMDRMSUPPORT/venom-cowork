@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@venom-cowork-ee/landing",
   "private": true,
   "version": "0.0.0",
@@ -29,3 +29,4 @@
     "typescript": "5.4.5"
   }
 }
+

@@ -52,9 +52,13 @@
     "release:ship:watch": "node scripts/release/ship.mjs --watch"
   },
   "devDependencies": {
+    "ico-endec": "^0.1.6",
     "png2icons": "^2.0.1",
     "sharp": "^0.34.5",
     "turbo": "^2.5.5"
   },
-  "packageManager": "pnpm@11.4.0"
+  "packageManager": "pnpm@11.4.0",
+  "dependencies": {
+    "glob": "^13.0.6"
+  }
 }

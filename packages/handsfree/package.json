@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@venom-cowork/handsfree",
   "private": true,
   "version": "0.1.0",
@@ -21,3 +21,4 @@
     "README.md"
   ]
 }
+

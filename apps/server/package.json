@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "venomcowork-server",
   "version": "0.15.2",
   "description": "Filesystem-backed API for VenomCowork remote clients",
@@ -63,3 +63,5 @@
   },
   "packageManager": "pnpm@10.27.0"
 }
+
+

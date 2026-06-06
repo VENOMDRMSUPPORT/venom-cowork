@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "venomcowork-orchestrator",
   "version": "0.15.2",
   "description": "VenomCowork host orchestrator for opencode + VenomCowork server + opencode-router",
@@ -63,3 +63,4 @@
   },
   "packageManager": "pnpm@10.27.0"
 }
+

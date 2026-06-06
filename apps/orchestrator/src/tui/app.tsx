@@ -1,4 +1,4 @@
-﻿import { RGBA, TextAttributes, type InputRenderable, type KeyEvent, type TabSelectRenderable } from "@opentui/core";
+import { RGBA, TextAttributes, type InputRenderable, type KeyEvent, type TabSelectRenderable } from "@opentui/core";
 import { render, useKeyboard, useRenderer, useSelectionHandler, useTerminalDimensions } from "@opentui/solid";
 import { For, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
@@ -887,3 +887,4 @@ export function startOrchestratorTui(options: TuiOptions): TuiHandle {
 
   return api;
 }
+

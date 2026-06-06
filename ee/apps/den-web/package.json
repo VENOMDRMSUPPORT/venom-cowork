@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@venom-cowork-ee/den-web",
   "private": true,
   "version": "0.0.0",
@@ -31,3 +31,4 @@
     "typescript": "5.4.5"
   }
 }
+

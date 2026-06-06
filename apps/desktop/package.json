@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@venom-cowork/desktop",
   "private": true,
   "version": "0.15.2",
@@ -42,3 +42,4 @@
   "packageManager": "pnpm@10.27.0",
   "opencodeRouterVersion": "0.15.2"
 }
+

@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "opencode-router",
   "version": "0.15.2",
   "description": "opencode-router: Slack + Telegram bridge + directory routing for a running opencode server",
@@ -58,3 +58,4 @@
     "typescript": "^5.6.3"
   }
 }
+

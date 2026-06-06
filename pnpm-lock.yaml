@@ -1,4 +1,4 @@
-﻿lockfileVersion: '9.0'
+lockfileVersion: '9.0'
 
 settings:
   autoInstallPeers: true
@@ -23,7 +23,17 @@ catalogs:
 importers:
 
   .:
+    dependencies:
+      glob:
+        specifier: ^13.0.6
+        version: 13.0.6
     devDependencies:
+      png2icons:
+        specifier: ^2.0.1
+        version: 2.0.1
+      sharp:
+        specifier: ^0.34.5
+        version: 0.34.5
       turbo:
         specifier: ^2.5.5
         version: 2.8.20
@@ -66,12 +76,6 @@ importers:
       '@opencode-ai/sdk':
         specifier: ^1.15.12
         version: 1.15.12
-      '@venom-cowork/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@venom-cowork/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@paper-design/shaders-react':
         specifier: 0.0.72
         version: 0.0.72(@types/react@19.2.14)(react@19.2.4)
@@ -90,6 +94,12 @@ importers:
       '@tanstack/react-virtual':
         specifier: ^3.13.23
         version: 3.13.23(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@venom-cowork/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      '@venom-cowork/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@xterm/addon-fit':
         specifier: ^0.11.0
         version: 0.11.0
@@ -303,12 +313,12 @@ importers:
       opencode-router:
         specifier: 0.15.2
         version: link:../opencode-router
-      venomcowork-server:
-        specifier: 0.15.2
-        version: link:../server
       solid-js:
         specifier: 1.9.9
         version: 1.9.9
+      venomcowork-server:
+        specifier: 0.15.2
+        version: link:../server
     devDependencies:
       '@opentui/core-darwin-arm64':
         specifier: 0.1.77
@@ -435,6 +445,15 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
         version: 1.29.0(zod@4.3.6)
+      '@standard-community/standard-json':
+        specifier: ^0.3.5
+        version: 0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.3.6))(zod@4.3.6)
+      '@standard-community/standard-openapi':
+        specifier: ^0.2.9
+        version: 0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.3.6))(zod@4.3.6))(@standard-schema/spec@1.1.0)(openapi-types@12.1.3)(zod@4.3.6)
+      '@standard-schema/spec':
+        specifier: ^1.1.0
+        version: 1.1.0
       '@venom-cowork-ee/den-db':
         specifier: workspace:*
         version: link:../../packages/den-db
@@ -447,15 +466,6 @@ importers:
       '@venom-cowork/types':
         specifier: workspace:*
         version: link:../../../packages/types
-      '@standard-community/standard-json':
-        specifier: ^0.3.5
-        version: 0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.3.6))(zod@4.3.6)
-      '@standard-community/standard-openapi':
-        specifier: ^0.2.9
-        version: 0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.3.6))(zod@4.3.6))(@standard-schema/spec@1.1.0)(openapi-types@12.1.3)(zod@4.3.6)
-      '@standard-schema/spec':
-        specifier: ^1.1.0
-        version: 1.1.0
       better-auth:
         specifier: 1.6.11
         version: 1.6.11(@opentelemetry/api@1.9.0)(drizzle-kit@0.31.9)(mysql2@3.17.4)(next@16.2.3(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.9)
@@ -499,6 +509,12 @@ importers:
 
   ee/apps/den-web:
     dependencies:
+      '@paper-design/shaders-react':
+        specifier: 0.0.72
+        version: 0.0.72(@types/react@19.2.14)(react@19.2.4)
+      '@tanstack/react-query':
+        specifier: ^5.96.2
+        version: 5.96.2(react@19.2.4)
       '@venom-cowork-ee/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -508,12 +524,6 @@ importers:
       '@venom-cowork/ui':
         specifier: workspace:*
         version: link:../../../packages/ui
-      '@paper-design/shaders-react':
-        specifier: 0.0.72
-        version: 0.0.72(@types/react@19.2.14)(react@19.2.4)
-      '@tanstack/react-query':
-        specifier: ^5.96.2
-        version: 5.96.2(react@19.2.4)
       lucide-react:
         specifier: ^0.577.0
         version: 0.577.0(react@19.2.4)
@@ -671,15 +681,15 @@ importers:
 
   ee/packages/den-db:
     dependencies:
+      '@planetscale/database':
+        specifier: ^1.19.0
+        version: 1.19.0
       '@venom-cowork-ee/utils':
         specifier: workspace:*
         version: link:../utils
       '@venom-cowork/types':
         specifier: workspace:*
         version: link:../../../packages/types
-      '@planetscale/database':
-        specifier: ^1.19.0
-        version: 1.19.0
       drizzle-orm:
         specifier: ^0.45.1
         version: 0.45.1(@opentelemetry/api@1.9.0)(@planetscale/database@1.19.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(bun-types@1.3.6)(kysely@0.28.17)(mysql2@3.17.4)
@@ -773,15 +783,6 @@ importers:
 
   packages/handsfree: {}
 
-  packages/venomcowork-ui-mcp:
-    dependencies:
-      '@modelcontextprotocol/sdk':
-        specifier: ^1.29.0
-        version: 1.29.0(zod@3.25.76)
-      zod:
-        specifier: ^3.25.76
-        version: 3.25.76
-
   packages/types:
     dependencies:
       zod:
@@ -819,6 +820,15 @@ importers:
       typescript:
         specifier: ^5.6.3
         version: 5.9.3
+
+  packages/venomcowork-ui-mcp:
+    dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.29.0
+        version: 1.29.0(zod@3.25.76)
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
 
 packages:
 
@@ -7660,6 +7670,10 @@ packages:
     resolution: {integrity: sha512-uysumyrvkUX0rX/dEVqt8gC3sTBzd4zoWfLeS29nb53imdaXVvLINYXTI2GNqzaMuvacNx4uJQ8+b3zXR0pkgQ==}
     engines: {node: '>=10.4.0'}
 
+  png2icons@2.0.1:
+    resolution: {integrity: sha512-GDEQJr8OG4e6JMp7mABtXFSEpgJa1CCpbQiAR+EjhkHJHnUL9zPPtbOrjsMD8gUbikgv3j7x404b0YJsV3aVFA==}
+    hasBin: true
+
   pngjs@6.0.0:
     resolution: {integrity: sha512-TRzzuFRRmEoSW/p1KVAmiOgPco2Irlah+bGFCeNfJXxxYGwSw7YwAOAcd7X28K/m5bjBWKsC29KyoMfHbypayg==}
     engines: {node: '>=12.13.0'}
@@ -10765,8 +10779,7 @@ snapshots:
       '@iconify/types': 2.0.0
       import-meta-resolve: 4.2.0
 
-  '@img/colour@1.1.0':
-    optional: true
+  '@img/colour@1.1.0': {}
 
   '@img/sharp-darwin-arm64@0.34.5':
     optionalDependencies:
@@ -12815,7 +12828,7 @@ snapshots:
   '@ts-morph/common@0.27.0':
     dependencies:
       fast-glob: 3.3.3
-      minimatch: 10.1.1
+      minimatch: 10.2.5
       path-browserify: 1.0.1
 
   '@turbo/darwin-64@2.8.20':
@@ -13269,7 +13282,7 @@ snapshots:
       js-yaml: 4.1.1
       json5: 2.2.3
       lazy-val: 1.0.5
-      minimatch: 10.1.1
+      minimatch: 10.2.5
       resedit: 1.7.2
       sanitize-filename: 1.6.4
       semver: 7.7.4
@@ -16750,6 +16763,8 @@ snapshots:
       base64-js: 1.5.1
       xmlbuilder: 15.1.1
 
+  png2icons@2.0.1: {}
+
   pngjs@6.0.0: {}
 
   pngjs@7.0.0: {}
@@ -17476,7 +17491,6 @@ snapshots:
       '@img/sharp-win32-arm64': 0.34.5
       '@img/sharp-win32-ia32': 0.34.5
       '@img/sharp-win32-x64': 0.34.5
-    optional: true
 
   shebang-command@2.0.0:
     dependencies:
