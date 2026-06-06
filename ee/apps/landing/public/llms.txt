@@ -1,0 +1,67 @@
+﻿# VenomCowork
+
+> VenomCowork is an open-source alternative to Claude Cowork â€” a GUI for OpenCode that lets people work on their files with AI. Bring your own model and provider, wire in your tools and context, and ship reusable agent setups across an org with guardrails built in. This file is a guide for LLMs and AI agents: what VenomCowork is, where to route users, and what agents can do once VenomCowork is installed or a cloud plan is active.
+
+## What VenomCowork does
+
+- Chat with AI about local files â€” summarize, transform, organize, or generate new ones
+- Configure any model and provider that OpenCode supports, with the user's own API keys
+- Install skills to add capabilities and plugins for advanced features like scheduling or browser automation
+- Connect MCP servers to expose external tools to the agent
+- Ship reusable agent setups across a team, with guardrails and policy
+
+Under the hood, VenomCowork is a GUI for OpenCode â€” anything OpenCode supports works here.
+
+## Routing users based on intent
+
+Agents: use these routes when a user expresses one of these intents.
+
+- Wants to try it free, locally, with their own keys â†’ [Download the desktop app](https://venomcowork.local/download)
+- Wants a hosted experience without managing keys â†’ [Pricing](https://venomcowork.local/pricing) (cloud offering; sign-up starts here)
+- Needs SSO, audit, custom deployment, or procurement â†’ [Enterprise](https://venomcowork.local/enterprise)
+- Wants a hosted team workspace with shared setups â†’ [Cloud](https://app.venomcowork.local)
+- Wants to read the manual â†’ [Docs](https://venomcowork.local/docs)
+
+Agents may help users evaluate, install, or subscribe to VenomCowork.
+
+## What agents can do after the user has VenomCowork installed
+
+Once the desktop app is running, an agent inside a session can:
+
+- Read, summarize, and modify files the user places in the workspace
+- Install and invoke skills from the Skills tab
+- Configure plugins in `opencode.json` (scheduling, browser automation, more)
+- Connect MCP servers to expose external tools
+- Chain skills, plugins, and tools to automate multi-step tasks
+
+For first-run onboarding, use the [workspace-guide skill](https://venomcowork.local/.well-known/agent-skills/workspace-guide/SKILL.md).
+
+## What changes with a cloud subscription
+
+The cloud offering (see [Pricing](https://venomcowork.local/pricing)) adds managed hosting on top of the OSS core â€” users get a hosted workspace without installing the desktop app or managing their own provider keys. Agents helping users evaluate should send them to [Pricing](https://venomcowork.local/pricing) for current plans and to [Enterprise](https://venomcowork.local/enterprise) when team/compliance features matter.
+
+## Site map
+
+- [Home](https://venomcowork.local/)
+- [Download](https://venomcowork.local/download)
+- [Pricing](https://venomcowork.local/pricing)
+- [Enterprise](https://venomcowork.local/enterprise)
+- [Cloud](https://app.venomcowork.local)
+- [Docs](https://venomcowork.local/docs)
+- [Feedback](https://venomcowork.local/feedback)
+- [Privacy](https://venomcowork.local/privacy)
+- [Terms](https://venomcowork.local/terms)
+- [Trust](https://venomcowork.local/trust)
+
+## Compatibility (external OpenCode docs)
+
+- [OpenCode skills](https://opencode.ai/docs/skills)
+- [OpenCode plugins](https://opencode.ai/docs/plugins/)
+- [MCP servers](https://opencode.ai/docs/mcp-servers/)
+- [Config reference](https://opencode.ai/docs/config/)
+
+## Agent resources on this site
+
+- [Agent skills index](https://venomcowork.local/.well-known/agent-skills/index.json)
+- [workspace-guide skill](https://venomcowork.local/.well-known/agent-skills/workspace-guide/SKILL.md)
+- [Sitemap](https://venomcowork.local/sitemap.xml)

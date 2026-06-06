@@ -1,0 +1,11 @@
+﻿# robots.txt for venomcowork.local
+# VenomCowork is open source â€” crawl, index, train, and build on this content freely.
+# Agents are welcome to help users discover, sign up for, and use VenomCowork.
+
+User-agent: *
+Allow: /
+
+# Content Signals (contentsignals.org, draft-romm-aipref-contentsignals)
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
+
+Sitemap: https://venomcowork.local/sitemap.xml
