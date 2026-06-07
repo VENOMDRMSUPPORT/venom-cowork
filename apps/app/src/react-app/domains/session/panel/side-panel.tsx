@@ -38,12 +38,15 @@ import {
   sameBounds,
 } from "./utils";
 
+import type { OpenTarget } from "../artifacts/open-target";
+
 type SidePanelProps = {
   sessionId: string;
   client: VenomcoworkServerClient | null;
   workspaceId: string | null;
   workspaceRoot: string;
   isRemoteWorkspace?: boolean;
+  onPreviewInBrowser?: (target: OpenTarget) => void;
   onClose: () => void;
 };
 
@@ -384,6 +387,7 @@ export function SidePanel({
   workspaceId,
   workspaceRoot,
   isRemoteWorkspace = false,
+  onPreviewInBrowser,
   onClose,
 }: SidePanelProps) {
   const { tabs } = useSessionPanelState(sessionId);
@@ -446,6 +450,7 @@ export function SidePanel({
               workspaceId={workspaceId}
               workspaceRoot={workspaceRoot}
               isRemoteWorkspace={isRemoteWorkspace}
+              onPreviewInBrowser={onPreviewInBrowser}
               onClose={onClose}
             />
           </div>

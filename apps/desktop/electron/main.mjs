@@ -442,7 +442,8 @@ configureFakeMediaForTests(app, envFlagEnabled("VENOMCOWORK_ELECTRON_FAKE_MEDIA"
 // VENOMCOWORK_DEN_BASE_URL to point at your own Den deployment, or leave it
 // unset to keep Den features unconfigured.
 const DEFAULT_DEN_BASE_URL = process.env.VENOMCOWORK_DEN_BASE_URL || "";
-const DEFAULT_LOCAL_BASE_URL = "http://127.0.0.1:4096";
+// Allow overriding the local server URL via env var (for connecting to shared orchestrator)
+const DEFAULT_LOCAL_BASE_URL = process.env.VENOMCOWORK_LOCAL_BASE_URL || "http://127.0.0.1:4096";
 const FORCE_DESKTOP_REQUIRE_SIGNIN = envFlagEnabled("VENOMCOWORK_FORCE_SIGNIN");
 const DEFAULT_DESKTOP_REQUIRE_SIGNIN = FORCE_DESKTOP_REQUIRE_SIGNIN;
 let applicationMenuVisible = process.platform === "darwin";

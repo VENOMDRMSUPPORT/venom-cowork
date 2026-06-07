@@ -45,7 +45,7 @@ export const DEFAULT_SHELL_CONFIG: ShellConfig = {
   starterCards: true,
   modelPicker: true,
   browser: true,
-  addWorkspace: true,
+  addWorkspace: false,
 };
 
 /* ------------------------------------------------------------------ */

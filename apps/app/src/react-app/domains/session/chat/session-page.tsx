@@ -102,6 +102,7 @@ export type SessionPageSidebarProps = {
   newTaskDisabled: boolean;
   sidebarHydratedFromCache: boolean;
   startupPhase: BootPhase;
+  todos: TodoItem[];
   onSelectWorkspace: (workspaceId: string) => Promise<boolean> | boolean | void;
   onOpenSession: (workspaceId: string, sessionId: string) => void;
   onPrefetchSession?: (workspaceId: string, sessionId: string) => void;
@@ -115,6 +116,7 @@ export type SessionPageSidebarProps = {
   onEditWorkspaceConnection: (workspaceId: string) => void;
   onForgetWorkspace: (workspaceId: string) => void;
   onOpenCreateWorkspace: () => void;
+  onOpenSettings?: () => void;
   onReorderWorkspaces?: (workspaceIds: string[]) => void;
 };
 
@@ -407,6 +409,22 @@ export function SessionPage(props: SessionPageProps) {
     preserveSidePanelOnPanelOpenRef.current = true;
     setCurrentSidePanel("panel");
   }, [activePanelTab?.id, browserUrlForTarget, openTab, props.selectedSessionId, setCurrentSidePanel]);
+  const previewComponentInBrowser = useCallback((target: OpenTarget) => {
+    if (target.kind !== "file") return;
+
+    // For component files, try to find a running dev server first
+    // Then open the browser with the component URL
+    const devServerUrl = `http://localhost:5173/${target.value}`;
+    const fallbackUrl = `http://localhost:3000/${target.value}`;
+
+    if (isElectronRuntime()) {
+      setCurrentSidePanel("panel");
+      // Try Vite first (5173), then Next.js (3000)
+      void window.__VENOMCOWORK_ELECTRON__?.browser?.createTab?.(devServerUrl);
+    } else {
+      window.open(devServerUrl, "_blank", "noopener,noreferrer");
+    }
+  }, [setCurrentSidePanel]);
   const closeRightPane = useCallback(() => {
     setCurrentSidePanel(null);
   }, [setCurrentSidePanel]);
@@ -745,6 +763,7 @@ export function SessionPage(props: SessionPageProps) {
           connectingWorkspaceId={props.sidebar.connectingWorkspaceId}
           workspaceConnectionStateById={props.sidebar.workspaceConnectionStateById}
           newTaskDisabled={props.sidebar.newTaskDisabled}
+          todos={props.sidebar.todos}
           onSelectWorkspace={props.sidebar.onSelectWorkspace}
           onOpenSession={openSessionTab}
           onPrefetchSession={props.sidebar.onPrefetchSession}
@@ -769,7 +788,7 @@ export function SessionPage(props: SessionPageProps) {
           onTestWorkspaceConnection={props.sidebar.onTestWorkspaceConnection}
           onEditWorkspaceConnection={props.sidebar.onEditWorkspaceConnection}
           onForgetWorkspace={props.sidebar.onForgetWorkspace}
-          onOpenCreateWorkspace={props.sidebar.onOpenCreateWorkspace}
+          onOpenSettings={props.sidebar.onOpenSettings ?? props.onOpenSettings}
           onReorderWorkspaces={props.sidebar.onReorderWorkspaces}
           onStartResize={startLeftSidebarResize}
         />
@@ -1176,6 +1195,7 @@ export function SessionPage(props: SessionPageProps) {
                       workspaceId={props.runtimeWorkspaceId}
                       workspaceRoot={props.selectedWorkspaceRoot}
                       isRemoteWorkspace={props.surface?.isRemoteWorkspace ?? false}
+                      onPreviewInBrowser={previewComponentInBrowser}
                       onClose={closeRightPane}
                     />
                   ) : null}

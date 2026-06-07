@@ -4,6 +4,8 @@ import {
   AlertCircle,
   Archive,
   ArchiveRestore,
+  BookOpen,
+  Check,
   ChevronRight,
   FolderPlus,
   Loader2,
@@ -26,6 +28,7 @@ import { getDisplaySessionTitle } from "../../../../app/lib/session-title";
 import type { WorkspaceInfo } from "../../../../app/lib/desktop";
 import { VenomCoworkDenHelpLink } from "../../workspace/venomcowork-den-help-link";
 import type {
+  TodoItem,
   WorkspaceConnectionState,
   WorkspaceSessionGroup,
 } from "../../../../app/types";
@@ -72,6 +75,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { SidebarContext, useSidebarContext } from "./app-sidebar-provider";
 import type { SidebarContextValue } from "./app-sidebar-provider";
@@ -94,8 +102,12 @@ import {
   useWorkspaceGroups,
   type SessionGroupDefinition,
 } from "./session-management-store";
+import { useShellConfig } from "../../../shell/shell-config";
+import { usePlatform } from "../../../kernel/platform";
 import { cn } from "@/lib/utils";
 import { WorkspaceIcon } from "../../../design-system/workspace-icon";
+
+const SIDEBAR_DOCS_URL = process.env.VENOMCOWORK_DOCS_URL || "";
 import { getSessionActivityStatusLabel, type SessionActivityStatus } from "../status/session-activity-store";
 
 interface SessionStatusIndicatorProps {
@@ -478,6 +490,7 @@ export type AppSidebarProps = {
   connectingWorkspaceId: string | null;
   workspaceConnectionStateById: Record<string, WorkspaceConnectionState>;
   newTaskDisabled: boolean;
+  todos: TodoItem[];
   onSelectWorkspace: (workspaceId: string) => Promise<boolean> | boolean | void;
   onOpenSession: (workspaceId: string, sessionId: string) => void;
   onPrefetchSession?: (workspaceId: string, sessionId: string) => void;
@@ -493,7 +506,7 @@ export type AppSidebarProps = {
   onTestWorkspaceConnection: (workspaceId: string) => Promise<boolean> | boolean | void;
   onEditWorkspaceConnection: (workspaceId: string) => void;
   onForgetWorkspace: (workspaceId: string) => void;
-  onOpenCreateWorkspace: () => void;
+  onOpenSettings?: () => void;
   onReorderWorkspaces?: (workspaceIds: string[]) => void;
   onStartResize?: React.PointerEventHandler<HTMLButtonElement>;
 };
@@ -513,6 +526,8 @@ function isSessionActivityStatus(status: string | undefined): status is SessionA
 }
 
 export function AppSidebar(props: AppSidebarProps) {
+  const { config: shellConfig } = useShellConfig();
+  const platform = usePlatform();
   const [expandedWorkspaceIds, setExpandedWorkspaceIds] = React.useState<Set<string>>(
     () => new Set(),
   );
@@ -671,15 +686,54 @@ export function AppSidebar(props: AppSidebarProps) {
           </m.div>
         </LazyMotion>
 
-        <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={props.onOpenCreateWorkspace}>
-                <Plus className="size-4" />
-                {t("workspace_list.add_workspace")}
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+        <SidebarTasksPanel todos={props.todos} />
+
+        <SidebarFooter
+          className="border-t border-border bg-background p-0"
+          data-slot="sidebar-tasks-footer"
+        >
+          <div className="flex h-8 items-center justify-end gap-0.5 px-2">
+            {shellConfig.docsButton && SIDEBAR_DOCS_URL ? (
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      className="text-muted-foreground"
+                      onClick={() => platform.openLink(SIDEBAR_DOCS_URL)}
+                      aria-label={t("status.open_docs")}
+                      title={t("status.open_docs")}
+                    >
+                      <BookOpen className="size-3.5" />
+                    </Button>
+                  }
+                />
+                <TooltipContent side="top">{t("status.open_docs")}</TooltipContent>
+              </Tooltip>
+            ) : null}
+            {props.onOpenSettings ? (
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      className="text-muted-foreground"
+                      onClick={props.onOpenSettings}
+                      aria-label={t("status.settings")}
+                      title={t("status.settings")}
+                    >
+                      <Settings className="size-3.5" />
+                    </Button>
+                  }
+                />
+                <TooltipContent side="top">{t("status.settings")}</TooltipContent>
+              </Tooltip>
+            ) : null}
+          </div>
         </SidebarFooter>
         <SidebarRail
           aria-label={props.onStartResize ? t("session.resize_workspace_column") : undefined}
@@ -701,6 +755,102 @@ type WorkspaceReorderItemProps = {
   previewCount: number;
   showMoreSessions: (workspaceId: string, totalRoots: number) => void;
 };
+
+function SidebarTasksPanel({ todos }: { todos: TodoItem[] }) {
+  const items = React.useMemo(
+    () => todos.filter((todo) => todo.content.trim()),
+    [todos],
+  );
+  const completedCount = React.useMemo(
+    () => items.filter((todo) => todo.status === "completed").length,
+    [items],
+  );
+  const [expanded, setExpanded] = React.useState(true);
+
+  if (items.length === 0) return null;
+
+  return (
+    <div
+      data-slot="sidebar-tasks-panel"
+      className="shrink-0 border-t border-border bg-background"
+    >
+      <button
+        type="button"
+        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent/50"
+        onClick={() => setExpanded((value) => !value)}
+        aria-expanded={expanded}
+        aria-label={t("session.todo_progress_label")}
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="font-medium text-foreground">
+            {t("session.todo_progress_label")}
+          </span>
+          <span className="truncate text-muted-foreground">
+            {t("session.todo_progress", undefined, {
+              completed: completedCount,
+              total: items.length,
+            })}
+          </span>
+        </span>
+        <ChevronRight
+          className={cn(
+            "size-3.5 shrink-0 text-muted-foreground transition-transform",
+            expanded && "rotate-90",
+          )}
+        />
+      </button>
+      {expanded ? (
+        <ul className="max-h-44 space-y-1.5 overflow-auto border-t border-border px-2 py-2">
+          {items.map((todo, index) => {
+            const done = todo.status === "completed";
+            const cancelled = todo.status === "cancelled";
+            const active = todo.status === "in_progress";
+            return (
+              <li
+                key={todo.id || `${index}-${todo.content}`}
+                className="flex items-start gap-2 px-1.5"
+              >
+                <div
+                  className={cn(
+                    "mt-0.5 flex size-3.5 shrink-0 items-center justify-center rounded-full border",
+                    done
+                      ? "border-green-6 bg-green-2 text-green-11"
+                      : active
+                        ? "border-amber-6 bg-amber-2 text-amber-11"
+                        : cancelled
+                          ? "border-border bg-muted text-muted-foreground"
+                          : "border-border bg-background text-muted-foreground",
+                  )}
+                >
+                  {done ? (
+                    <Check className="size-2.5" />
+                  ) : active ? (
+                    <span className="size-1.5 rounded-full bg-amber-9" />
+                  ) : null}
+                </div>
+                <span
+                  className={cn(
+                    "min-w-0 flex-1 text-[11px] leading-snug",
+                    cancelled
+                      ? "text-muted-foreground line-through"
+                      : done
+                        ? "text-muted-foreground"
+                        : "text-foreground/90",
+                  )}
+                >
+                  <span className="mr-1 tabular-nums text-muted-foreground">
+                    {index + 1}.
+                  </span>
+                  {todo.content}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
 
 function WorkspaceReorderItem({
   className,

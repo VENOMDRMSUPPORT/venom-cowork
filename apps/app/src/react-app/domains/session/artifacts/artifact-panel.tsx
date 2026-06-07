@@ -1,7 +1,7 @@
 /** @jsxImportSource react */
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Download, ExternalLink, X } from "lucide-react";
+import { Download, ExternalLink, Eye, X } from "lucide-react";
 
 import type { VenomcoworkServerClient } from "@/app/lib/venomcowork-server";
 import { openDesktopPath } from "@/app/lib/desktop";
@@ -28,6 +28,7 @@ type ArtifactPanelProps = {
   workspaceId: string | null;
   workspaceRoot: string;
   isRemoteWorkspace?: boolean;
+  onPreviewInBrowser?: (target: OpenTarget) => void;
   onClose: () => void;
 };
 
@@ -37,6 +38,7 @@ type ArtifactPanelViewProps = {
   workspaceRoot: string;
   isRemoteWorkspace?: boolean;
   target: OpenTarget;
+  onPreviewInBrowser?: (target: OpenTarget) => void;
   onClose: () => void;
 };
 
@@ -54,10 +56,10 @@ function absoluteWorkspacePath(root: string, path: string) {
 }
 
 function isTextContent(target: OpenTarget): boolean {
-  return ["markdown", "text", "sheet", "html"].includes(target.preview) && !/\.(xlsx|xls|ods)$/i.test(target.value);
+  return ["markdown", "text", "sheet", "html", "component"].includes(target.preview) && !/\.(xlsx|xls|ods)$/i.test(target.value);
 }
 
-export function ArtifactPanel({ sessionId, tab, client, workspaceId, workspaceRoot, isRemoteWorkspace = false, onClose }: ArtifactPanelProps) {
+export function ArtifactPanel({ sessionId, tab, client, workspaceId, workspaceRoot, isRemoteWorkspace = false, onPreviewInBrowser, onClose }: ArtifactPanelProps) {
   const transcriptTargets = usePanelTabStore((state) => state.transcriptArtifactTargets[sessionId] ?? EMPTY_TRANSCRIPT_TARGETS);
   const artifactTargets = useMemo(() => transcriptTargets.filter(isCollectibleArtifactTarget), [transcriptTargets]);
   const target = artifactTargets.find((item) => item.id === tab.id) ?? null;
@@ -73,12 +75,13 @@ export function ArtifactPanel({ sessionId, tab, client, workspaceId, workspaceRo
       workspaceRoot={workspaceRoot}
       isRemoteWorkspace={isRemoteWorkspace}
       target={target}
+      onPreviewInBrowser={onPreviewInBrowser}
       onClose={onClose}
     />
   );
 }
 
-function ArtifactPanelView({ client, workspaceId, workspaceRoot, isRemoteWorkspace = false, target, onClose }: ArtifactPanelViewProps) {
+function ArtifactPanelView({ client, workspaceId, workspaceRoot, isRemoteWorkspace = false, target, onPreviewInBrowser, onClose }: ArtifactPanelViewProps) {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
@@ -274,6 +277,18 @@ function ArtifactPanelView({ client, workspaceId, workspaceRoot, isRemoteWorkspa
                 <TooltipContent>Edit artifact</TooltipContent>
               </Tooltip>
             )
+          ) : null}
+          {target.kind === "file" && target.preview === "component" && onPreviewInBrowser ? (
+            <Tooltip>
+              <TooltipTrigger
+                render={(
+                  <Button variant="ghost" size="icon-sm" onClick={() => onPreviewInBrowser(target)} aria-label="Preview in browser">
+                    <Eye />
+                  </Button>
+                )}
+              />
+              <TooltipContent>Preview in browser</TooltipContent>
+            </Tooltip>
           ) : null}
           {target.kind === "file" ? (
             <Tooltip>

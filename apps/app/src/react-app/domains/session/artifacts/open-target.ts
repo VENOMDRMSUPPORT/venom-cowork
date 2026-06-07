@@ -1,7 +1,7 @@
 ﻿import type { UIMessage } from "ai";
 
 type OpenTargetKind = "url" | "file";
-export type OpenTargetPreview = "browser" | "markdown" | "sheet" | "slides" | "image" | "pdf" | "html" | "text" | "external";
+export type OpenTargetPreview = "browser" | "markdown" | "sheet" | "slides" | "image" | "pdf" | "html" | "component" | "text" | "external";
 
 export interface TextData {
   kind: "text";
@@ -34,7 +34,7 @@ const WORKSPACE_ID_PREFIX_PATTERN = /^workspace\/(?:ws_[^/]+|\d+|[0-9a-f-]{6,})\
 const FILE_PATTERN = /(?:^|[\s"'`([{])((?:\.{1,2}[/\\]|~[/\\]|[/\\])?[\w.\-]+(?:[/\\][\w.\-]+)+\.[a-z][a-z0-9]{0,9}|[\w.\-]+\.[a-z][a-z0-9]{0,9})/gi;
 const URL_PATTERN = /https?:\/\/[^\s)\]}>"'`]+/gi;
 const SOCKET_PATTERN = /(?:ws|wss):\/\/[^\s)\]}>"'`]+/gi;
-const ARTIFACT_FILE_PREVIEWS = new Set<OpenTargetPreview>(["markdown", "sheet", "slides", "image", "pdf", "html"]);
+const ARTIFACT_FILE_PREVIEWS = new Set<OpenTargetPreview>(["markdown", "sheet", "slides", "image", "pdf", "html", "component", "text"]);
 const ASSISTANT_ARTIFACT_MENTION_PATTERN = /\b(?:artifact|created|deck|deliverable|exported|file|generated|opened|presentation|saved|slides?|updated|wrote)\b/i;
 const DISCOVERY_TOOL_NAMES = new Set(["glob", "grep", "search", "find"]);
 const ARTIFACT_METADATA_TOOL_NAMES = new Set(["venomcowork_extension_call"]);
@@ -87,7 +87,11 @@ function classifyOpenTarget(value: string, kind: OpenTargetKind): OpenTargetPrev
   if ([".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"].includes(ext)) return "image";
   if (ext === ".pdf") return "pdf";
   if ([".html", ".htm"].includes(ext)) return "html";
-  if ([".txt", ".log", ".json", ".jsonc", ".yaml", ".yml", ".toml", ".xml", ".ts", ".tsx", ".js", ".jsx", ".css", ".scss"].includes(ext)) return "text";
+  // UI component files — can be previewed with a dev server
+  if ([".tsx", ".jsx", ".vue", ".svelte", ".astro"].includes(ext)) return "component";
+  // Static style files — directly previewable
+  if ([".css", ".scss", ".less"].includes(ext)) return "component";
+  if ([".txt", ".log", ".json", ".jsonc", ".yaml", ".yml", ".toml", ".xml", ".ts", ".js"].includes(ext)) return "text";
   return "external";
 }
 

@@ -3,6 +3,10 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { isSamePathname } from "../_lib/client-route";
 import { getErrorMessage, requestJson, type AuthMode } from "../_lib/den-flow";
 import { getMcpOAuthSelectOrganizationRoute } from "../_lib/mcp-oauth-route";
@@ -316,7 +320,7 @@ export function AuthPanel({
       ) : null}
 
       <form
-        className="grid gap-4"
+        className="flex flex-col gap-4"
         onSubmit={async (event) => {
           if (isPasswordResetRequest) {
             await submitPasswordResetRequest(event);
@@ -371,49 +375,61 @@ export function AuthPanel({
         ) : null}
 
         {!hideEmailField ? (
-          <label className="grid gap-2">
-            <span className="den-label">Email</span>
-            <input
-              className="den-input disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+          <Field data-invalid={!!authError} data-disabled={lockEmail}>
+            <FieldLabel htmlFor="auth-email">Email</FieldLabel>
+            <Input
+              id="auth-email"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               autoComplete="email"
               readOnly={lockEmail}
               disabled={lockEmail}
+              aria-invalid={!!authError}
               required
             />
-          </label>
+            {authError ? (
+              <FieldDescription className="text-destructive">{authError}</FieldDescription>
+            ) : null}
+          </Field>
         ) : null}
 
         {!verificationRequired && !isPasswordResetRequest ? (
-          <label className="grid gap-2">
-            <span className="den-label">Password</span>
-            <input
-              className="den-input"
+          <Field>
+            <FieldLabel htmlFor="auth-password">Password</FieldLabel>
+            <Input
+              id="auth-password"
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete={authMode === "sign-up" ? "new-password" : "current-password"}
               required
             />
-          </label>
+          </Field>
         ) : isPasswordResetRequest ? null : (
-          <label className="grid gap-2">
-            <span className="den-label">Verification code</span>
-            <input
-              className="den-input text-center text-[18px] font-semibold tracking-[0.35em]"
-              type="text"
+          <Field>
+            <FieldLabel htmlFor="auth-verification">Verification code</FieldLabel>
+            <InputOTP
+              id="auth-verification"
+              maxLength={6}
+              value={verificationCode}
+              onChange={(value) => setVerificationCode(value)}
+              autoComplete="one-time-code"
               inputMode="numeric"
               pattern="[0-9]*"
-              value={verificationCode}
-              onChange={(event) =>
-                setVerificationCode(event.target.value.replace(/\D+/g, "").slice(0, 6))
-              }
-              autoComplete="one-time-code"
               required
-            />
-          </label>
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+            <FieldDescription>Enter the six-digit code from your inbox.</FieldDescription>
+          </Field>
         )}
 
         {authMode === "sign-in" && !verificationRequired && !isPasswordResetRequest && !hideEmailField ? (

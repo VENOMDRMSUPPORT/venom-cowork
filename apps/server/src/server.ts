@@ -1363,6 +1363,9 @@ function artifactPreviewForPath(path: string): string {
   if (/\.(png|jpe?g|gif|webp|svg)$/.test(lowered)) return "image";
   if (lowered.endsWith(".pdf")) return "pdf";
   if (/\.(html|htm)$/.test(lowered)) return "html";
+  // UI component files — can be previewed with dev server
+  if (/\.(tsx|jsx|vue|svelte|astro)$/.test(lowered)) return "component";
+  if (/\.(css|scss|less)$/.test(lowered)) return "component";
   if (isSupportedWorkspaceTextFilePath(path)) return "text";
   return "external";
 }

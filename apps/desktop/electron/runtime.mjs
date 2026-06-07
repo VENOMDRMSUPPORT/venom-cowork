@@ -1701,6 +1701,32 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
       throw new Error("workspacePath is required");
     }
 
+    // Check if we should connect to an external orchestrator instead of starting one
+    const externalBaseUrl = process.env.VENOMCOWORK_LOCAL_BASE_URL?.trim();
+    if (externalBaseUrl) {
+      console.log(`[runtime] Connecting to external orchestrator: ${externalBaseUrl}`);
+      const token = process.env.VENOMCOWORK_TOKEN?.trim() || String(options.venomcoworkToken ?? randomUUID()).trim();
+      const hostToken = process.env.VENOMCOWORK_HOST_TOKEN?.trim() || String(options.venomcoworkHostToken ?? randomUUID()).trim();
+      
+      // Parse port from URL
+      const url = new URL(externalBaseUrl);
+      const port = parseInt(url.port, 10) || (url.protocol === "https:" ? 443 : 80);
+      
+      // Verify connection
+      await waitForHttpOk(`${externalBaseUrl}/health`, 12_000);
+      
+      return {
+        venomcoworkUrl: externalBaseUrl,
+        token,
+        ownerToken: token,
+        hostToken,
+        port,
+        sandboxBackend: null,
+        sandboxRunId: null,
+        sandboxContainerName: null,
+      };
+    }
+
     const sandboxBackend = String(options.sandboxBackend ?? "none").trim().toLowerCase();
     if (!["none", "docker", "microsandbox"].includes(sandboxBackend)) {
       throw new Error("sandboxBackend must be one of: none, docker, microsandbox");
@@ -1709,9 +1735,13 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
     const wantsDockerSandbox = sandboxBackend === "docker" || sandboxBackend === "microsandbox";
     const runId = String(options.runId ?? randomUUID()).trim();
     const containerName = wantsDockerSandbox ? deriveOrchestratorContainerName(runId) : null;
-    const port = await findFreePort("127.0.0.1");
+    // Support remote access via env var (for Tailscale/VPN scenarios)
+    const remoteAccess = process.env.VENOMCOWORK_REMOTE_ACCESS === "1";
+    const bindHost = remoteAccess ? "0.0.0.0" : "127.0.0.1";
+    const port = await findFreePort(bindHost);
     const token = String(options.venomcoworkToken ?? randomUUID()).trim();
     const hostToken = String(options.venomcoworkHostToken ?? randomUUID()).trim();
+    // Internal URL for desktop app to connect (always use 127.0.0.1 for local connection)
     const venomcoworkUrl = `http://127.0.0.1:${port}`;
     const program = resolveBinary("venomcowork-orchestrator") ?? resolveBinary("venomcowork");
     if (!program) {
@@ -1729,6 +1759,7 @@ export function createRuntimeManager({ app, desktopRoot, listLocalWorkspacePaths
       String(port),
       "--run-id",
       runId,
+      ...(remoteAccess ? ["--remote-access"] : []),
       ...(wantsDockerSandbox ? ["--sandbox", "docker"] : []),
       ...(options.sandboxImageRef ? ["--sandbox-image", String(options.sandboxImageRef)] : []),
     ];

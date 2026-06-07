@@ -2949,6 +2949,7 @@ export function SessionRoute() {
         newTaskDisabled: !canCreateTask,
         sidebarHydratedFromCache: Object.values(sessionsByWorkspaceId).some((list) => list.length > 0),
         startupPhase: effectiveLoading ? "nativeInit" : "ready",
+        todos,
         onSelectWorkspace: async (workspaceId) => {
           if (workspaceId === selectedWorkspaceId) return true;
           setLegacySelectedWorkspaceId(workspaceId);
@@ -3041,6 +3042,7 @@ export function SessionRoute() {
         onEditWorkspaceConnection: remoteWorkspaceConnectionEditor.open,
         onForgetWorkspace: (id) => void handleForgetWorkspace(id),
         onOpenCreateWorkspace: handleOpenCreateWorkspace,
+        onOpenSettings: () => handleOpenSettings("/settings/general"),
         onReorderWorkspaces: handleReorderWorkspaces,
       }}
       surface={surfaceProps}
