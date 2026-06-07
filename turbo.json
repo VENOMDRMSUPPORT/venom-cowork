@@ -1,5 +1,4 @@
 ﻿{
-  "$schema": "https://turbo.build/schema.json",
   "globalEnv": [
     "VENOMCOWORK_DEV_MODE",
     "DATABASE_URL",
