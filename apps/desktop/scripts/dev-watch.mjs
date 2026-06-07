@@ -108,23 +108,43 @@ function runBuild(triggerFiles) {
     .join("\n");
   const more = triggerFiles.length > 5 ? `\n  ... and ${triggerFiles.length - 5} more` : "";
   logInfo(`Change detected (${triggerFiles.length} file${triggerFiles.length === 1 ? "" : "s"}):\n${summary}${more}`);
-  logInfo("Running build...");
+  logInfo("Running full rebuild (compile + asar pack)...");
 
-  const child = spawn(process.execPath, [buildScript], {
+  // Step 1: electron-build.mjs (compile TS, bundle, copy assets)
+  const step1 = spawn(process.execPath, [buildScript], {
     cwd: repoRoot,
     stdio: "inherit",
     env: process.env,
   });
 
-  child.on("exit", (code) => {
-    const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
-    building = false;
-    if (code === 0) {
-      logOk(`Build complete in ${elapsed}s. The VenomCowork shortcut on your Desktop will open the new exe.`);
-      if (shouldLaunch) launchExe();
-    } else {
-      logErr(`Build FAILED (exit ${code}) after ${elapsed}s. Watcher still running, fix the error and save again.`);
+  step1.on("exit", (code) => {
+    if (code !== 0) {
+      const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+      building = false;
+      logErr(`Compile step FAILED (exit ${code}) after ${elapsed}s. Watcher still running.`);
+      return;
     }
+    logInfo("Compile OK. Packing asar...");
+
+    // Step 2: electron-builder --dir (pack asar + win-unpacked)
+    const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+    const step2 = spawn(pnpmCmd, ["exec", "electron-builder", "--config", "electron-builder.yml", "--dir"], {
+      cwd: desktopRoot,
+      stdio: "inherit",
+      shell: true,
+      env: process.env,
+    });
+
+    step2.on("exit", (code2) => {
+      const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+      building = false;
+      if (code2 === 0) {
+        logOk(`Full rebuild complete in ${elapsed}s. The VenomCowork shortcut on your Desktop will open the new exe.`);
+        if (shouldLaunch) launchExe();
+      } else {
+        logErr(`Asar pack FAILED (exit ${code2}) after ${elapsed}s. Watcher still running.`);
+      }
+    });
   });
 }
 
