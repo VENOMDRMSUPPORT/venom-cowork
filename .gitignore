@@ -44,6 +44,9 @@ packaging/docker/workspace/
 # OS
 .DS_Store
 
+# VS Code
+.vscode/
+
 # OpenCode mirror
 vendor/opencode/
 

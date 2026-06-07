@@ -48,11 +48,11 @@ const opencodeGithubRepo = (() => {
   }
   return normalized;
 })();
-const opencodeVersion = (() => {
+const venomcoworkEngineVersion = (() => {
   try {
     const raw = readFileSync(constantsPath, "utf8");
     const parsed = JSON.parse(raw);
-    return typeof parsed.opencodeVersion === "string" ? parsed.opencodeVersion.trim() || null : null;
+    return typeof parsed.venomcoworkEngineVersion === "string" ? parsed.venomcoworkEngineVersion.trim() || null : null;
   } catch {
     return null;
   }
@@ -287,7 +287,7 @@ if (!existingOpencodeVersion && opencodeCandidatePath) {
       : null;
 }
 
-const normalizedOpencodeVersion = normalizeVersion(opencodeVersion);
+const normalizedOpencodeVersion = normalizeVersion(venomcoworkEngineVersion);
 
 if (!normalizedOpencodeVersion) {
   console.error(

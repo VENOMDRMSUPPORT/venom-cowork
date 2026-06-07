@@ -109,12 +109,12 @@ async function buildOnce(entrypoint: string, outdir: string, filename: string, t
   try {
     const constants = JSON.parse(
       readFileSync(resolve("..", "..", "constants.json"), "utf8"),
-    ) as { opencodeVersion?: string };
+    ) as { venomcoworkEngineVersion?: string };
     if (
-      typeof constants.opencodeVersion === "string" &&
-      constants.opencodeVersion.trim()
+      typeof constants.venomcoworkEngineVersion === "string" &&
+      constants.venomcoworkEngineVersion.trim()
     ) {
-      define.__VENOMCOWORK_PINNED_OPENCODE_VERSION__ = `\"${constants.opencodeVersion
+      define.__VENOMCOWORK_PINNED_OPENCODE_VERSION__ = `\"${constants.venomcoworkEngineVersion
         .trim()
         .replace(/^v/, "")}\"`;
     }

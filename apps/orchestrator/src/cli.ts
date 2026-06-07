@@ -169,7 +169,7 @@ type VersionInfo = {
   sha256: string;
 };
 
-type SidecarName = "venomcowork-server" | "opencode-router" | "opencode";
+type SidecarName = "venomcowork-server" | "venomcowork-router" | "opencode";
 
 type SidecarTarget =
   | "darwin-arm64"
@@ -226,7 +226,7 @@ type BinaryDiagnostics = {
   actualVersion?: string;
 };
 
-type RuntimeServiceName = "venomcowork-server" | "opencode" | "opencode-router";
+type RuntimeServiceName = "venomcowork-server" | "opencode" | "venomcowork-router";
 
 type RuntimeServiceSnapshot = {
   name: RuntimeServiceName;
@@ -992,10 +992,10 @@ async function readPinnedOpencodeVersion(): Promise<string | undefined> {
     if (await fileExists(candidate)) {
       try {
         const raw = await readFile(candidate, "utf8");
-        const parsed = JSON.parse(raw) as { opencodeVersion?: unknown };
+        const parsed = JSON.parse(raw) as { venomcoworkEngineVersion?: unknown };
         const value =
-          typeof parsed.opencodeVersion === "string"
-            ? parsed.opencodeVersion.trim()
+          typeof parsed.venomcoworkEngineVersion === "string"
+            ? parsed.venomcoworkEngineVersion.trim()
             : "";
         if (!value) continue;
         return value.startsWith("v") ? value.slice(1) : value;
@@ -2264,7 +2264,7 @@ async function resolveOpenCodeRouterRepoDir(): Promise<string | null> {
   const repoRoot = resolve(root, "..", "..");
   const candidates = [
     envPath,
-    resolve(repoRoot, "packages", "opencode-router"),
+    resolve(repoRoot, "packages", "venomcowork-router"),
   ].filter(Boolean) as string[];
 
   for (const candidate of candidates) {
@@ -2291,11 +2291,11 @@ async function resolveExpectedVersion(
       const localVersion = await readPackageVersion(localPath);
       if (localVersion) return localVersion;
     }
-    if (name === "opencode-router") {
+    if (name === "venomcowork-router") {
       const repoDir = await resolveOpenCodeRouterRepoDir();
       const localPath = repoDir
         ? join(repoDir, "package.json")
-        : join(root, "..", "opencode-router", "package.json");
+        : join(root, "..", "venomcowork-router", "package.json");
       const localVersion = await readPackageVersion(localPath);
       if (localVersion) return localVersion;
     }
@@ -2317,9 +2317,9 @@ async function resolveExpectedVersion(
       // ignore
     }
   }
-  if (name === "opencode-router") {
+  if (name === "venomcowork-router") {
     try {
-      const pkgPath = require.resolve("opencode-router/package.json");
+      const pkgPath = require.resolve("venomcowork-router/package.json");
       const version = await readPackageVersion(pkgPath);
       if (version) return version;
     } catch {
@@ -2729,7 +2729,7 @@ async function resolveOpenCodeRouterBin(options: {
   source: BinarySourcePreference;
 }): Promise<ResolvedBinary> {
   if (options.explicit && !options.allowExternal) {
-    throw new Error("opencode-router-bin requires --allow-external");
+    throw new Error("venomcowork-router-bin requires --allow-external");
   }
   if (
     options.explicit &&
@@ -2737,13 +2737,13 @@ async function resolveOpenCodeRouterBin(options: {
     options.source !== "external"
   ) {
     throw new Error(
-      "opencode-router-bin requires --sidecar-source external or auto",
+      "venomcowork-router-bin requires --sidecar-source external or auto",
     );
   }
 
   const expectedVersion = await resolveExpectedVersion(
     options.manifest,
-    "opencode-router",
+    "venomcowork-router",
   );
   const resolveExternal = async (): Promise<ResolvedBinary> => {
     if (!options.allowExternal) {
@@ -2755,14 +2755,14 @@ async function resolveOpenCodeRouterBin(options: {
         (resolved.includes("/") || resolved.startsWith(".")) &&
         !(await fileExists(resolved))
       ) {
-        throw new Error(`opencode-router-bin not found: ${resolved}`);
+        throw new Error(`venomcowork-router-bin not found: ${resolved}`);
       }
       return { bin: resolved, source: "external", expectedVersion };
     }
 
     const repoDir = await resolveOpenCodeRouterRepoDir();
     if (repoDir) {
-      const binPath = join(repoDir, "dist", "bin", "opencode-router");
+      const binPath = join(repoDir, "dist", "bin", "venomcowork-router");
       if (await isExecutable(binPath)) {
         return { bin: binPath, source: "external", expectedVersion };
       }
@@ -2774,9 +2774,9 @@ async function resolveOpenCodeRouterBin(options: {
 
     const require = createRequire(import.meta.url);
     try {
-      const pkgPath = require.resolve("opencode-router/package.json");
+      const pkgPath = require.resolve("venomcowork-router/package.json");
       const pkgDir = dirname(pkgPath);
-      const binaryPath = join(pkgDir, "dist", "bin", "opencode-router");
+      const binaryPath = join(pkgDir, "dist", "bin", "venomcowork-router");
       if (await isExecutable(binaryPath)) {
         return { bin: binaryPath, source: "external", expectedVersion };
       }
@@ -2789,14 +2789,14 @@ async function resolveOpenCodeRouterBin(options: {
     }
 
     throw new Error(
-      "opencode-router binary not found. Install the opencode-router dependency or pass --opencode-router-bin with --allow-external.",
+      "venomcowork-router binary not found. Install the venomcowork-router dependency or pass --venomcowork-router-bin with --allow-external.",
     );
   };
 
   if (options.source === "bundled") {
     const bundled = await resolveBundledBinary(
       options.manifest,
-      "opencode-router",
+      "venomcowork-router",
     );
     if (!bundled) {
       throw new Error(
@@ -2808,7 +2808,7 @@ async function resolveOpenCodeRouterBin(options: {
 
   if (options.source === "downloaded") {
     const downloaded = await downloadSidecarBinary({
-      name: "opencode-router",
+      name: "venomcowork-router",
       sidecar: options.sidecar,
     });
     if (!downloaded) {
@@ -2825,7 +2825,7 @@ async function resolveOpenCodeRouterBin(options: {
 
   const bundled = await resolveBundledBinary(
     options.manifest,
-    "opencode-router",
+    "venomcowork-router",
   );
   if (bundled && !(options.allowExternal && options.explicit)) {
     return { bin: bundled, source: "bundled", expectedVersion };
@@ -2836,7 +2836,7 @@ async function resolveOpenCodeRouterBin(options: {
   }
 
   const downloaded = await downloadSidecarBinary({
-    name: "opencode-router",
+    name: "venomcowork-router",
     sidecar: options.sidecar,
   });
   if (downloaded) return downloaded;
@@ -2867,9 +2867,9 @@ function resolveOpencodeRouterConfigPath(): string {
   if (override) return resolve(override.replace(/^~\//, `${homedir()}/`));
   const dataDir =
     process.env.OPENCODE_ROUTER_DATA_DIR?.trim() ||
-    join(homedir(), ".venomcowork", "opencode-router");
+    join(homedir(), ".venomcowork", "venomcowork-router");
   const expanded = dataDir.replace(/^~\//, `${homedir()}/`);
-  return join(resolve(expanded), "opencode-router.json");
+  return join(resolve(expanded), "venomcowork-router.json");
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -2935,7 +2935,7 @@ async function resolveOpencodeRouterEnabled(
   enabled: boolean;
   source: "flag" | "env" | "workspace-config" | "inferred";
 }> {
-  const flagValue = flags.get("opencode-router");
+  const flagValue = flags.get("venomcowork-router");
   const parsedFlag = readOptionalBool(flagValue);
   if (parsedFlag !== undefined) {
     return { enabled: parsedFlag, source: "flag" };
@@ -3523,7 +3523,7 @@ async function fetchOpenCodeRouterHealthViaVenomcowork(
   venomcoworkUrl: string,
   token: string,
 ): Promise<OpenCodeRouterHealthSnapshot> {
-  const url = `${venomcoworkUrl.replace(/\/$/, "")}/opencode-router/health`;
+  const url = `${venomcoworkUrl.replace(/\/$/, "")}/venomcowork-router/health`;
   return (await fetchJson(url, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -3559,7 +3559,7 @@ async function waitForOpenCodeRouterHealthyViaVenomcowork(
   timeoutMs = 10_000,
   pollMs = 500,
 ): Promise<OpenCodeRouterHealthSnapshot> {
-  const url = `${venomcoworkUrl.replace(/\/$/, "")}/opencode-router/health`;
+  const url = `${venomcoworkUrl.replace(/\/$/, "")}/venomcowork-router/health`;
   const start = Date.now();
   let lastError: string | null = null;
   while (Date.now() - start < timeoutMs) {
@@ -3733,11 +3733,11 @@ function printHelp(): void {
     "  --cors <origins>          Comma-separated CORS origins or *",
     "  --connect-host <host>     Override LAN host used for pairing URLs",
     "  --venomcowork-server-bin <p> Path to venomcowork-server binary (requires --allow-external)",
-    "  --opencode-router-bin <path>     Path to opencodeRouter binary (requires --allow-external)",
-    "  --opencode-router-health-port <p> Health server port for opencodeRouter (default: random)",
-    "  --opencode-router                Enable opencodeRouter sidecar (default from workspace messaging config)",
-    "  --no-opencode-router             Disable opencodeRouter sidecar",
-    "  --opencode-router-required       Exit if opencodeRouter stops",
+    "  --venomcowork-router-bin <path>     Path to opencodeRouter binary (requires --allow-external)",
+    "  --venomcowork-router-health-port <p> Health server port for opencodeRouter (default: random)",
+    "  --venomcowork-router                Enable opencodeRouter sidecar (default from workspace messaging config)",
+    "  --no-venomcowork-router             Disable opencodeRouter sidecar",
+    "  --venomcowork-router-required       Exit if opencodeRouter stops",
     "  --allow-external          Allow external sidecar binaries (dev only, required for custom bins)",
     "  --sidecar-dir <path>      Cache directory for downloaded sidecars",
     "  --sidecar-base-url <url>  Base URL for sidecar downloads",
@@ -4035,7 +4035,7 @@ async function startOpenCodeRouter(options: {
         VENOMCOWORK_LOG_FORMAT: options.logFormat,
         OTEL_RESOURCE_ATTRIBUTES: mergeResourceAttributes(
           {
-            "service.name": "opencode-router",
+            "service.name": "venomcowork-router",
             "service.instance.id": options.runId,
           },
           process.env.OTEL_RESOURCE_ATTRIBUTES,
@@ -4064,14 +4064,14 @@ async function startOpenCodeRouter(options: {
 
   prefixStream(
     child.stdout,
-    "opencode-router",
+    "venomcowork-router",
     "stdout",
     options.logger,
     child.pid ?? undefined,
   );
   prefixStream(
     child.stderr,
-    "opencode-router",
+    "venomcowork-router",
     "stderr",
     options.logger,
     child.pid ?? undefined,
@@ -4241,7 +4241,7 @@ async function stageSandboxRuntime(options: {
   await ensureExecutable(stagedVenomcowork);
 
   if (options.sidecars.opencodeRouter) {
-    const stagedOpenCodeRouter = join(sidecarsDir, "opencode-router");
+    const stagedOpenCodeRouter = join(sidecarsDir, "venomcowork-router");
     await copyFile(options.sidecars.opencodeRouter, stagedOpenCodeRouter);
     await ensureExecutable(stagedOpenCodeRouter);
   }
@@ -4288,7 +4288,7 @@ async function writeSandboxEntrypoint(options: {
 }): Promise<void> {
   const opencodeBin = `${options.rootInContainer}/sidecars/opencode`;
   const venomcoworkBin = `${options.rootInContainer}/sidecars/venomcowork-server`;
-  const opencodeRouterBin = `${options.rootInContainer}/sidecars/opencode-router`;
+  const opencodeRouterBin = `${options.rootInContainer}/sidecars/venomcowork-router`;
   const workspaceDir = "/workspace";
   const opencodeConfigDir = options.opencodeConfigDirInContainer;
   const hostOpencodeConfigDir = SANDBOX_OPENCODE_GLOBAL_CONFIG_CONTAINER_PATH;
@@ -4386,7 +4386,7 @@ async function writeSandboxEntrypoint(options: {
       ` --opencode-directory ${shQuote(workspaceDir)}` +
       ` --log-format ${shQuote(options.venomcowork.logFormat)}` +
       (options.venomcowork.opencodeRouterEnabled
-        ? ` --opencode-router-health-port ${shQuote(String(SANDBOX_INTERNAL_OPENCODE_ROUTER_HEALTH_PORT))}`
+        ? ` --venomcowork-router-health-port ${shQuote(String(SANDBOX_INTERNAL_OPENCODE_ROUTER_HEALTH_PORT))}`
         : "") +
       (venomcoworkCors ? ` ${venomcoworkCors}` : ""),
   ]
@@ -4769,7 +4769,7 @@ async function verifyOpenCodeRouterVersion(
   }
   const actual = await readCliVersion(binary.bin);
   assertVersionMatch(
-    "opencode-router",
+    "venomcowork-router",
     binary.expectedVersion,
     actual,
     binary.bin,
@@ -4944,9 +4944,9 @@ async function runChecks(input: {
   await fetchJson(`${baseUrl}/workspace/${workspaceId}/config`, { headers });
 
   // Smoke test: mounted opencodeRouter proxy and auth behavior.
-  // - /w/:id/opencode-router/health is client-readable
-  // - other /w/:id/opencode-router/* requires host/owner auth
-  const owMountBase = `${baseUrl}/w/${encodeURIComponent(workspaceId)}/opencode-router`;
+  // - /w/:id/venomcowork-router/health is client-readable
+  // - other /w/:id/venomcowork-router/* requires host/owner auth
+  const owMountBase = `${baseUrl}/w/${encodeURIComponent(workspaceId)}/venomcowork-router`;
   const owHealthRes = await fetch(`${owMountBase}/health`, {
     headers,
     signal: AbortSignal.timeout(3000),
@@ -5082,7 +5082,7 @@ async function runSandboxChecks(input: {
   }
 
   // 6. opencodeRouter proxy is reachable (if configured)
-  const owRes = await fetch(`${baseUrl}/opencode-router/health`, {
+  const owRes = await fetch(`${baseUrl}/venomcowork-router/health`, {
     headers,
     signal: AbortSignal.timeout(3000),
   });
@@ -5092,7 +5092,7 @@ async function runSandboxChecks(input: {
 
   // 7. Mounted opencodeRouter proxy + auth behavior (if configured)
   if (owRes.status !== 404) {
-    const owMountBase = `${baseUrl}/w/${encodeURIComponent(workspaceId)}/opencode-router`;
+    const owMountBase = `${baseUrl}/w/${encodeURIComponent(workspaceId)}/venomcowork-router`;
     const mountHealth = await fetch(`${owMountBase}/health`, {
       headers,
       signal: AbortSignal.timeout(3000),
@@ -6904,7 +6904,7 @@ async function runStart(args: ParsedArgs) {
       if (!tui) return;
       const component = event.component ?? "venomcowork-orchestrator";
       const tuiComponent =
-        component === "opencode-router" ? "router" : component;
+        component === "venomcowork-router" ? "router" : component;
       tui.pushLog({
         time: event.time,
         level: event.level,
@@ -6996,7 +6996,7 @@ async function runStart(args: ParsedArgs) {
   await ensureOpencodeManagedTools(opencodeConfigDir);
   const opencodeRouterDataDir =
     sandboxMode === "none"
-      ? join(dataDir, "opencode-router", workspaceIdForLocal(resolvedWorkspace))
+      ? join(dataDir, "venomcowork-router", workspaceIdForLocal(resolvedWorkspace))
       : null;
   if (opencodeRouterDataDir) {
     await mkdir(opencodeRouterDataDir, { recursive: true });
@@ -7024,7 +7024,7 @@ async function runStart(args: ParsedArgs) {
     readFlag(args.flags, "venomcowork-server-bin") ??
     process.env.VENOMCOWORK_SERVER_BIN;
   const explicitOpenCodeRouterBin =
-    readFlag(args.flags, "opencode-router-bin") ??
+    readFlag(args.flags, "venomcowork-router-bin") ??
     process.env.OPENCODE_ROUTER_BIN;
   assertManagedOpencodeAuth(args);
   const opencodeBindHost = resolveManagedOpencodeHost(
@@ -7075,7 +7075,7 @@ async function runStart(args: ParsedArgs) {
   const opencodeRouterHealthPort = await resolvePort(
     readNumber(
       args.flags,
-      "opencode-router-health-port",
+      "venomcowork-router-health-port",
       undefined,
       "OPENCODE_ROUTER_HEALTH_PORT",
     ),
@@ -7212,7 +7212,7 @@ async function runStart(args: ParsedArgs) {
   const opencodeRouterEnabled = opencodeRouterMode.enabled;
   const opencodeRouterRequired = readBool(
     args.flags,
-    "opencode-router-required",
+    "venomcowork-router-required",
     false,
     "VENOMCOWORK_OPENCODE_ROUTER_REQUIRED",
   );
@@ -7242,7 +7242,7 @@ async function runStart(args: ParsedArgs) {
     await assertSandboxBinaryFile("venomcowork-server", venomcoworkServerBinary.bin);
     if (opencodeRouterBinary) {
       await assertSandboxBinaryFile(
-        "opencode-router",
+        "venomcowork-router",
         opencodeRouterBinary.bin,
       );
     }
@@ -7346,7 +7346,7 @@ async function runStart(args: ParsedArgs) {
         actualVersion: opencodeActualVersion,
       }),
       buildRuntimeServiceSnapshot({
-        name: "opencode-router",
+        name: "venomcowork-router",
         enabled: Boolean(opencodeRouterEnabled && opencodeRouterBinary),
         running: Boolean(
           opencodeRouterChild && isProcessAlive(opencodeRouterChild.pid),
@@ -7496,8 +7496,8 @@ async function runStart(args: ParsedArgs) {
       return;
     }
     if (opencodeRouterChild) {
-      restartingServices.add("opencode-router");
-      removeChildHandle("opencode-router");
+      restartingServices.add("venomcowork-router");
+      removeChildHandle("venomcowork-router");
       await stopChild(opencodeRouterChild);
       opencodeRouterChild = null;
     }
@@ -7515,12 +7515,12 @@ async function runStart(args: ParsedArgs) {
       runId,
       logFormat,
     });
-    children.push({ name: "opencode-router", child: opencodeRouterChild });
+    children.push({ name: "venomcowork-router", child: opencodeRouterChild });
     opencodeRouterChild.on("exit", (code, signal) =>
-      handleExit("opencode-router", code, signal),
+      handleExit("venomcowork-router", code, signal),
     );
     opencodeRouterChild.on("error", (error) =>
-      handleSpawnError("opencode-router", error),
+      handleSpawnError("venomcowork-router", error),
     );
     await waitForOpenCodeRouterHealthy(
       `http://127.0.0.1:${opencodeRouterHealthPort}`,
@@ -7552,12 +7552,12 @@ async function runStart(args: ParsedArgs) {
         ]);
       }
       if (
-        services.includes("opencode-router") &&
+        services.includes("venomcowork-router") &&
         opencodeRouterBinary?.source === "external" &&
         opencodeRouterBinary.expectedVersion
       ) {
         await installGlobalPackages([
-          `opencode-router@${opencodeRouterBinary.expectedVersion}`,
+          `venomcowork-router@${opencodeRouterBinary.expectedVersion}`,
         ]);
       }
       if (services.includes("venomcowork-server")) {
@@ -7578,7 +7578,7 @@ async function runStart(args: ParsedArgs) {
           source: opencodeSource,
         });
       }
-      if (services.includes("opencode-router") && opencodeRouterEnabled) {
+      if (services.includes("venomcowork-router") && opencodeRouterEnabled) {
         opencodeRouterBinary = await resolveOpenCodeRouterBin({
           explicit: explicitOpenCodeRouterBin,
           manifest,
@@ -7590,7 +7590,7 @@ async function runStart(args: ParsedArgs) {
       if (services.includes("opencode")) {
         await restartOpencode();
       }
-      if (services.includes("opencode-router")) {
+      if (services.includes("venomcowork-router")) {
         await restartOpenCodeRouter();
       }
       if (
@@ -7765,7 +7765,7 @@ async function runStart(args: ParsedArgs) {
           },
           {
             name: "router",
-            label: "opencode-router",
+            label: "venomcowork-router",
             status: opencodeRouterEnabled ? "starting" : "disabled",
             port: sandboxMode !== "none" ? undefined : opencodeRouterHealthPort,
           },
@@ -7780,7 +7780,7 @@ async function runStart(args: ParsedArgs) {
         onRouterHealth: async () =>
           fetchOpenCodeRouterHealthViaVenomcowork(venomcoworkBaseUrl, venomcoworkToken),
         onRouterTelegramIdentities: async () => {
-          const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/opencode-router/identities/telegram`;
+          const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/venomcowork-router/identities/telegram`;
           const result = await fetchJson(url, {
             headers: {
               "X-VenomCowork-Host-Token": venomcoworkHostToken,
@@ -7790,7 +7790,7 @@ async function runStart(args: ParsedArgs) {
           return { items };
         },
         onRouterSlackIdentities: async () => {
-          const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/opencode-router/identities/slack`;
+          const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/venomcowork-router/identities/slack`;
           const result = await fetchJson(url, {
             headers: {
               "X-VenomCowork-Host-Token": venomcoworkHostToken,
@@ -7801,7 +7801,7 @@ async function runStart(args: ParsedArgs) {
         },
         onRouterSetGroupsEnabled: async (enabled) => {
           try {
-            const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/opencode-router/config/groups`;
+            const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/venomcowork-router/config/groups`;
             await fetchJson(url, {
               method: "POST",
               headers: {
@@ -7820,7 +7820,7 @@ async function runStart(args: ParsedArgs) {
         },
         onRouterSetTelegramToken: async (token) => {
           try {
-            const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/opencode-router/identities/telegram`;
+            const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/venomcowork-router/identities/telegram`;
             await fetchJson(url, {
               method: "POST",
               headers: {
@@ -7839,7 +7839,7 @@ async function runStart(args: ParsedArgs) {
         },
         onRouterSetSlackTokens: async (botToken, appToken) => {
           try {
-            const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/opencode-router/identities/slack`;
+            const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/venomcowork-router/identities/slack`;
             await fetchJson(url, {
               method: "POST",
               headers: {
@@ -7871,7 +7871,7 @@ async function runStart(args: ParsedArgs) {
   }
 
   const tuiServiceName = (name: string) =>
-    name === "opencode-router" ? "router" : name;
+    name === "venomcowork-router" ? "router" : name;
 
   const handleExit = (
     name: string,
@@ -7952,7 +7952,7 @@ async function runStart(args: ParsedArgs) {
               (item): item is RuntimeServiceName =>
                 item === "venomcowork-server" ||
                 item === "opencode" ||
-                item === "opencode-router",
+                item === "venomcowork-router",
             ),
           ),
         );
@@ -8024,7 +8024,7 @@ async function runStart(args: ParsedArgs) {
               ports: {
                 venomcowork: venomcoworkPort,
                 // In sandbox mode, opencodeRouter is only reachable via venomcowork-server
-                // proxy (/opencode-router/*). Do not publish a separate host port.
+                // proxy (/venomcowork-router/*). Do not publish a separate host port.
                 opencodeRouterHealth: null,
               },
               opencode: {
@@ -8068,7 +8068,7 @@ async function runStart(args: ParsedArgs) {
               ports: {
                 venomcowork: venomcoworkPort,
                 // In sandbox mode, opencodeRouter is only reachable via venomcowork-server
-                // proxy (/opencode-router/*). Do not publish a separate host port.
+                // proxy (/venomcowork-router/*). Do not publish a separate host port.
                 opencodeRouterHealth: null,
               },
               opencode: {
@@ -8272,7 +8272,7 @@ async function runStart(args: ParsedArgs) {
           });
           opencodeRouterChild = startedOpenCodeRouterChild;
           children.push({
-            name: "opencode-router",
+            name: "venomcowork-router",
             child: startedOpenCodeRouterChild,
           });
           tui?.updateService("router", {
@@ -8283,15 +8283,15 @@ async function runStart(args: ParsedArgs) {
           logger.info(
             "Process spawned",
             { pid: startedOpenCodeRouterChild.pid ?? 0 },
-            "opencode-router",
+            "venomcowork-router",
           );
           startedOpenCodeRouterChild.on("exit", (code, signal) => {
-            if (restartingServices.has("opencode-router")) {
-              restartingServices.delete("opencode-router");
+            if (restartingServices.has("venomcowork-router")) {
+              restartingServices.delete("venomcowork-router");
               return;
             }
             if (opencodeRouterRequired) {
-              handleExit("opencode-router", code, signal);
+              handleExit("venomcowork-router", code, signal);
               return;
             }
             const reason =
@@ -8307,18 +8307,18 @@ async function runStart(args: ParsedArgs) {
             logger.warn(
               "Process exited, continuing without opencodeRouter",
               { reason, code, signal },
-              "opencode-router",
+              "venomcowork-router",
             );
           });
           startedOpenCodeRouterChild.on("error", (error) =>
-            handleSpawnError("opencode-router", error),
+            handleSpawnError("venomcowork-router", error),
           );
 
           const healthBaseUrl = `http://127.0.0.1:${opencodeRouterHealthPort}`;
           logger.info(
             "Waiting for health",
             { url: healthBaseUrl },
-            "opencode-router",
+            "venomcowork-router",
           );
           const health = await waitForOpenCodeRouterHealthy(
             healthBaseUrl,
@@ -8332,7 +8332,7 @@ async function runStart(args: ParsedArgs) {
           logger.info(
             "Healthy",
             { url: healthBaseUrl, ok: health.ok },
-            "opencode-router",
+            "venomcowork-router",
           );
           opencodeRouterReady = true;
         } catch (error) {
@@ -8344,7 +8344,7 @@ async function runStart(args: ParsedArgs) {
           logger.warn(
             "OpenCodeRouter failed to start, continuing without it",
             { error: message },
-            "opencode-router",
+            "venomcowork-router",
           );
           tui?.updateService("router", { status: "stopped", message });
           if (opencodeRouterChild) {
@@ -8457,8 +8457,8 @@ async function runStart(args: ParsedArgs) {
           `opencodeRouter version: ${opencodeRouterActualVersion ?? "unknown"}`,
         );
         try {
-          const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/opencode-router/health`;
-          logger.info("Waiting for health", { url }, "opencode-router");
+          const url = `${venomcoworkBaseUrl.replace(/\/$/, "")}/venomcowork-router/health`;
+          logger.info("Waiting for health", { url }, "venomcowork-router");
           const health = await waitForOpenCodeRouterHealthyViaVenomcowork(
             venomcoworkBaseUrl,
             venomcoworkToken,
@@ -8467,12 +8467,12 @@ async function runStart(args: ParsedArgs) {
           tui?.updateService("router", {
             status: health.ok ? "healthy" : "running",
           });
-          logger.info("Healthy", { url, ok: health.ok }, "opencode-router");
+          logger.info("Healthy", { url, ok: health.ok }, "venomcowork-router");
         } catch (error) {
           logger.warn(
             "OpenCodeRouter health check failed",
             { error: String(error) },
-            "opencode-router",
+            "venomcowork-router",
           );
           tui?.updateService("router", {
             status: "running",

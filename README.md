@@ -2,7 +2,7 @@
 
 **VenomCowork** is the open-source alternative to Claude Cowork / Codex as a
 desktop app. Run local and remote agentic workflows from one place, powered by
-[OpenCode](https://github.com/sst/opencode).
+[the OpenCode engine](https://github.com/sst/opencode).
 
 This repository is a vanilla rebrand of [OpenWork v0.15.2](https://github.com/different-ai/openwork).
 All upstream external endpoints (release feeds, doc sites, support emails,
@@ -22,9 +22,8 @@ shipping this build to end users.
   and can connect to remote workers when you need them.
 - **Server-consumption first.** The desktop app is a client of the local
   VenomCowork server surface; it does not invent a parallel control plane.
-- **Composable.** Use the desktop app, the orchestrator CLI, or the opencode
-  router — whatever fits the task.
-- **Ejectable.** Anything OpenCode can do is available from VenomCowork, even
+- **Composable.** Use the desktop app, the orchestrator CLI, or the VenomCowork Router — whatever fits the task.
+- **Ejectable.** Anything the OpenCode engine can do is available from VenomCowork, even
   before a dedicated UI surface exists.
 - **Sharing is caring.** Start solo on `localhost`, then opt into a remote
   worker when your team is ready.
@@ -36,8 +35,8 @@ shipping this build to end users.
 | Desktop shell | `apps/desktop` | Electron shell that wraps the renderer, server, and sidecars into a Windows / macOS / Linux app |
 | Renderer UI | `apps/app` | React + Vite + shadcn/ui (Base UI) — the user-facing surface |
 | Local server | `apps/server` | Filesystem-backed API for the renderer; hosts skills, plugins, MCP, and the skill hub |
-| Orchestrator CLI | `apps/orchestrator` | `venomcowork` binary — orchestrates opencode + venomcowork-server + opencode-router |
-| OpenCode router | `apps/opencode-router` | Slack + Telegram bridge that routes messages to a running `opencode` server |
+| Orchestrator CLI | `apps/orchestrator` | `venomcowork` binary — orchestrates opencode + venomcowork-server + venomcowork-router |
+| OpenCode router | `apps/venomcowork-router` | Slack + Telegram bridge that routes messages to a running opencode server |
 | UI demo | `apps/ui-demo` | Standalone UI playground (no server) |
 | `@venom-cowork/venomcowork-ui-mcp` | `packages/venomcowork-ui-mcp` | MCP server exposing UI snapshot / actions / execute as tools |
 | `@venom-cowork/email` | `packages/email` | React Email templates (password reset, org invite) |
@@ -84,7 +83,7 @@ pnpm dev
 
 `pnpm dev` automatically sets `VENOMCOWORK_DEV_MODE=1` and a dedicated
 `VENOMCOWORK_ELECTRON_REMOTE_DEBUG_PORT` so desktop development uses an
-isolated OpenCode state instead of your personal global config.
+isolated VenomCowork Engine state instead of your personal global config.
 
 ### Run the renderer only (no Electron shell)
 
@@ -132,7 +131,7 @@ pnpm --filter venomcowork-orchestrator dev -- \
 pnpm typecheck
 
 # Sanity-check the sidecar resolution
-pnpm --filter @venom-cowork/desktop exec node -e "console.log(require('./package.json').opencodeRouterVersion)"
+pnpm --filter @venom-cowork/desktop exec node -e "console.log(require('./package.json').venomcoworkRouterVersion)"
 ```
 
 ---
@@ -161,8 +160,8 @@ apps/
     resources/        icons, sidecars, computer-use helper
     server/           snapshot of apps/server/dist copied at build time
   server/             Filesystem-backed API (Bun + TypeScript)
-  orchestrator/       CLI that orchestrates opencode + server + router
-  opencode-router/    Slack + Telegram bridge
+  orchestrator/       CLI that orchestrates venomcowork-engine + server + router
+  venomcowork-router/    Slack + Telegram bridge
   ui-demo/            Standalone UI playground
 packages/
   venomcowork-ui-mcp/ MCP server exposing UI as tools

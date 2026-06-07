@@ -39,6 +39,7 @@
     "electron-devtools-installer": "^4.0.0"
   },
   "packageManager": "pnpm@10.27.0",
-  "opencodeRouterVersion": "0.15.2"
+  "opencodeRouterVersion": "0.15.2",
+  "venomcoworkRouterVersion": "0.15.2"
 }
 

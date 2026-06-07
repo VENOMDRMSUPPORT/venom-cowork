@@ -29,7 +29,7 @@
 #   3. Tauri webview       (target/debug/VenomCowork-Dev)  <-- never /Applications/
 #   4. Electron main+helpers (node_modules/electron/...Electron.app)
 #   5. Vite                (node node_modules/.../vite)
-#   6. orchestrator + venomcowork-server + opencode + opencode-router
+#   6. orchestrator + venomcowork-server + opencode + venomcowork-router
 #      (both target/debug/* and src-tauri/sidecars/* trees)
 #
 # Cache/ephemeral state wiped by `reset`:
@@ -196,7 +196,7 @@ NODE
 
 snapshot() {
   echo "=== dev stack processes ==="
-  ps -Ao pid,ppid,command | awk '/target\/debug\/VenomCowork-Dev|node_modules\/electron\/dist\/Electron\.app\/Contents\/MacOS\/Electron|apps\/desktop\/scripts\/electron-dev\.mjs|target\/debug\/venomcowork-server|target\/debug\/venomcowork-orchestrator|target\/debug\/opencode( |\/)|target\/debug\/opencode-router|apps\/desktop\/src-tauri\/sidecars\/venomcowork-server|apps\/desktop\/src-tauri\/sidecars\/venomcowork-orchestrator|apps\/desktop\/src-tauri\/sidecars\/opencode( |\/)|apps\/desktop\/src-tauri\/sidecars\/opencode-router|vite|pnpm .*dev/ && !/awk/ && !/grep/' | sed -E 's#/Users/[^ ]*/#â€¦/#g' | head -20
+  ps -Ao pid,ppid,command | awk '/target\/debug\/VenomCowork-Dev|node_modules\/electron\/dist\/Electron\.app\/Contents\/MacOS\/Electron|apps\/desktop\/scripts\/electron-dev\.mjs|target\/debug\/venomcowork-server|target\/debug\/venomcowork-orchestrator|target\/debug\/opencode( |\/)|target\/debug\/venomcowork-router|apps\/desktop\/src-tauri\/sidecars\/venomcowork-server|apps\/desktop\/src-tauri\/sidecars\/venomcowork-orchestrator|apps\/desktop\/src-tauri\/sidecars\/opencode( |\/)|apps\/desktop\/src-tauri\/sidecars\/venomcowork-router|vite|pnpm .*dev/ && !/awk/ && !/grep/' | sed -E 's#/Users/[^ ]*/#â€¦/#g' | head -20
 
   echo
   echo "=== venomcowork-server ==="
@@ -229,24 +229,24 @@ snapshot() {
   fi
 
   echo
-  echo "=== opencode-router ==="
+  echo "=== venomcowork-router ==="
   local r_port
   r_port=$(ps -Ao command \
-    | grep -E "(target/debug|apps/desktop/src-tauri/sidecars)/opencode-router" \
+    | grep -E "(target/debug|apps/desktop/src-tauri/sidecars)/venomcowork-router" \
     | grep -v grep \
     | grep -oE '\-\-opencode-url http://127.0.0.1:[0-9]+' \
     | head -1 \
     | awk '{print $2}' \
     || true)
   if [[ -z "$r_port" ]]; then
-    echo "  (no opencode-router info)"
+    echo "  (no venomcowork-router info)"
   else
     echo "  attached to $r_port"
   fi
 
   echo
   echo "=== orphans (parent == 1) ==="
-  ps -Ao pid,ppid,command | awk '$2 == 1 && $3 ~ /venomcowork-server|venomcowork-orchestrator|opencode( |\/)|opencode-router/' | head
+  ps -Ao pid,ppid,command | awk '$2 == 1 && $3 ~ /venomcowork-server|venomcowork-orchestrator|opencode( |\/)|venomcowork-router/' | head
 
   echo
   echo "=== dev log sink ==="
@@ -274,7 +274,7 @@ tail_logs() {
 
 kill_orphans() {
   local pids
-  pids=$(ps -Ao pid,ppid,command | awk '$2 == 1 && $3 ~ /venomcowork-server|venomcowork-orchestrator|opencode( |\/)|opencode-router/ {print $1}')
+  pids=$(ps -Ao pid,ppid,command | awk '$2 == 1 && $3 ~ /venomcowork-server|venomcowork-orchestrator|opencode( |\/)|venomcowork-router/ {print $1}')
   if [[ -z "$pids" ]]; then
     log "no orphans"
     return 0
@@ -465,7 +465,7 @@ stop() {
   kill_by_pattern "node_modules/\.bin/vite"
   kill_by_pattern "node_modules/vite/bin/vite\.js"
 
-  # 5. venomcowork-server / orchestrator / opencode / opencode-router for the
+  # 5. venomcowork-server / orchestrator / opencode / venomcowork-router for the
   #    current dev build. These are the longest-lived children and the ones
   #    most likely to orphan after an unclean shutdown.
   #    Tauri dev runs them from target/debug/, Electron dev runs them from
@@ -473,11 +473,11 @@ stop() {
   kill_by_pattern "target/debug/venomcowork-server"
   kill_by_pattern "target/debug/venomcowork-orchestrator"
   kill_by_pattern "target/debug/opencode"
-  kill_by_pattern "target/debug/opencode-router"
+  kill_by_pattern "target/debug/venomcowork-router"
   kill_by_pattern "apps/desktop/src-tauri/sidecars/venomcowork-server"
   kill_by_pattern "apps/desktop/src-tauri/sidecars/venomcowork-orchestrator"
   kill_by_pattern "apps/desktop/src-tauri/sidecars/opencode( |/)"
-  kill_by_pattern "apps/desktop/src-tauri/sidecars/opencode-router"
+  kill_by_pattern "apps/desktop/src-tauri/sidecars/venomcowork-router"
 
   # Safety net for stragglers we don't own directly.
   kill_orphans

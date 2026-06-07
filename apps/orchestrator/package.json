@@ -1,7 +1,7 @@
 {
   "name": "venomcowork-orchestrator",
   "version": "0.15.2",
-  "description": "VenomCowork host orchestrator for opencode + VenomCowork server + opencode-router",
+  "description": "VenomCowork host orchestrator for VenomCowork Engine + VenomCowork server + VenomCowork Router",
   "private": true,
   "type": "module",
   "scripts": {
@@ -25,7 +25,6 @@
   ],
   "keywords": [
     "venomcowork",
-    "opencode",
     "orchestrator",
     "cli",
     "agent"
@@ -38,7 +37,7 @@
     "@opencode-ai/sdk": "^1.15.12",
     "@opentui/core": "0.1.77",
     "@opentui/solid": "0.1.77",
-    "opencode-router": "0.15.2",
+    "venomcowork-router": "0.15.2",
     "venomcowork-server": "0.15.2",
     "solid-js": "1.9.9"
   },

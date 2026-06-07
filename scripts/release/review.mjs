@@ -17,13 +17,13 @@ const orchestratorPkg = readJson(
   resolve(root, "apps", "orchestrator", "package.json"),
 );
 const pinnedOpencodeVersion = String(
-  readJson(resolve(root, "constants.json")).opencodeVersion ?? "",
+  readJson(resolve(root, "constants.json")).venomcoworkEngineVersion ?? "",
 )
   .trim()
   .replace(/^v/, "");
 const serverPkg = readJson(resolve(root, "apps", "server", "package.json"));
 const opencodeRouterPkg = readJson(
-  resolve(root, "apps", "opencode-router", "package.json"),
+  resolve(root, "apps", "venomcowork-router", "package.json"),
 );
 const versions = {
   app: appPkg.version ?? null,
@@ -66,7 +66,7 @@ addCheck(
   `${versions.app ?? "?"} vs ${versions.server ?? "?"}`,
 );
 addCheck(
-  "App/opencode-router versions match",
+  "App/venomcowork-router versions match",
   versions.app &&
     versions.opencodeRouter &&
     versions.app === versions.opencodeRouter,
@@ -123,7 +123,7 @@ if (existsSync(sidecarManifestPath)) {
     `${manifest.version ?? "?"} vs ${versions.orchestrator ?? "?"}`,
   );
   const serverEntry = manifest.entries?.["venomcowork-server"]?.version;
-  const routerEntry = manifest.entries?.["opencode-router"]?.version;
+  const routerEntry = manifest.entries?.["venomcowork-router"]?.version;
   if (serverEntry) {
     addCheck(
       "Sidecar manifest venomcowork-server version matches",
@@ -133,7 +133,7 @@ if (existsSync(sidecarManifestPath)) {
   }
   if (routerEntry) {
     addCheck(
-      "Sidecar manifest opencode-router version matches",
+      "Sidecar manifest venomcowork-router version matches",
       versions.opencodeRouter && routerEntry === versions.opencodeRouter,
       `${routerEntry ?? "?"} vs ${versions.opencodeRouter ?? "?"}`,
     );

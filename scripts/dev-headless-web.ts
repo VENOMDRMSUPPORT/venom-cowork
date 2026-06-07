@@ -132,7 +132,7 @@ const venomcoworkServerBin = path.join(
 );
 const opencodeRouterBin = path.join(
   cwd,
-  "apps/opencode-router/dist/bin/opencode-router",
+  "apps/venomcowork-router/dist/bin/venomcowork-router",
 );
 
 const ensureVenomcoworkServer = async () => {
@@ -179,13 +179,13 @@ const ensureOpencodeRouter = async () => {
   } catch {
     if (!autoBuildEnabled) {
       logLine(
-        `[dev:headless-web] Missing opencode-router binary at ${opencodeRouterBin}`,
+        `[dev:headless-web] Missing venomcowork-router binary at ${opencodeRouterBin}`,
       );
       logLine(
         "[dev:headless-web] Auto-build disabled (VENOMCOWORK_DEV_HEADLESS_WEB_AUTOBUILD=0)",
       );
       logLine(
-        "[dev:headless-web] Run: pnpm --filter opencode-router build:bin",
+        "[dev:headless-web] Run: pnpm --filter venomcowork-router build:bin",
       );
       logLine(
         "[dev:headless-web] Or unset/enable VENOMCOWORK_DEV_HEADLESS_WEB_AUTOBUILD to auto-build.",
@@ -194,13 +194,13 @@ const ensureOpencodeRouter = async () => {
     }
 
     logLine(
-      `[dev:headless-web] Missing opencode-router binary at ${opencodeRouterBin}`,
+      `[dev:headless-web] Missing venomcowork-router binary at ${opencodeRouterBin}`,
     );
     logLine(
-      "[dev:headless-web] Auto-building: pnpm --filter opencode-router build:bin",
+      "[dev:headless-web] Auto-building: pnpm --filter venomcowork-router build:bin",
     );
     try {
-      await runCommand("pnpm", ["--filter", "opencode-router", "build:bin"]);
+      await runCommand("pnpm", ["--filter", "venomcowork-router", "build:bin"]);
       await access(opencodeRouterBin);
     } catch (error) {
       logLine(
@@ -213,7 +213,7 @@ const ensureOpencodeRouter = async () => {
 
 const venomcoworkUrl = `http://${clientHost}:${venomcoworkPort}`;
 const webUrl = `http://${clientHost}:${webPort}`;
-// In practice we want opencode-router on for end-to-end messaging tests.
+// In practice we want venomcowork-router on for end-to-end messaging tests.
 // Allow opt-out via VENOMCOWORK_DEV_OPENCODE_ROUTER=0.
 const opencodeRouterEnabled =
   process.env.VENOMCOWORK_DEV_OPENCODE_ROUTER == null
@@ -296,9 +296,9 @@ const headlessProcess = spawnLogged(
     "--approval",
     "auto",
     "--allow-external",
-    "--opencode-router",
+    "--venomcowork-router",
     opencodeRouterEnabled ? "true" : "false",
-    ...(opencodeRouterRequired ? ["--opencode-router-required"] : []),
+    ...(opencodeRouterRequired ? ["--venomcowork-router-required"] : []),
     ...(remoteAccessEnabled ? ["--remote-access"] : []),
     "--venomcowork-port",
     String(venomcoworkPort),
