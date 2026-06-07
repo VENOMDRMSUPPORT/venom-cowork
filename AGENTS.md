@@ -48,10 +48,24 @@ If you cannot run tests or capture the video, say so explicitly and explain why,
 - Use components from @/components when possible.
 - When creating new components, we prefer using shadcn/ui with (Base UI).
 - Assume most end users of VenomCowork are non-technical.
+- **Auto-load skills**: The agent automatically detects UI tasks and loads `frontend-design`, `shadcn-best-practices`, or `react-best-practices` as needed. Do not narrate skill loading.
 
 ### Tech Stack Preferences
 
 When uncertain, prefer: Tailwind, TypeScript, React, shadcn/ui (Base UI), TanStack Query, Zustand, Zod, Drizzle, Better-Auth.
+
+### Design System
+
+VenomCowork includes a built-in OKLCH-based design token system:
+
+- **Location**: `packages/ui/src/react/design-tokens/`
+- **Theme Presets**: `obsidian-noir`, `arctic-bloom`, `industrial-brutalist`, `twilight-editorial`, `neon-depth`
+- **Components**: `ThemeProvider`, `ThemeSwitcher`, `useTheme` hook
+- **CSS Generation**: `generateCompleteStylesheet(preset)`, `generateCSSVariables(preset)`
+- **Tailwind Integration**: `generateTailwindConfig(preset)`
+- **WCAG Compliance**: `wcagCompliance(textColor, bgColor)` for contrast checking
+
+Each preset has a named aesthetic direction, one unforgettable element, and an explicit anti-pattern to avoid.
 
 ### Code Style
 
