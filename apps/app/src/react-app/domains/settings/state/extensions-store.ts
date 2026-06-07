@@ -351,7 +351,7 @@ export function createExtensionsStore(options: {
     importedCloudMarketplaces: {},
     importedCloudPlugins: {},
     hubRepo: DEFAULT_HUB_REPO,
-    hubRepos: [DEFAULT_HUB_REPO],
+    hubRepos: DEFAULT_HUB_REPO ? [DEFAULT_HUB_REPO] : [],
     pluginScope: "project",
     pluginConfig: null,
     pluginConfigPath: null,
@@ -461,7 +461,7 @@ export function createExtensionsStore(options: {
   const normalizeHubRepo = (input?: Partial<HubSkillRepo> | null): HubSkillRepo | null => {
     const owner = input?.owner?.trim() || "";
     const repo = input?.repo?.trim() || "";
-    const ref = input?.ref?.trim() || DEFAULT_HUB_REPO.ref;
+    const ref = input?.ref?.trim() || DEFAULT_HUB_REPO?.ref || "main";
     if (!owner || !repo) return null;
     return { owner, repo, ref };
   };

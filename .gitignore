@@ -68,4 +68,14 @@ transcript-analysis
 config.json
 graphify-out/
 
+# Generated icon assets (regenerate via scripts/generate-icons.mjs)
+generated-icons/
+apps/desktop/resources/icons/*.png
+apps/desktop/resources/icons/*.ico
+apps/desktop/resources/icons/dev/*.png
+apps/desktop/resources/icons/dev/*.ico
+apps/app/public/favicon-*.png
+apps/app/public/apple-touch-icon.png
+brand/venomcowork-logo-transparent.png
+
 

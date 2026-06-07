@@ -7,8 +7,8 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "moduleResolution": "Bundler",
-    "baseUrl": ".",
     "paths": {
+      "*": ["./*"],
       "@/*": ["./src/*"]
     },
     "resolveJsonModule": true,
