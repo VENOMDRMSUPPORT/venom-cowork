@@ -23,11 +23,11 @@ import { createClient } from "./opencode.js";
 import { parseSlackPeerId } from "./slack.js";
 import { truncateText } from "./text.js";
 
-declare const __OPENCODE_ROUTER_VERSION__: string | undefined;
+declare const __VENOMCOWORK_ENGINE_ROUTER_VERSION__: string | undefined;
 
 const VERSION = (() => {
-  if (typeof __OPENCODE_ROUTER_VERSION__ === "string" && __OPENCODE_ROUTER_VERSION__.trim()) {
-    return __OPENCODE_ROUTER_VERSION__.trim();
+  if (typeof __VENOMCOWORK_ENGINE_ROUTER_VERSION__ === "string" && __VENOMCOWORK_ENGINE_ROUTER_VERSION__.trim()) {
+    return __VENOMCOWORK_ENGINE_ROUTER_VERSION__.trim();
   }
   try {
     const pkgPath = new URL("../package.json", import.meta.url);
@@ -157,20 +157,20 @@ function deleteSlackApp(cfg: OpenCodeRouterConfigFile, idRaw: string): { next: O
 
 async function runStart(pathOverride?: string, options?: { opencodeUrl?: string }) {
   if (pathOverride?.trim()) {
-    process.env.OPENCODE_DIRECTORY = pathOverride.trim();
+    process.env.VENOMCOWORK_ENGINE_DIRECTORY = pathOverride.trim();
   }
   if (options?.opencodeUrl?.trim()) {
-    process.env.OPENCODE_URL = options.opencodeUrl.trim();
+    process.env.VENOMCOWORK_ENGINE_URL = options.opencodeUrl.trim();
   }
   const config = loadConfig();
   const logger = createAppLogger(config);
   const reporter = createConsoleReporter();
-  if (!process.env.OPENCODE_DIRECTORY) {
-    process.env.OPENCODE_DIRECTORY = config.opencodeDirectory;
+  if (!process.env.VENOMCOWORK_ENGINE_DIRECTORY) {
+    process.env.VENOMCOWORK_ENGINE_DIRECTORY = config.opencodeDirectory;
   }
   const bridge = await startBridge(config, logger, reporter);
   if (process.stdout.isTTY) {
-    reporter.onStatus?.("Commands: opencode-router identities, opencode-router bindings, opencode-router status");
+    reporter.onStatus?.("Commands: venomcowork-router identities, venomcowork-router bindings, venomcowork-router status");
   }
 
   const shutdown = async () => {
@@ -186,9 +186,9 @@ async function runStart(pathOverride?: string, options?: { opencodeUrl?: string 
 const program = new Command();
 
 program
-  .name("opencode-router")
+  .name("venomcowork-router")
   .version(VERSION)
-  .description("opencode-router: Slack + Telegram bridge + directory routing")
+  .description("venomcowork-router: Slack + Telegram bridge + directory routing")
   .option("--json", "Output in JSON format", false);
 
 program

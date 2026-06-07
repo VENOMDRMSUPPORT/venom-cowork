@@ -120,7 +120,7 @@ function expandHome(value: string): string {
 }
 
 function resolveConfigPath(dataDir: string, env: EnvLike): string {
-  const override = env.OPENCODE_ROUTER_CONFIG_PATH?.trim();
+  const override = env.VENOMCOWORK_ROUTER_CONFIG_PATH?.trim();
   if (override) return expandHome(override);
   return path.join(dataDir, "opencode-router.json");
 }
@@ -232,14 +232,14 @@ export function loadConfig(
   const requireOpencode = options.requireOpencode ?? false;
 
   const defaultDataDir = path.join(os.homedir(), ".venomcowork", "opencode-router");
-  const dataDir = expandHome(env.OPENCODE_ROUTER_DATA_DIR ?? defaultDataDir);
-  const dbPath = expandHome(env.OPENCODE_ROUTER_DB_PATH ?? path.join(dataDir, "opencode-router.db"));
-  const logFile = expandHome(env.OPENCODE_ROUTER_LOG_FILE ?? path.join(dataDir, "logs", "opencode-router.log"));
+  const dataDir = expandHome(env.VENOMCOWORK_ROUTER_DATA_DIR ?? defaultDataDir);
+  const dbPath = expandHome(env.VENOMCOWORK_ROUTER_DB_PATH ?? path.join(dataDir, "opencode-router.db"));
+  const logFile = expandHome(env.VENOMCOWORK_ROUTER_LOG_FILE ?? path.join(dataDir, "logs", "opencode-router.log"));
   const configPath = resolveConfigPath(dataDir, env);
   let { config: configFile } = readConfigFile(configPath);
-  const opencodeDirectory = env.OPENCODE_DIRECTORY?.trim() || configFile.opencodeDirectory || "";
+  const opencodeDirectory = env.VENOMCOWORK_ENGINE_DIRECTORY?.trim() || configFile.opencodeDirectory || "";
   if (!opencodeDirectory && requireOpencode) {
-    throw new Error("OPENCODE_DIRECTORY is required");
+    throw new Error("VENOMCOWORK_ENGINE_DIRECTORY is required");
   }
   const resolvedDirectory = opencodeDirectory || process.cwd();
 
@@ -261,11 +261,11 @@ export function loadConfig(
     slackApps.unshift({ id: "env", botToken: envSlackBot, appToken: envSlackApp, enabled: true });
   }
   const healthPort =
-    parseInteger(env.OPENCODE_ROUTER_HEALTH_PORT) ??
+    parseInteger(env.VENOMCOWORK_ROUTER_HEALTH_PORT) ??
     // Convenience alias (common on PaaS / local experiments)
     parseInteger(env.PORT) ??
     3005;
-  const model = parseModel(env.OPENCODE_ROUTER_MODEL);
+  const model = parseModel(env.VENOMCOWORK_ROUTER_MODEL);
 
   const telegramEnabledDefault = configFile.channels?.telegram?.enabled ?? true;
   const slackEnabledDefault = configFile.channels?.slack?.enabled ?? true;
@@ -273,10 +273,10 @@ export function loadConfig(
   return {
     configPath,
     configFile,
-    opencodeUrl: env.OPENCODE_URL?.trim() || configFile.opencodeUrl || "http://127.0.0.1:4096",
+    opencodeUrl: env.VENOMCOWORK_ENGINE_URL?.trim() || configFile.opencodeUrl || "http://127.0.0.1:4096",
     opencodeDirectory: resolvedDirectory,
-    opencodeUsername: env.OPENCODE_SERVER_USERNAME?.trim() || undefined,
-    opencodePassword: env.OPENCODE_SERVER_PASSWORD?.trim() || undefined,
+    opencodeUsername: env.VENOMCOWORK_ENGINE_SERVER_USERNAME?.trim() || undefined,
+    opencodePassword: env.VENOMCOWORK_ENGINE_SERVER_PASSWORD?.trim() || undefined,
     model,
     telegramBots: telegramBots.map((bot) => ({ ...bot, enabled: bot.enabled !== false && parseBoolean(env.TELEGRAM_ENABLED, telegramEnabledDefault) })),
     slackApps: slackApps.map((app) => ({
