@@ -44,7 +44,8 @@
     "bump:patch": "pnpm --filter @venom-cowork/app bump:patch",
     "bump:minor": "pnpm --filter @venom-cowork/app bump:minor",
     "bump:major": "pnpm --filter @venom-cowork/app bump:major",
-    "bump:set": "pnpm --filter @venom-cowork/app bump:set"
+    "bump:set": "pnpm --filter @venom-cowork/app bump:set",
+    "generate-icons": "node scripts/generate-icons.mjs"
   },
   "devDependencies": {
     "ico-endec": "^0.1.6",
