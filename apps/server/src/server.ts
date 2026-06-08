@@ -1112,7 +1112,7 @@ function buildCapabilities(config: ServerConfig): Capabilities {
   return {
     schemaVersion,
     serverVersion: SERVER_VERSION,
-    venomcoworkEngineVersion: OPENCODE_VERSION,
+    opencodeVersion: OPENCODE_VERSION,
     skills: { read: true, write: writeEnabled, source: "venomcowork" },
     hub: {
       skills: {
