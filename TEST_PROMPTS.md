@@ -10,9 +10,9 @@
 
 **Prompt:**
 ```
-فيه مشكلة في الفورم بتاع التسجيل — الـ validation messages مش ظاهرة صح
-وكمان الـ input fields محتاجة input groups مع addons
-ممكن تصلحها وetsكد إنها بتتبع أحدث best practices لـ shadcn?
+The registration form has a bug — validation messages aren't showing correctly,
+and the input fields need input groups with addons.
+Can you fix it and make sure it follows the latest shadcn best practices?
 ```
 
 **What to check:**
@@ -28,9 +28,9 @@
 
 **Prompt:**
 ```
-الصفحة الرئيسية بطيئة جداً — فيها 3 API calls بتعمل sequentially
-ومعدين كل component بيعمل re-render كتير
-ممكن تحسّن الأداء?
+The home page is really slow — it makes 3 API calls sequentially,
+and then every component re-renders too often.
+Can you improve performance?
 ```
 
 **What to check:**
@@ -45,8 +45,8 @@
 
 **Prompt:**
 ```
-عايز أعمل dashboard للـ analytics — يعرض charts و stats و recent activity
-المستخدمين مش تقنيين فالمفروض يكون سهل وواضح
+I want to build an analytics dashboard — charts, stats, and recent activity.
+Users aren't technical, so it should be simple and clear.
 ```
 
 **What to check:**
@@ -62,9 +62,9 @@
 
 **Prompt:**
 ```
-محتاج أعمل settings page كامل — فيها profile section, notifications preferences,
-dark mode toggle, integrations tab, و billing section
-ده هيكون multi-screen UI
+I need a full settings page — profile section, notification preferences,
+dark mode toggle, integrations tab, and billing section.
+This will be a multi-screen UI.
 ```
 
 **What to check:**
@@ -81,9 +81,8 @@ dark mode toggle, integrations tab, و billing section
 
 **Prompt:**
 ```
-عايز أضيف theme switcher للتطبيق — المستخدم يقدر يختار بين
-dark و light و casual theme
-المفروض ي remember الاختيار بتاعه
+I want to add a theme switcher — users can pick dark, light, or casual theme.
+It should remember their choice.
 ```
 
 **What to check:**
@@ -99,9 +98,9 @@ dark و light و casual theme
 
 **Prompt:**
 ```
-محتاج أعمل settings page فيها tabs — كل tab فيها Card مع form controls
-فيه switches و selects و checkboxes
-وكمان محتاج alert component لل error states
+I need a settings page with tabs — each tab has a Card with form controls.
+There are switches, selects, and checkboxes.
+Also need an alert component for error states.
 ```
 
 **What to check:**
@@ -118,9 +117,9 @@ dark و light و casual theme
 
 **Prompt:**
 ```
-الـ data table بتاعي فيها 1000 row وبتعمل filter و sort
-كل مرة بكتب في الـ search box كل الـ rows بتعمل re-render
-ممكن تحسّن الأداء?
+My data table has 1000 rows with filter and sort.
+Every time I type in the search box, all rows re-render.
+Can you improve performance?
 ```
 
 **What to check:**
@@ -136,9 +135,9 @@ dark و light و casual theme
 
 **Prompt:**
 ```
-عايز أغير الـ color palette للتطبيق كله — من blue إلى something
-more warm و professional
-والمفروض يتنشر على كل الـ components
+I want to change the app's entire color palette — from blue to something
+warmer and more professional.
+It should apply across all components.
 ```
 
 **What to check:**
@@ -154,8 +153,8 @@ more warm و professional
 
 **Prompt:**
 ```
-محتاج أعمل settings page فيها form validation مع Supabase backend
-والمفروض تكون accessible و performant
+I need a settings page with form validation backed by Supabase.
+It should be accessible and performant.
 ```
 
 **What to check:**
@@ -171,9 +170,8 @@ more warm و professional
 
 **Prompt:**
 ```
-عايز أعمل landing page لمنتج SaaS — الصفحة الرئيسية
-محتاج hero section و features و pricing و testimonials
-عايزها تكون مختلفة و مش عادية زي كل الـ SaaS landing pages
+I want a SaaS product landing page — hero section, features, pricing, and testimonials.
+It should feel different from the usual generic SaaS landing pages.
 ```
 
 **What to check:**

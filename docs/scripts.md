@@ -1,66 +1,66 @@
-# سكريبتات التطوير
+# Development scripts
 
-هذا المستند يوضح جميع السكريبتات المتاحة في `package.json` الرئيسي.
+This document lists scripts available in the root `package.json`.
 
-## تطوير Desktop (Electron)
+## Desktop development (Electron)
 
-| السكريبت | الوصف |
-|---------|-------|
-| `pnpm dev` | تشغيل Electron كامل في وضع التطوير |
-| `pnpm dev:electron` | Electron shell فقط |
-| `pnpm dev:windows` | وضع التطوير الخاص بـ Windows |
-| `pnpm dev:headless` | وضع headless (بدون UI) |
+| Script | Description |
+|--------|-------------|
+| `pnpm dev` | Full Electron app in development mode |
+| `pnpm dev:electron` | Electron shell only |
+| `pnpm dev:windows` | Windows-specific development mode |
+| `pnpm dev:headless` | Headless mode (no UI) |
 
-## تطوير UI
+## UI development
 
-| السكريبت | الوصف |
-|---------|-------|
-| `pnpm dev:ui` | Renderer فقط (بدون Electron) |
-| `pnpm dev:ui-demo` | ملعب مكونات UI |
-| `pnpm preview` | معاينة إنتاج build |
+| Script | Description |
+|--------|-------------|
+| `pnpm dev:ui` | Renderer only (no Electron) |
+| `pnpm dev:ui-demo` | UI component playground |
+| `pnpm preview` | Preview production build |
 
-## تطوير Cloud Control Plane
+## Cloud Control Plane development
 
-| السكريبت | الوصف |
-|---------|-------|
-| `pnpm dev:den` | Den API/Web stack محلي |
-| `pnpm dev:den:api` | خادم Den API فقط |
-| `pnpm dev:den:web` | واجهة Den Next.js فقط |
-| `pnpm dev:den:inference` | عامل Model inference |
+| Script | Description |
+|--------|-------------|
+| `pnpm dev:den` | Local Den API/Web stack |
+| `pnpm dev:den:api` | Den API server only |
+| `pnpm dev:den:web` | Den Next.js UI only |
+| `pnpm dev:den:inference` | Model inference worker |
 
-## الاختبار
+## Testing
 
-| السكريبت | الوصف |
-|---------|-------|
-| `pnpm test:health` | فحص صحي سريع |
-| `pnpm test:e2e` | اختبارات شاملة |
-| `pnpm test:refactor` | Typecheck + فحوصات sanity |
-| `pnpm test:sessions` | اختبارات إدارة الجلسات |
-| `pnpm test:permissions` | اختبارات الأذونات |
+| Script | Description |
+|--------|-------------|
+| `pnpm test:health` | Quick health check |
+| `pnpm test:e2e` | Broader integration tests |
+| `pnpm test:refactor` | Typecheck + sanity checks |
+| `pnpm test:sessions` | Session management tests |
+| `pnpm test:permissions` | Permission tests |
 
-## البناء
+## Build
 
-| السكريبت | الوصف |
-|---------|-------|
-| `pnpm build` | بناء workspace كامل |
-| `pnpm build:ui` | بناء Renderer فقط |
-| `pnpm build:web` | بناء تطبيق Den web |
-| `pnpm build:desktop` | بناء Electron app |
+| Script | Description |
+|--------|-------------|
+| `pnpm build` | Build entire workspace |
+| `pnpm build:ui` | Build renderer only |
+| `pnpm build:web` | Build Den web app |
+| `pnpm build:desktop` | Build Electron app |
 
-## الأدوات
+## Tooling
 
-| السكريبت | الوصف |
-|---------|-------|
-| `pnpm lint` | فحص ESLint |
-| `pnpm format` | تنسيق مع Prettier |
-| `pnpm typecheck` | فحص TypeScript types |
+| Script | Description |
+|--------|-------------|
+| `pnpm lint` | Run ESLint |
+| `pnpm format` | Format with Prettier |
+| `pnpm typecheck` | Run TypeScript type check |
 
 ---
 
-## للحصول على قائمة كاملة
+## Full script list
 
 ```bash
 pnpm run
 ```
 
-أو راجع [`package.json`](../package.json) مباشرة.
+Or see [`package.json`](../package.json) directly.

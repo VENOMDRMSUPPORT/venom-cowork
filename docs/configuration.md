@@ -1,106 +1,106 @@
-# تكوين VenomCowork
+# VenomCowork configuration
 
-هذا المستند يوضح جميع خيارات التكوين ومتغيرات البيئة المتاحة في VenomCowork.
+This document lists configuration options and environment variables available in VenomCowork.
 
-## متغيرات البيئة
+## Environment variables
 
-### التحديثات التلقائية
+### Auto-updates
 
-| المتغير | الافتراضي | الوصف |
-|---------|----------|-------|
-| `VENOMCOWORK_UPDATER_STABLE_URL` | فارغ | رابط feed التحديثات المستقرة |
-| `VENOMCOWORK_UPDATER_ALPHA_URL` | فارغ | رابط feed التحديثات التجريبية |
-| `VENOMCOWORK_RELEASE_PAGE_URL` | فارغ | صفحة الإصدارات |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VENOMCOWORK_UPDATER_STABLE_URL` | empty | Stable update feed URL |
+| `VENOMCOWORK_UPDATER_ALPHA_URL` | empty | Alpha update feed URL |
+| `VENOMCOWORK_RELEASE_PAGE_URL` | empty | Releases page URL |
 
-### التوثيق والدعم
+### Documentation and support
 
-| المتغير | الافتراضي | الوصف |
-|---------|----------|-------|
-| `VENOMCOWORK_DOCS_URL` | فارغ | رابط التوثيق (Desktop) |
-| `VITE_VENOMCOWORK_DOCS_URL` | فارغ | رابط التوثيق (Renderer) |
-| `VITE_VENOMCOWORK_FEEDBACK_URL` | فارغ | رابط إرسال Feedback |
-| `VITE_VENOMCOWORK_DOWNLOAD_URL` | فارغ | رابط تحميل الويب |
-| `VENOMCOWORK_SUPPORT_CONTACT` | عام | جهة الاتصال للدعم |
-| `VITE_VENOMCOWORK_SUPPORT_CONTACT` | عام | جهة الاتصال للدعم (Renderer) |
-| `VENOMCOWORK_REPORT_ISSUE_URL` | فارغ | ر柄ر الإبلاغ عن مشكلة |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VENOMCOWORK_DOCS_URL` | empty | Docs URL (desktop) |
+| `VITE_VENOMCOWORK_DOCS_URL` | empty | Docs URL (renderer) |
+| `VITE_VENOMCOWORK_FEEDBACK_URL` | empty | Feedback submission URL |
+| `VITE_VENOMCOWORK_DOWNLOAD_URL` | empty | Web download URL |
+| `VENOMCOWORK_SUPPORT_CONTACT` | generic | Support contact |
+| `VITE_VENOMCOWORK_SUPPORT_CONTACT` | generic | Support contact (renderer) |
+| `VENOMCOWORK_REPORT_ISSUE_URL` | empty | Report-issue link |
 
 ### Cloud Control Plane
 
-| المتغير | الافتراضي | الوصف |
-|---------|----------|-------|
-| `VITE_DEN_BASE_URL` | فارغ | رابط قاعدة Den API (Renderer) |
-| `VENOMCOWORK_DEN_BASE_URL` | فارغ | رابط قاعدة Den API (Desktop) |
-| `VENOMCOWORK_MODELS_URL` | فارغ | رابط دليل النماذج المستضافة |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_DEN_BASE_URL` | empty | Den API base URL (renderer) |
+| `VENOMCOWORK_DEN_BASE_URL` | empty | Den API base URL (desktop) |
+| `VENOMCOWORK_MODELS_URL` | empty | Hosted model catalog URL |
 
 ### Skill Hub
 
-| المتغير | الافتراضي | الوصف |
-|---------|----------|-------|
-| `VENOMCOWORK_HUB_OWNER` | فارغ | مالك repo hub skills |
-| `VENOMCOWORK_HUB_REPO` | فارغ | اسم repo hub skills |
-| `VENOMCOWORK_HUB_REF` | فارغ | الفرع/المرجع (اختياري) |
-| `VITE_VENOMCOWORK_HUB_OWNER` | فارغ | مالك hub (Renderer) |
-| `VITE_VENOMCOWORK_HUB_REPO` | فارغ | اسم repo hub (Renderer) |
-| `VITE_VENOMCOWORK_HUB_REF` | فارغ | الفرع/المرجع (اختياري، Renderer) |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VENOMCOWORK_HUB_OWNER` | empty | Skill hub repo owner |
+| `VENOMCOWORK_HUB_REPO` | empty | Skill hub repo name |
+| `VENOMCOWORK_HUB_REF` | empty | Branch/ref (optional) |
+| `VITE_VENOMCOWORK_HUB_OWNER` | empty | Hub owner (renderer) |
+| `VITE_VENOMCOWORK_HUB_REPO` | empty | Hub repo name (renderer) |
+| `VITE_VENOMCOWORK_HUB_REF` | empty | Branch/ref (optional, renderer) |
 
-### Sidecar Downloads
+### Sidecar downloads
 
-| المتغير | الافتراضي | الوصف |
-|---------|----------|-------|
-| `VENOMCOWORK_SIDECAR_BASE_URL` | فارغ | رابط تحميل sidecar (CLI) |
-| `VENOMCOWORK_ORCHESTRATOR_DOWNLOAD_BASE_URL` | فارغ | رابط تحميل Orchestrator |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VENOMCOWORK_SIDECAR_BASE_URL` | empty | Sidecar download URL (CLI) |
+| `VENOMCOWORK_ORCHESTRATOR_DOWNLOAD_BASE_URL` | empty | Orchestrator download URL |
 
-### التطوير
+### Development
 
-| المتغير | الافتراضي | الوصف |
-|---------|----------|-------|
-| `VENOMCOWORK_DEV_MODE` | غير محدد | تفعيل وضع التطوير |
-| `VENOMCOWORK_SERVER_PORT` | 3000 | منفذ الخادم المحلي |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VENOMCOWORK_DEV_MODE` | unset | Enable development mode |
+| `VENOMCOWORK_SERVER_PORT` | 3000 | Local server port |
 
 ---
 
-## ملفات التكوين الحرجة
+## Critical config files
 
 ### `apps/desktop/electron-builder.yml`
 - `appId`: `com.venom.cowork` (dev: `com.venom.cowork.dev`)
 - `productName`: `VenomCowork`
 - `protocols`: `venomcowork://`
-- بدون `publish:` block (لا توجد روابط خارجية)
+- No `publish:` block (no external URLs)
 
 ### `apps/desktop/electron/main.mjs`
 - `APP_NAME`: `VenomCowork`
 - `APP_IDENTIFIER`: `com.venom.cowork`
-- جميع قنوات IPC تستخدم `venomcowork:` prefix
+- All IPC channels use the `venomcowork:` prefix
 
 ### `turbo.json`
-- تكوين Turborepo للبناء المتوازي
+- Turborepo configuration for parallel builds
 
 ### `pnpm-workspace.yaml`
-- تعريف workspace packages
-- إصدارات React catalog
+- Workspace package definitions
+- React catalog versions
 
 ---
 
-## البناء
+## Build
 
-### متغيرات البناء
+### Build-time variables
 
 ```bash
-# تفعيل Cloud features
+# Enable Cloud features
 VITE_DEN_BASE_URL=https://your-den-api.com
 
-# تفعيل Skill Hub
+# Enable Skill Hub
 VITE_VENOMCOWORK_HUB_OWNER=your-org
 VITE_VENOMCOWORK_HUB_REPO=venomcowork-skills
 
-# تفعيل Feedback
+# Enable feedback
 VITE_VENOMCOWORK_FEEDBACK_URL=https://your-feedback.com
 
-# تفعيل الدعم
+# Enable support contact
 VITE_VENOMCOWORK_SUPPORT_CONTACT=support@example.com
 ```
 
-### توقيع البناء (Windows)
+### Code signing (Windows)
 
 ```bash
 CSC_LINK=path/to/certificate.p12
@@ -109,11 +109,11 @@ CSC_KEY_PASSWORD=your-password
 
 ---
 
-## ملاحظات مهمة
+## Important notes
 
-1. **جميعEndpoints فارغة افتراضيًا** - يجب على المشغل إعدادها
-2. **التحديثات التلقائية تعتمد على hosted feed** - يجب استضافة `latest.yml`
-3. **Cloud features معطلة افتراضيًا** - يتطلب `VITE_DEN_BASE_URL`
-4. **Skill Hub فارغ افتراضيًا** - يتطلب متغيرات `HUB_*`
+1. **All endpoints default to empty** — operators must configure them
+2. **Auto-updates require a hosted feed** — you must host `latest.yml`
+3. **Cloud features are off by default** — requires `VITE_DEN_BASE_URL`
+4. **Skill Hub is empty by default** — requires `HUB_*` variables
 
-للمزيد من التفاصيل، راجع [`REBRAND_SUMMARY.md`](../REBRAND_SUMMARY.md).
+For more details, see [`REBRAND_SUMMARY.md`](../REBRAND_SUMMARY.md).

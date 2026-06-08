@@ -1,104 +1,104 @@
 # VenomCowork Enterprise Edition
 
-هذا الدليل يحتوي على خيارات **Cloud Control Plane** لـ VenomCowork.
+This tree contains optional **Cloud Control Plane** apps for VenomCowork.
 
-## 📦 التطبيقات
+## Apps
 
 ### Apps (`ee/apps/`)
 
-| التطبيق | الوصف |
-|---------|-------|
-| `den-api` | خادم API السحابي |
-| `den-web` | تطبيق Next.js على الويب |
-| `landing` | موقع التسويق |
-| `inference` | عامل Model inference |
+| App | Description |
+|-----|-------------|
+| `den-api` | Cloud API server |
+| `den-web` | Next.js web app |
+| `landing` | Marketing site |
+| `inference` | Model inference worker |
 
 ### Packages (`ee/packages/`)
 
-| الحزمة | الوصف |
-|-------|-------|
-| `den-db` | أدوات قاعدة البيانات |
-| `utils` | وظائف مساعدة مشتركة |
+| Package | Description |
+|---------|-------------|
+| `den-db` | Database utilities |
+| `utils` | Shared helper functions |
 
 ---
 
-## ⚠️ حالة Rebrand
+## Rebrand status
 
-### ما تم تحديثه ✅
-- سلاسل `productName` محدثة إلى `VenomCowork`
-- العلامة التجارية متسقة في جميع التطبيقات
+### Updated
+- `productName` strings set to `VenomCowork`
+- Branding is consistent across apps
 
-### ما لم يتم تحديثه ⚠️
-- **عناوين upstream** لا تزال تشير إلى `different-ai.com`
-- **عناوين البريد الإلكتروني** للدعم لا تزال قديمة
-- **خلاصات التحديث** تشير إلى upstream repos
+### Not yet updated
+- **Upstream domains** still point at `different-ai.com`
+- **Support email addresses** are still legacy
+- **Update feeds** still reference upstream repos
 
-هذا متعمد per request المشغل - يجب تحديثها بشكل منفصل قبل الشحن.
+This is intentional per operator request — update these separately before shipping.
 
 ---
 
-## 🔧 قبل الشحن
+## Before shipping
 
-إذا كنت تخطط لتشحن ميزات Cloud، **يجب** تحديث التالي:
+If you plan to ship Cloud features, **you must** update the following:
 
-### 1. النطاقات والعناوين
+### 1. Domains and URLs
 ```bash
-# ابحث عن all different-ai.com
+# Find all different-ai.com references
 grep -r "different-ai.com" ee/
 
-# ابحث عن all upstream references
+# Find all upstream references
 grep -r "opencode.ai" ee/
 ```
 
-### 2. البريد الإلكتروني للدعم
+### 2. Support email
 ```bash
-# ابحث عن support email references
+# Find support email references
 grep -r "support@" ee/
 grep -r "@different-ai.com" ee/
 ```
 
-### 3. خلاصات التحديث
+### 3. Update feeds
 ```bash
-# تحقق من update URLs
+# Check update URLs
 grep -r "UPDATER" ee/
 grep -r "update" ee/ -i
 ```
 
-### 4. تكوينات الإنتاج
-- تأكد من عدم وجود مفاتيح API embedded
-- تحقق من متغيرات البيئة المطلوبة
-- تأكد من تكوين قاعدة البيانات
+### 4. Production configuration
+- Ensure no embedded API keys
+- Verify required environment variables
+- Confirm database configuration
 
 ---
 
-## 🏗️ التشغيل المحلي
+## Local development
 
 ```bash
-# تشغيل Den API
+# Run Den API
 pnpm dev:den:api
 
-# تشغيل Den Web
+# Run Den Web
 pnpm dev:den:web
 
-# تشغيل Inference worker
+# Run inference worker
 pnpm dev:den:inference
 
-# تشغيل الكل معًا
+# Run everything together
 pnpm dev:den
 ```
 
 ---
 
-## 📝 ملاحظات
+## Notes
 
-- هذه التطبيقات مبنية بـ **Deno**
-- `den-api` يستخدم Oak framework
-- `den-web` يستخدم Next.js
-- `inference` يعمل كـ worker منفصل
+- These apps are built with **Deno**
+- `den-api` uses the Oak framework
+- `den-web` uses Next.js
+- `inference` runs as a separate worker
 
 ---
 
-## 🔗 روابط
+## Links
 
-- [`REBRAND_SUMMARY.md`](../REBRAND_SUMMARY.md) - تفاصيل Rebrand الكاملة
-- [CONTRIBUTING.md](../CONTRIBUTING.md) - كيفية المساهمة
+- [`REBRAND_SUMMARY.md`](../REBRAND_SUMMARY.md) — full rebrand details
+- [CONTRIBUTING.md](../CONTRIBUTING.md) — how to contribute

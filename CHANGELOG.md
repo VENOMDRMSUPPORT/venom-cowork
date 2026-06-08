@@ -1,79 +1,80 @@
-# سجل التغييرات
+# Changelog
 
-يتم إصدار VenomCowork وفقًا للإصدار الدلالي ([SemVer](https://semver.org/lang/ar/)).
+VenomCowork follows [Semantic Versioning](https://semver.org/).
 
-## تنسيق الإصدارات
+## Version format
 
-الإصدارات تتبع التنسيق: `MAJOR.MINOR.PATCH`
+Versions follow `MAJOR.MINOR.PATCH`:
 
-- **MAJOR**: تغييرات غير متوافقة مع الإصدارات السابقة
-- **MINOR**: وظائف جديدة متوافقة مع الإصدارات السابقة
-- **PATCH**: إصلاحات أخطاء متوافقة مع الإصدارات السابقة
+- **MAJOR**: incompatible API changes
+- **MINOR**: backwards-compatible features
+- **PATCH**: backwards-compatible bug fixes
 
 ---
 
 ## [Unreleased]
 
-### مضاف
-- `pnpm verify` — فحص baseline (typecheck + اختبارات وحدة server/app)
-- `.github/workflows/ci.yml` — CI على push/PR
-- `docs/local-dev.md` — دليل التطوير المحلي
-- `.env.local.example` — متغيرات اختيارية للتشغيل المحلي
-- `apps/server/script/run-unit-tests.mjs` — اختبارات server بدون e2e
+### Added
+- `pnpm verify` — baseline checks (typecheck + server/app unit tests)
+- `.github/workflows/ci.yml` — CI on push/PR
+- `docs/local-dev.md` — local development guide
+- `.env.local.example` — optional variables for local runs
+- `apps/server/script/run-unit-tests.mjs` — server tests without e2e
 
-### تغيير
-- إزالة build artifacts من git tracking
+### Changed
+- Removed build artifacts from git tracking
 
-### إصلاح
-- إصلاح خطأ TypeScript في `venomcoworkEngineVersion` → `opencodeVersion` في `buildCapabilities()`
+### Fixed
+- TypeScript error in `venomcoworkEngineVersion` → `opencodeVersion` in `buildCapabilities()`
 
 ---
 
 ## [0.15.2] - 2026-06-08
 
-### مضاف
-- إكمال إعادة تسمية العلامة التجارية من OpenCode إلى VenomCowork
-- تحديث جميع ملفات الترجمة (OpenCode → VenomCowork Engine)
-- إضافة `scripts/tsconfig.json` لدعم TypeScript في VS Code
-- إضافة نظام رموز التصميم OKLCH (5 سمات: obsidian-noir, arctic-bloom, industrial-brutalist, twilight-editorial, neon-depth)
-- إضافة مكونات `ThemeProvider` و `ThemeSwitcher` و `useTheme` hook
-- إضافة توليد CSS/Tailwind من رموز التصميم مع فحص تباين WCAG
+### Added
+- Completed rebrand from OpenCode to VenomCowork
+- Updated all translation files (OpenCode → VenomCowork Engine)
+- Added `scripts/tsconfig.json` for TypeScript support in VS Code
+- Added OKLCH design token system (5 themes: obsidian-noir, arctic-bloom, industrial-brutalist, twilight-editorial, neon-depth)
+- Added `ThemeProvider`, `ThemeSwitcher`, and `useTheme` hook
+- Added CSS/Tailwind generation from design tokens with WCAG contrast checks
 
-### تغيير
-- إعادة تسمية `apps/opencode-router` إلى `apps/venomcowork-router`
-- تحديث جميع مراجع الكود (scripts، orchestrator، server) للعلامة التجارية الجديدة
-- تحديث متغيرات البيئة من `OPENCODE_*` إلى `VENOMCOWORK_ENGINE_*`
-- تحديث `constants.json`: `opencodeVersion` → `venomcoworkEngineVersion`
-- تحديث `venomcowork.jsonc` (إزالة schema غير موثوق)
-- تحديث `turbo.json` (إزالة schema غير موثوق)
-- تحسين سكريبتات إعادة البناء التلقائي للتطبيق المكتبي (`desktop:rebuild`، `desktop:watch`)
+### Changed
+- Renamed `apps/opencode-router` to `apps/venomcowork-router`
+- Updated all code references (scripts, orchestrator, server) for the new brand
+- Updated env vars from `OPENCODE_*` to `VENOMCOWORK_ENGINE_*`
+- Updated `constants.json`: `opencodeVersion` → `venomcoworkEngineVersion`
+- Updated `venomcowork.jsonc` (removed untrusted schema)
+- Updated `turbo.json` (removed untrusted schema)
+- Improved desktop auto-rebuild scripts (`desktop:rebuild`, `desktop:watch`)
 
-### إصلاح
-- إزالة schemas غير موثوقة من ملفات JSON (`$schema` من turbo.json و venomcowork.jsonc)
-- إصلاح بناء التطبيق المكتبي ليعمل بشكل صحيح مع electron-builder
-- تحديث pnpm-lock بعد سكريبتات إعادة البناء
+### Fixed
+- Removed untrusted schemas from JSON files (`$schema` from turbo.json and venomcowork.jsonc)
+- Fixed desktop app build to work correctly with electron-builder
+- Updated pnpm-lock after rebuild scripts
 
 ---
 
-## كيفية الإضافة
+## How to add entries
 
-أضف التغييرات تحت القسم المناسب (مضاف/تغيير/إصلاح) مع وصف واضح:
+Add changes under the appropriate section (Added/Changed/Fixed) with a clear description:
 
 ```markdown
-### مضاف
-- وصف简短 للتغيير الجديد
+### Added
+- Brief description of the new change
 
-### تغيير
-- وصف简短 للتغيير الموجود
+### Changed
+- Brief description of the existing change
 
-### إصلاح
-- وصف简一本 للإصلاح
+### Fixed
+- Brief description of the fix
 ```
 
 ---
 
-## الإصدارات السابقة
+## Previous releases
 
-للحصول على سجل التغييرات الكامل، راجع:
+For the full changelog, see:
+
 - [Git Tags](https://github.com/your-org/venomcowork/tags)
 - [GitHub Releases](https://github.com/your-org/venomcowork/releases)

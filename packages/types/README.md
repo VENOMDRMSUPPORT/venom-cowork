@@ -1,48 +1,48 @@
 # @venom-cowork/types
 
-أنواع TypeScript المشتركة لـ VenomCowork.
+Shared TypeScript types for VenomCowork.
 
-## المحتوى
+## Contents
 
 - Domain types
 - API contracts
 - Shared interfaces
 - Utility types
 
-## الاستخدام
+## Usage
 
 ```typescript
 import { Session, Domain, Permission } from '@venom-cowork/types';
 ```
 
-## الهيكل
+## Structure
 
 ```
 src/
-├── domains/      # أنواع DOM-related
-├── server/       # أنواع server/API
-└── shared/       # أنواع مشتركة
+├── domains/      # DOM-related types
+├── server/       # Server/API types
+└── shared/       # Shared types
 ```
 
-## Domain Types
+## Domain types
 
-تحدد كيفية تمثيل DOM elements في VenomCowork:
+Define how DOM elements are represented in VenomCowork:
 
-- `Domain` - منطقة في DOM
-- `DomainElement` - عنصر domain
-- `DomainQuery` - استعلام domain
+- `Domain` — a region in the DOM
+- `DomainElement` — a domain element
+- `DomainQuery` — a domain query
 
-## Server Types
+## Server types
 
-تحدد شكل الاتصال بين renderer و server:
+Define communication between renderer and server:
 
-- `Session` - جلسة مستخدم
-- `Permission` - أذونات الملفات
-- `ServerMessage` - رسائل من الخادم
+- `Session` — user session
+- `Permission` — file permissions
+- `ServerMessage` — messages from the server
 
-## التطوير
+## Development
 
 ```bash
-# typecheck فقط
+# Typecheck only
 pnpm --filter @venom-cowork/types typecheck
 ```

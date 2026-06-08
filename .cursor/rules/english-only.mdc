@@ -1,0 +1,42 @@
+---
+description: English-only project — no Arabic in repo files or agent output
+alwaysApply: true
+---
+
+# English only
+
+This repository is **English-only**. Agents must never write Arabic anywhere in the project.
+
+## Required language
+
+- **All repo files**: English only — docs, comments, commit messages, PR descriptions, code strings, configs, and agent prompts checked into git.
+- **Agent chat in this workspace**: English only when discussing or changing project files.
+- **User-facing copy in source**: English in `en.ts` and default strings; use the i18n locale files for other languages, not inline Arabic.
+
+## When you find Arabic
+
+1. Translate it to clear English.
+2. Do not add new Arabic text “for the user’s convenience.”
+3. Do not mix Arabic and English in the same file.
+
+## Examples
+
+```markdown
+<!-- BAD -->
+# [Arabic heading — not allowed]
+
+<!-- GOOD -->
+# Development guide
+```
+
+```typescript
+// BAD — Arabic string literal
+const label = "<Arabic text>";
+
+// GOOD
+const label = "Save"; // or use t('save') from i18n
+```
+
+## Verification
+
+Run `node scripts/check-english-only.mjs` before pushing. CI runs this as part of `pnpm verify`.

@@ -32,6 +32,14 @@ To maximize merge speed, include evidence of the end-to-end flow:
 
 If you cannot run tests or capture the video, say so explicitly and explain why, and include the exact commands/steps for the reviewer to reproduce.
 
+## Language (Mandatory)
+
+- **English only** in every file committed to this repository.
+- Never write Arabic in docs, comments, strings, configs, prompts, or agent handoffs.
+- If you encounter Arabic text, translate it to English as part of the same change.
+- For localized UI copy, use the i18n locale files under `apps/app/src/i18n/locales/` — do not add Arabic inline in source.
+- Run `node scripts/check-english-only.mjs` (included in `pnpm verify`) to catch Arabic script in tracked files.
+
 ## Coding Guidelines
 
 ### TypeScript

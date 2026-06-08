@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "VENOMCOWORK_DEV_MODE=1 bun src/cli.ts",
     "test": "bun test",
+    "test:unit": "node ./script/run-unit-tests.mjs",
     "test:artifacts": "bun test src/artifact-files.e2e.test.ts src/workspace-init.test.ts src/server.normalizeWorkspaceRelativePath.test.ts",
     "build": "tsc -p tsconfig.json && bun build src/opencode-plugins/venomcowork-extensions-preview.ts src/opencode-plugins/venomcowork-capabilities-knowledge.ts --outdir dist/opencode-plugins --target node --format esm",
     "build:bin": "bun build --compile src/cli.ts --outfile dist/bin/venomcowork-server",

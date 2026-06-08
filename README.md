@@ -65,11 +65,11 @@ the directory and any `ee` references in `pnpm-workspace.yaml`.
 ```bash
 pnpm install
 
-# توليد الأيقونات المطلوبة
+# Generate required icons
 node scripts/generate-icons.mjs
 ```
 
-> **للمساهمة:** راجع [CONTRIBUTING.md](CONTRIBUTING.md) لدليل التطوير الكامل.
+> **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/local-dev.md](docs/local-dev.md) for local development.
 
 The install may take a few minutes — pnpm fetches Windows, macOS, and Linux
 native binaries for `node-pty`, `better-sqlite3`, and a few other packages.
